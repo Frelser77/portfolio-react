@@ -9,7 +9,7 @@ const Portfolio = () => {
 			try {
 				const response = await fetch("https://api.github.com/users/Frelser77/repos?per_page=100", {
 					headers: {
-						Authorization: `token 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`,
+						Authorization: `token ${import.meta.env.VITE_TOKEN}`,
 					},
 				});
 				if (!response.ok) {
@@ -42,14 +42,16 @@ const Portfolio = () => {
 		<div id="Portfolio">
 			<h4>Portfolio</h4>
 			<Container fluid>
-				<Row>
+				<Row className="g-2">
 					{repos.map((repo, index) => (
-						<Col key={index} sm={12} md={4} lg={6}>
-							<Card>
-								<Card.Body>
-									<Card.Title>{repo.name}</Card.Title>
-									<Card.Text>{repo.description || "No description"}</Card.Text>
-									<Card.Link href={repo.html_url} target="_blank">
+						<Col key={index} xs={12} lg={6}>
+							<Card className="border-0 my-bg h-100">
+								<Card.Body className="d-flex flex-column aling-items-start justify-content-between">
+									<div>
+										<Card.Title>{repo.name}</Card.Title>
+										<Card.Text>{repo.description || "No description"}</Card.Text>
+									</div>
+									<Card.Link href={repo.html_url} target="_blank" className="nav-link">
 										View on GitHub
 									</Card.Link>
 								</Card.Body>

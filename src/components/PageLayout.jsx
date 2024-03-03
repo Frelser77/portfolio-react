@@ -8,7 +8,7 @@ const PageLayout = () => {
 	return (
 		<Container>
 			<Row className="my-5">
-				<Col xs={12} className="my-2">
+				<Col xs={12} className="mt-2 mb-5">
 					<MainComponent />
 				</Col>
 				<Col xs={12} className="my-2">

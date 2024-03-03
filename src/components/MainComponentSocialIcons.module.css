@@ -1,0 +1,133 @@
+:root {
+	--facebook: black;
+	--twitter: black;
+	--linkedin: black;
+	--instagram: black;
+	--github: black;
+}
+
+.social {
+	width: 40px;
+	height: 40px;
+	background-color: #fff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 100%;
+	position: relative;
+	box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.5);
+	transition: 0.6s all cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.social:hover {
+	background-color: #52489c;
+	text-decoration-color: #fff;
+}
+
+.social:hover > i {
+	color: #fff;
+}
+.social span {
+	position: absolute;
+	color: #fff;
+	transform: translateY(0px);
+	font-size: 18px;
+	padding: 5px 10px;
+	border-radius: 5px;
+	visibility: hidden;
+	opacity: 0;
+	transition: 0.6s all cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	transition-delay: 0s;
+}
+
+.social span::before {
+	position: absolute;
+	content: "";
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid #fff;
+	bottom: -5px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.social.socialGitHub span {
+	background-color: var(--github);
+}
+
+.social.socialGitHub span::before {
+	border-top-color: var(--github);
+}
+
+.social .socialFacebook span {
+	background-color: var(--facebook);
+}
+
+.social .socialFacebook span::before {
+	border-top-color: var(--facebook);
+}
+
+.social .socialTwitter span {
+	background-color: var(--twitter);
+}
+
+.social .socialTwitter span::before {
+	border-top-color: var(--twitter);
+}
+
+.social.socialLinkedin span {
+	background-color: var(--linkedin);
+}
+
+.social.socialLinkedin span::before {
+	border-top-color: var(--linkedin);
+}
+
+.social .socialInstagram span {
+	background-color: var(--instagram);
+}
+
+.social .socialInstagram span::before {
+	border-top-color: var(--instagram);
+}
+
+.social.active,
+.social:hover {
+	box-shadow: -20px 20px 30px rgba(0, 0, 0, 0.5);
+}
+
+.social.github:hover {
+	background-color: var(--github);
+}
+
+.social.facebook:hover {
+	background-color: var(--facebook);
+}
+
+.social.twitter:hover {
+	background-color: var(--twitter);
+}
+
+.social .socialLinkedin:hover {
+	background-color: var(--linkedin);
+}
+
+.social .instagram.active,
+.social .instagram:hover {
+	background-color: var(--instagram);
+}
+
+.social.active span,
+.social:hover span {
+	transform: translateY(-80px);
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0.3s;
+}
+
+.social.active svg path,
+.social.active svg circle,
+.social:hover svg path,
+.social:hover svg circle {
+	fill: #fff;
+}
