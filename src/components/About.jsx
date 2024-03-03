@@ -30,7 +30,7 @@ const images = [
 
 const About = () => {
 	return (
-		<div id="About" className="about-container">
+		<div id="About" className="about-container mx-auto">
 			<div className="about-content">
 				<h1>About me</h1>
 				<Card className="border-0">
@@ -47,10 +47,12 @@ const About = () => {
 						</p>
 					</CardBody>
 				</Card>
-				<Row xs={1} md={3} lg={6} className="g-5 py-3 my-1">
+				<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto">
 					{images.map((imgSrc, index) => (
 						<Col key={index}>
-							<Image src={imgSrc} alt="Technology icon" fluid className="tec-icon" />
+							<div className="ms-2">
+								<Image src={imgSrc} alt="Technology icon" fluid className="tec-icon" />
+							</div>
 						</Col>
 					))}
 				</Row>

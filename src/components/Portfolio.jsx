@@ -39,19 +39,21 @@ const Portfolio = () => {
 	}, []);
 
 	return (
-		<div id="Portfolio">
-			<h4>Portfolio</h4>
+		<div id="Portfolio" className="mt-2">
 			<Container fluid>
 				<Row className="g-2">
 					{repos.map((repo, index) => (
 						<Col key={index} xs={12} lg={6}>
-							<Card className="border-0 my-bg h-100">
+							<Card className="border-0 my-bg h-100 position-relative">
+								<div className="position-absolute pstn-archiv">
+									<i className="bx bx-archive"></i>
+								</div>
 								<Card.Body className="d-flex flex-column aling-items-start justify-content-between">
 									<div>
-										<Card.Title>{repo.name}</Card.Title>
-										<Card.Text>{repo.description || "No description"}</Card.Text>
+										<Card.Title className="fs-4">{repo.name}</Card.Title>
+										<Card.Text className="fs-6">{repo.description || "No description"}</Card.Text>
 									</div>
-									<Card.Link href={repo.html_url} target="_blank" className="nav-link">
+									<Card.Link href={repo.html_url} target="_blank" className="nav-link link-hvr">
 										View on GitHub
 									</Card.Link>
 								</Card.Body>

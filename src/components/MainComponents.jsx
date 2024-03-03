@@ -8,7 +8,7 @@ const MainComponent = () => {
 			<div className="main">
 				<div className="detail">
 					<div className="detail">
-						<h3>Hi, I'm</h3>
+						<h3 className="h3">Hi, I'm</h3>
 						<h1>
 							<span style={{ color: "#52489C" }}>Salvatore</span> <span className="surname"> D'Amico </span>
 						</h1>

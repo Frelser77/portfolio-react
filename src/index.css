@@ -14,6 +14,10 @@
 	scroll-behavior: smooth;
 }
 
+.card {
+	border: 1px solid transparent !important;
+}
+
 .img-w {
 	width: 100%;
 	height: auto;
@@ -42,7 +46,6 @@ nav {
 /* Section 1 */
 
 .main {
-	padding: 6rem 0;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(277px, 1fr));
 	row-gap: 2rem;
@@ -120,6 +123,7 @@ nav {
 label {
 	cursor: pointer;
 }
+
 .dark-mode {
 	background-color: var(--primary-dark);
 	color: #ffffff;
@@ -221,7 +225,6 @@ label {
 
 	.main h3 {
 		color: #000;
-		margin-top: 1rem;
 	}
 }
 
@@ -274,9 +277,10 @@ label {
 
 	.mode {
 		position: absolute;
-		top: 11rem;
-		right: 3rem;
+		top: 1rem;
+		right: 11.5rem;
 	}
+
 	.images {
 		width: 100%;
 		margin: auto;
@@ -287,11 +291,19 @@ label {
 	}
 }
 
+.dark-mode .h3 {
+	color: #fff;
+}
+
 .dark-mode .nav-link {
 	color: #fff; /* Cambia colore link */
 }
 
 .dark-mode .surname {
+	color: #fff;
+}
+
+.dark-mode .navbar-toggler {
 	color: #fff;
 }
 
@@ -344,4 +356,68 @@ label {
 		width: 100%;
 		height: auto;
 	}
+}
+
+.pstn-archiv {
+	right: 18px;
+	top: 18px;
+}
+.link-hvr {
+	color: #212529bf;
+}
+
+.link-hvr:hover {
+	color: #000;
+}
+
+.detail .bx {
+	scale: 1.25;
+}
+
+.social-icons .bx {
+	scale: 1.7;
+	transition: transform 0.3s ease;
+}
+
+.bx-x {
+	transform: rotate(45deg); /* O un angolo che preferisci per la "X" */
+}
+
+.ftr-lnk {
+	text-decoration: none;
+}
+
+/* button submit */
+
+.btn-hover {
+	width: 120px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #fff;
+	cursor: pointer;
+	margin: 20px;
+	height: 40px;
+	text-align: center;
+	border: none;
+	background-size: 300% 100%;
+	border-radius: 50px;
+	-o-transition: all 0.4s ease-in-out;
+	-webkit-transition: all 0.4s ease-in-out;
+	transition: all 0.4s ease-in-out;
+}
+
+.btn-hover:hover {
+	background-position: 100% 0;
+	-o-transition: all 0.4s ease-in-out;
+	-webkit-transition: all 0.4s ease-in-out;
+	transition: all 0.4s ease-in-out;
+}
+
+.btn-hover:focus {
+	outline: none;
+}
+
+.btn-hover.bn20 {
+	background-image: linear-gradient(to right, #667eea, #764ba2, #6b8dd6, #8e37d7);
+	box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.75);
 }
