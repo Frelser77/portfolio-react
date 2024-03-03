@@ -10,7 +10,7 @@ const MainComponent = () => {
 					<div className="detail">
 						<h3>Hi, I'm</h3>
 						<h1>
-							<span style={{ color: "#52489C" }}>Salvatore</span> D'Amico
+							<span style={{ color: "#52489C" }}>Salvatore</span> <span className="surname"> D'Amico </span>
 						</h1>
 						<p>
 							As a Junior Web Developer, I'm very excited to start my journey in this fantastic world of web
