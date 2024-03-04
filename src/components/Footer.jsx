@@ -1,61 +1,88 @@
-import React, { useState } from "react";
-import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Alert, Spinner } from "react-bootstrap";
 import "boxicons";
 import emailjs from "emailjs-com";
+import { useState } from "react";
 
 const Footer = () => {
 	const year = new Date().getFullYear();
 	const [fromName, setFromName] = useState("");
+	const [fromEmail, setFromEmail] = useState("");
 	const [message, setMessage] = useState("");
-	const [showError, setShowError] = useState(false);
+	const [alertInfo, setAlertInfo] = useState({ show: false, message: "", variant: "" });
+	const [isSubmitting, setIsSubmitting] = useState(false); // Nuovo stato per gestire l'invio
 	const maxLength = 500;
 	const charactersLeft = maxLength - message.length;
 
 	const handleInputChange = (e) => {
-		if (e.target.value.length <= maxLength) {
-			setMessage(e.target.value);
-		} else {
-			setShowError(true);
+		const { name, value } = e.target;
+
+		if (name === "from_name") {
+			setFromName(value);
+		} else if (name === "from_email") {
+			setFromEmail(value);
+		} else if (name === "message") {
+			if (value.length <= maxLength) {
+				setMessage(value);
+				if (alertInfo.show) {
+					setAlertInfo({ ...alertInfo, show: false });
+				}
+			}
 		}
 	};
 
-	const sendEmail = (e) => {
+	const handleTouchEnd = (e) => {
 		e.preventDefault();
-		setShowError(false);
+		if (!isSubmitting) {
+			sendEmail(e);
+		}
+	};
+
+	const sendEmail = async (e) => {
+		e.preventDefault();
+		setIsSubmitting(true);
 
 		if (!e.target.checkValidity()) {
-			// Se il form non è valido, mostra il messaggio di errore
-			setShowError(true);
-			return; // Non procedere con l'invio dell'email
+			setAlertInfo({ show: true, message: "Please fill in all required fields.", variant: "danger" });
+			setIsSubmitting(false);
+			return;
 		}
 
-		emailjs
-			.sendForm(
+		try {
+			const result = await emailjs.sendForm(
 				import.meta.env.VITE_SERVICE_ID,
 				import.meta.env.VITE_TEMPLATE_ID,
 				e.target,
 				import.meta.env.VITE_USER_ID
-			)
-			.then(
-				(result) => {
-					console.log(result.text);
-					// Reset dei campi del form dopo l'invio
-					setFromName("");
-					setMessage("");
-					// Aggiungi qui altre azioni post-invio, come mostrare un messaggio di successo
-					alert("Success!");
-				},
-				(error) => {
-					console.log(error.text);
-					alert("Error!");
-					// Gestisci l'errore
-				}
 			);
+			console.log(result.text);
+			setAlertInfo({ show: true, message: "Email sent successfully!", variant: "success" });
+			setFromName("");
+			setFromEmail("");
+			setMessage("");
+		} catch (error) {
+			console.log(error.text);
+			setAlertInfo({ show: true, message: "Failed to send email. Please try again.", variant: "danger" });
+		}
+		setIsSubmitting(false); // Completa l'invio
+		setTimeout(() => setAlertInfo((current) => ({ ...current, show: false })), 5000);
 	};
 
 	return (
 		<footer id="Contact" className="text-center p-4">
 			<Container>
+				<Row>
+					{alertInfo.show && (
+						<Col>
+							<Alert
+								variant={alertInfo.variant}
+								onClose={() => setAlertInfo({ ...alertInfo, show: false })}
+								dismissible
+							>
+								{alertInfo.message}
+							</Alert>
+						</Col>
+					)}
+				</Row>
 				<Row>
 					<Col className="social-icons mb-3">
 						<a
@@ -79,9 +106,8 @@ const Footer = () => {
 				</Row>
 				<Row>
 					<Col xs={12} md={{ span: 6, offset: 3 }}>
-						{showError && <Alert variant="danger">Please fill in all required fields.</Alert>}
-						<span>Write your name and a message to send me a email</span>
-						<Form onSubmit={sendEmail}>
+						<span>..and don’t forget to leave your contact</span>
+						<Form onSubmit={sendEmail} noValidate>
 							<Form.Group className="mb-3" controlId="fromName">
 								<Form.Label>Your Name</Form.Label>
 								<Form.Control
@@ -90,13 +116,26 @@ const Footer = () => {
 									value={fromName}
 									onChange={handleInputChange}
 									required
-									title="Please enter your name."
+									placeholder="Enter your name"
 									className="name mx-auto"
 								/>
 							</Form.Group>
+							<Form.Group className="mb-3" controlId="fromEmail">
+								<Form.Label>Email address</Form.Label>
+								<Form.Control
+									type="email"
+									name="from_email"
+									value={fromEmail}
+									onChange={handleInputChange}
+									required
+									placeholder="Enter your email"
+								/>
+							</Form.Group>
+
 							<Form.Group className="mb-3" controlId="toName">
 								<Form.Control type="hidden" name="to_name" defaultValue={"Salvatore"} />
 							</Form.Group>
+
 							<Form.Group className="mb-3 position-relative" controlId="message">
 								<Form.Label>Message</Form.Label>
 								<Form.Control
@@ -104,25 +143,37 @@ const Footer = () => {
 									rows={3}
 									name="message"
 									value={message}
-									title="Please write something to be able to send an email."
 									onChange={handleInputChange}
 									maxLength={maxLength}
 									required
+									placeholder="Write your message here"
 								/>
-								<span className="text-muted position-absolute chart">{charactersLeft}</span>
+								<Form.Text className="chart position-absolute">{charactersLeft}</Form.Text>
 							</Form.Group>
-							<Button variant="primary" type="submit" className="btn-hover bn20">
-								Submit
+							<Button
+								variant="primary"
+								type="submit"
+								disabled={isSubmitting}
+								onTouchEnd={handleTouchEnd}
+								className="btn-hover bn20"
+							>
+								{isSubmitting ? (
+									<>
+										<Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+										<span className="ms-2">Sending...</span>
+									</>
+								) : (
+									"Submit"
+								)}
 							</Button>
 						</Form>
 					</Col>
 				</Row>
 				<Row>
-					<Col className="mt-3">{`© ${year} Salvatore D'Amico / Frelser77. All rights reserved.`}</Col>
+					<Col className="mt-3">{`© ${year} Your Name. All rights reserved.`}</Col>
 				</Row>
 			</Container>
 		</footer>
 	);
 };
-
 export default Footer;

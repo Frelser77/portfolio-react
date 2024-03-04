@@ -1,6 +1,6 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
-import { Container, Col, Row, Image } from "react-bootstrap";
+import { Col, Row, Image } from "react-bootstrap";
 import { motion } from "framer-motion";
 import html5Icon from "/img/html5_icon.png";
 import css3Icon from "/img/css3_icon.png";

@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import { DarkModeProvider } from "../src/context/DarkModeContext";
 import MyNavbar from "./components/NavBar";

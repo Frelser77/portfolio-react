@@ -1,30 +1,27 @@
-import React from "react";
 module.exports = {
+	root: true,
 	env: {
 		browser: true,
 		es2021: true,
 	},
-	extends: ["eslint:recommended", "plugin:react/recommended"],
-	settings: {
-		react: {
-			version: "detect",
-		},
-	},
-	overrides: [
-		{
-			env: {
-				node: true,
-			},
-			files: [".eslintrc.{js,cjs}"],
-			parserOptions: {
-				sourceType: "script",
-			},
-		},
+	extends: [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:react/jsx-runtime",
+		"plugin:react-hooks/recommended",
 	],
+	ignorePatterns: ["dist", ".eslintrc.cjs"],
 	parserOptions: {
-		ecmaVersion: "latest",
+		ecmaVersion: "2021",
 		sourceType: "module",
 	},
-	plugins: ["react"],
-	rules: {},
+	settings: {
+		react: {
+			version: "18.2",
+		},
+	},
+	plugins: ["react-refresh"],
+	rules: {
+		"react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+	},
 };

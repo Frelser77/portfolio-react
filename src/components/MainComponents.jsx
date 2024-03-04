@@ -1,4 +1,3 @@
-import React from "react";
 import "boxicons";
 import styles from "./MainComponentSocialIcons.module.css";
 
@@ -22,7 +21,7 @@ const MainComponent = () => {
 							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
 							style={{ "--socialAni": "1" }}
 							target="_blank"
-							className={styles.socialLinkedin + " " + styles.social}
+							className={styles.socialLinkedin + " " + styles.social + " " + "social socialLinkedin"}
 							rel="noreferrer"
 							title="Link to my LinkedIn profile"
 						>
@@ -33,7 +32,7 @@ const MainComponent = () => {
 							href="https://github.com/Frelser77"
 							style={{ "--socialAni": "3" }}
 							target="_blank"
-							className={styles.socialGitHub + " " + styles.social}
+							className={styles.socialGitHub + " " + styles.social + " " + "social socialGitHub"}
 							rel="noreferrer"
 							title="Link to my GitHub profile"
 						>

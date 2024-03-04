@@ -344,6 +344,24 @@ label {
 	background-color: #1f252e;
 }
 
+.dark-mode .social:hover,
+.dark-mode .social.active,
+.dark-mode .social:active,
+.dark-mode .social:focus-within,
+.dark-mode .social:focus {
+	box-shadow: -15px 15px 30px rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .social.socialLinkedin span {
+	color: black;
+	background-color: white;
+}
+
+.dark-mode .social.socialGitHub span {
+	color: black;
+	background-color: white;
+}
+
 .form-control.name {
 	width: 250px;
 }

@@ -91,9 +91,12 @@
 	border-top-color: var(--instagram);
 }
 
+.social:hover,
 .social.active,
-.social:hover {
-	box-shadow: -20px 20px 30px rgba(0, 0, 0, 0.5);
+.social:active,
+.social:focus-within,
+.social:focus {
+	box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.5);
 }
 
 .social.github:hover {
