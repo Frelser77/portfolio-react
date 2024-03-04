@@ -15,7 +15,7 @@ const MyNavbar = () => {
 	return (
 		<Navbar expand="lg" expanded={expanded} className="">
 			<Container>
-				<Navbar.Brand href="#">
+				<Navbar.Brand href="/">
 					<img
 						src="../../img/Logo_BW_sm.png"
 						alt="Il mio logo personalizzato, con l'icona del coding e le lettere F e R e il numero 7, che sta per Frelser7"
