@@ -231,6 +231,7 @@ label {
 @media screen and (max-width: 768px) {
 	.container {
 		padding: 0 1.6rem;
+		overflow-x: hidden;
 	}
 }
 
