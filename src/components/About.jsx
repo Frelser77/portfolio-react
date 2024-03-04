@@ -1,32 +1,5 @@
-import React from "react";
-import { Card, CardBody, Row, Col, Image } from "react-bootstrap";
-import bootstrapIcon from "/img/bootstrap_icon.png";
-import css3Icon from "/img/css3_icon.png";
-import html5Icon from "/img/html5_icon.png";
-import jsIcon from "/img/js_icon.png";
-import reactNativeIcon from "/img/react_native_icon.png";
-import reduxIcon from "/img/redux_icon.png";
-import sassIcon from "/img/sass_icon.png";
-import csharpIcon from "/img/csharp.png";
-import aspnetIcon from "/img/aspnet.png";
-import aspnetmvcIcon from "/img/aspnetmvc.png";
-import sqlserverIcon from "/img/sqlserver.png";
-import sqlsmanIcon from "/img/sqlsman.png";
-
-const images = [
-	html5Icon,
-	css3Icon,
-	sassIcon,
-	bootstrapIcon,
-	jsIcon,
-	reactNativeIcon,
-	reduxIcon,
-	csharpIcon,
-	aspnetIcon,
-	aspnetmvcIcon,
-	sqlserverIcon,
-	sqlsmanIcon,
-];
+import React, { useContext, useEffect, useState } from "react";
+import { Card, CardBody, Row, Col } from "react-bootstrap";
 
 const About = () => {
 	return (
@@ -47,15 +20,6 @@ const About = () => {
 						</p>
 					</CardBody>
 				</Card>
-				<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto">
-					{images.map((imgSrc, index) => (
-						<Col key={index}>
-							<div className="ms-2">
-								<Image src={imgSrc} alt="Technology icon" fluid className="tec-icon" />
-							</div>
-						</Col>
-					))}
-				</Row>
 			</div>
 		</div>
 	);

@@ -291,6 +291,10 @@ label {
 	}
 }
 
+.dark-mode .card-link {
+	background-color: #2a333f96;
+}
+
 .dark-mode .h3 {
 	color: #fff;
 }
@@ -319,9 +323,29 @@ label {
 	color: #fff;
 }
 
+.dark-mode .form-control:focus {
+	border-color: #86b7fe;
+	outline: 0;
+	box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+}
+.dark-mode textarea.form-control {
+	color: white;
+	background-color: #1f252e;
+	min-height: calc(1.5em + 0.75rem + calc(var(--bs-border-width) * 2));
+}
+
+.dark-mode .form-control {
+	color: white;
+	background-color: #1f252e;
+}
+
+.form-control.name {
+	width: 250px;
+}
+
 .tec-icon {
-	height: 90px;
-	width: 100px;
+	height: 80px;
+	width: 90px;
 }
 
 .my-bg {
@@ -341,6 +365,7 @@ label {
 	border-radius: 5px;
 	padding: 0.5em 1em;
 	transition: background-color 0.3s ease-out;
+	margin-top: 10px;
 }
 
 .card-link:hover {
@@ -420,4 +445,11 @@ label {
 .btn-hover.bn20 {
 	background-image: linear-gradient(to right, #667eea, #764ba2, #6b8dd6, #8e37d7);
 	box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.75);
+}
+
+.chart {
+	color: rgb(173, 173, 173);
+	top: 30px;
+	right: 10px;
+	scale: 0.8;
 }

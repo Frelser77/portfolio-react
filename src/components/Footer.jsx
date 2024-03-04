@@ -73,12 +73,20 @@ const Footer = () => {
 						<Form onSubmit={sendEmail}>
 							<Form.Group className="mb-3" controlId="fromName">
 								<Form.Label>Your Name</Form.Label>
-								<Form.Control type="text" name="from_name" value={fromName} required title="Please enter your name." />
+								<Form.Control
+									type="text"
+									name="from_name"
+									value={fromName}
+									onChange={handleInputChange}
+									required
+									title="Please enter your name."
+									className="name mx-auto"
+								/>
 							</Form.Group>
 							<Form.Group className="mb-3" controlId="toName">
-								<Form.Control type="hidden" name="to_name" value="Salvatore" />
+								<Form.Control type="hidden" name="to_name" defaultValue={"Salvatore"} />
 							</Form.Group>
-							<Form.Group className="mb-3" controlId="message">
+							<Form.Group className="mb-3 position-relative" controlId="message">
 								<Form.Label>Message</Form.Label>
 								<Form.Control
 									as="textarea"
@@ -89,8 +97,9 @@ const Footer = () => {
 									onChange={handleInputChange}
 									maxLength={maxLength}
 									required
+									className=""
 								/>
-								<span className="text-light">Characters left: {charactersLeft}</span>
+								<span className="text-muted position-absolute chart">{charactersLeft}</span>
 							</Form.Group>
 							<Button variant="primary" type="submit" className="btn-hover bn20">
 								Submit

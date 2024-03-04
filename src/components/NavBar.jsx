@@ -1,26 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Navbar, Nav, Container, Form, FormControl } from "react-bootstrap";
 import "boxicons";
 import { Fade } from "react-awesome-reveal";
+import { DarkModeContext } from "../context/DarkModeContext"; // Assicurati che il percorso sia corretto
 
 const MyNavbar = () => {
-	const [darkMode, setDarkMode] = useState(false);
+	const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
 	const [expanded, setExpanded] = useState(false);
 
-	useEffect(() => {
-		const isDarkModeEnabled = localStorage.getItem("darkMode") === "enabled";
-		setDarkMode(isDarkModeEnabled);
-		document.body.className = isDarkModeEnabled ? "dark-mode" : "";
-	}, []);
-
-	const toggleDarkMode = () => {
-		const newState = !darkMode;
-		setDarkMode(newState);
-		localStorage.setItem("darkMode", newState ? "enabled" : "disabled");
-		document.body.className = newState ? "dark-mode" : "";
+	const toggleNavbar = () => {
+		setExpanded(!expanded);
 	};
-
-	const toggleNavbar = () => setExpanded(!expanded);
 
 	return (
 		<Navbar expand="lg" expanded={expanded} className="">
@@ -31,10 +21,11 @@ const MyNavbar = () => {
 				</Navbar.Toggle>
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="me-auto">
-						<Nav.Link href="#" className="active">
+						<Nav.Link href="/" className="active">
 							Home
 						</Nav.Link>
 						<Nav.Link href="#About">About</Nav.Link>
+						<Nav.Link href="#Skills">Skills</Nav.Link>
 						<Nav.Link href="#Portfolio">Portfolio</Nav.Link>
 						<Nav.Link href="#Contact">Contact</Nav.Link>
 					</Nav>

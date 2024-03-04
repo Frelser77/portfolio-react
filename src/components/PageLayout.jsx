@@ -1,29 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import MainComponent from "./MainComponents";
 import About from "./About";
 import Portfolio from "./Portfolio";
-import { Fade } from "react-awesome-reveal";
 import Footer from "./Footer";
+import AOS from "aos";
+import "aos/dist/aos.css"; // Importa il CSS di AOS
+import Skills from "./Skilss";
 
 const PageLayout = () => {
+	useEffect(() => {
+		AOS.init({
+			duration: 2000, // Puoi personalizzare la durata qui
+		});
+	}, []);
+
 	return (
 		<Container>
 			<Row className="mt-xs-1 mt-lg-4">
-				<Col xs={12} className="mb-5">
-					<Fade direction="right" triggerOnce>
-						<MainComponent />
-					</Fade>
+				<Col xs={12} className="mb-5" data-aos="fade-right">
+					<MainComponent />
 				</Col>
-				<Col xs={12} className="my-2">
-					<Fade direction="left" triggerOnce>
-						<About />
-					</Fade>
+				<Col xs={12} className="my-2" data-aos="fade-left">
+					<About />
 				</Col>
-				<Col xs={12} className="my-2">
-					<Fade direction="right" triggerOnce>
-						<Portfolio />
-					</Fade>
+				<Col xs={12} className="my-2" data-aos="fade-right">
+					<Skills />
+				</Col>
+				<Col xs={12} className="my-2" data-aos="fade-left">
+					<Portfolio />
 				</Col>
 				<Footer />
 			</Row>
