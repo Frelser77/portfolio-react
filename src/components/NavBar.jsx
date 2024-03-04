@@ -16,7 +16,11 @@ const MyNavbar = () => {
 		<Navbar expand="lg" expanded={expanded} className="">
 			<Container>
 				<Navbar.Brand href="#">
-					<img src="../../img/Logo_BW_sm.png" alt="" />
+					<img
+						src="../../img/Logo_BW_sm.png"
+						alt="Il mio logo personalizzato, con l'icona del coding e le lettere F e R e il numero 7, che sta per Frelser7"
+						className="logo"
+					/>
 				</Navbar.Brand>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" onClick={toggleNavbar} className="border-0">
 					<i className={`bx ${expanded ? "bx-x" : "bx-menu"}`} style={{ fontSize: "24px" }}></i>

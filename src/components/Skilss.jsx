@@ -77,7 +77,7 @@ const Skills = () => {
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
-							transition={{ duration: 1, delay: index * 0.2 }}
+							transition={{ duration: 1.5, delay: index * 0.2 }}
 						>
 							<Image src={imgSrc} alt="Technology icon" fluid className="tec-icon" />
 						</motion.div>

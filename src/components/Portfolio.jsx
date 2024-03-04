@@ -39,8 +39,11 @@ const Portfolio = () => {
 	}, []);
 
 	return (
-		<div id="Portfolio" className="mt-2">
+		<div className="mt-2">
 			<Container fluid>
+				<h4 id="Portfolio" className="text-center">
+					Portfolio
+				</h4>
 				<Row className="g-2">
 					{repos.map((repo, index) => (
 						<Col key={index} xs={12} lg={6}>
