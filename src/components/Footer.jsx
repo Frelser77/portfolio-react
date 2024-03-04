@@ -58,13 +58,20 @@ const Footer = () => {
 			<Container>
 				<Row>
 					<Col className="social-icons mb-3">
-						<a href="https://github.com/Frelser77" className="me-3" target="_blank" rel="noreferrer">
+						<a
+							href="https://github.com/Frelser77"
+							className="me-3"
+							target="_blank"
+							rel="noreferrer"
+							title="Link to my GitHub profile"
+						>
 							<i className="bx bxl-github"></i>
 						</a>
 						<a
 							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
 							target="_blank"
 							rel="noreferrer"
+							title="Link to my LinkedIn profile"
 						>
 							<i className="bx bxl-linkedin"></i>
 						</a>

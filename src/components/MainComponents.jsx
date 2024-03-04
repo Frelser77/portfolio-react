@@ -24,6 +24,7 @@ const MainComponent = () => {
 							target="_blank"
 							className={styles.socialLinkedin + " " + styles.social}
 							rel="noreferrer"
+							title="Link to my LinkedIn profile"
 						>
 							<span>Linkedin</span>
 							<i className="bx bxl-linkedin"></i>
@@ -34,6 +35,7 @@ const MainComponent = () => {
 							target="_blank"
 							className={styles.socialGitHub + " " + styles.social}
 							rel="noreferrer"
+							title="Link to my GitHub profile"
 						>
 							<span>GitHub</span>
 							<i className="bx bxl-github"></i>

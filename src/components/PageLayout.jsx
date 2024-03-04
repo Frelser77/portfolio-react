@@ -17,7 +17,7 @@ const PageLayout = () => {
 
 	return (
 		<Container>
-			<Row className="mt-xs-1 mt-lg-4">
+			<Row className="mt-xs-1 mt-lg-4 ms-auto">
 				<Col xs={12} className="mb-5" data-aos="fade-right">
 					<MainComponent />
 				</Col>
