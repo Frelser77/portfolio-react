@@ -12,12 +12,19 @@ const Footer = () => {
 	const charactersLeft = maxLength - message.length;
 
 	const handleInputChange = (e) => {
-		if (e.target.value.length <= maxLength) {
-			setMessage(e.target.value);
-		} else {
-			setShowError(true);
-		}
-	};
+  const { name, value } = e.target;
+
+  if (name === "from_name") {
+    setFromName(value);
+  } else if (name === "message") {
+    if (value.length <= maxLength) {
+      setMessage(value);
+      setShowError(false);
+    } else {
+      setShowError(true);
+    }
+  }
+};
 
 	const sendEmail = (e) => {
 		e.preventDefault();
