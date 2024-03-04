@@ -41,7 +41,7 @@ const Portfolio = () => {
 	return (
 		<div className="mt-2">
 			<Container fluid>
-				<h4 id="Portfolio" className="text-center">
+				<h4 id="Portfolio" className="text-center mt-2 mb-3">
 					Portfolio
 				</h4>
 				<Row className="g-2">

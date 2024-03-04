@@ -5,13 +5,13 @@ import About from "./About";
 import Portfolio from "./Portfolio";
 import Footer from "./Footer";
 import AOS from "aos";
-import "aos/dist/aos.css"; // Importa il CSS di AOS
+import "aos/dist/aos.css";
 import Skills from "./Skilss";
 
 const PageLayout = () => {
 	useEffect(() => {
 		AOS.init({
-			duration: 2000, // Puoi personalizzare la durata qui
+			duration: 2000,
 		});
 	}, []);
 

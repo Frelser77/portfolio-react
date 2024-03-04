@@ -8,13 +8,12 @@ const MainComponent = () => {
 			<div className="main">
 				<div className="detail">
 					<div className="detail">
-						<h3 className="h3">Hi, I'm</h3>
+						<h3 className="h3">{`Hi, I'm`}</h3>
 						<h1>
-							<span style={{ color: "#7163d4" }}>Salvatore</span> <span className="surname"> D'Amico </span>
+							<span style={{ color: "#7163d4" }}>Salvatore</span> <span className="surname">{` D'Amico `}</span>
 						</h1>
 						<p>
-							As a Junior Web Developer, I'm very excited to start my journey in this fantastic world of web
-							development.
+							{`As a Junior Web Developer, I'm very excited to start my journey in this fantastic world of web development.`}
 						</p>
 					</div>
 
@@ -24,6 +23,7 @@ const MainComponent = () => {
 							style={{ "--socialAni": "1" }}
 							target="_blank"
 							className={styles.socialLinkedin + " " + styles.social}
+							rel="noreferrer"
 						>
 							<span>Linkedin</span>
 							<i className="bx bxl-linkedin"></i>
@@ -33,6 +33,7 @@ const MainComponent = () => {
 							style={{ "--socialAni": "3" }}
 							target="_blank"
 							className={styles.socialGitHub + " " + styles.social}
+							rel="noreferrer"
 						>
 							<span>GitHub</span>
 							<i className="bx bxl-github"></i>

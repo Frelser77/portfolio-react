@@ -58,10 +58,14 @@ const Footer = () => {
 			<Container>
 				<Row>
 					<Col className="social-icons mb-3">
-						<a href="https://github.com/Frelser77" className="me-3" target="_blank">
+						<a href="https://github.com/Frelser77" className="me-3" target="_blank" rel="noreferrer">
 							<i className="bx bxl-github"></i>
 						</a>
-						<a href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/" target="_blank">
+						<a
+							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
+							target="_blank"
+							rel="noreferrer"
+						>
 							<i className="bx bxl-linkedin"></i>
 						</a>
 					</Col>
@@ -69,7 +73,7 @@ const Footer = () => {
 				<Row>
 					<Col xs={12} md={{ span: 6, offset: 3 }}>
 						{showError && <Alert variant="danger">Please fill in all required fields.</Alert>}
-						<span className="">Write your name and a message to send me a email</span>
+						<span>Write your name and a message to send me a email</span>
 						<Form onSubmit={sendEmail}>
 							<Form.Group className="mb-3" controlId="fromName">
 								<Form.Label>Your Name</Form.Label>
@@ -97,7 +101,6 @@ const Footer = () => {
 									onChange={handleInputChange}
 									maxLength={maxLength}
 									required
-									className=""
 								/>
 								<span className="text-muted position-absolute chart">{charactersLeft}</span>
 							</Form.Group>
@@ -108,7 +111,7 @@ const Footer = () => {
 					</Col>
 				</Row>
 				<Row>
-					<Col className="mt-3">© {year} Salvatore D'Amico / Frelser77. All rights reserved.</Col>
+					<Col className="mt-3">{`© ${year} Salvatore D'Amico / Frelser77. All rights reserved.`}</Col>
 				</Row>
 			</Container>
 		</footer>

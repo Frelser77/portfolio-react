@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Card, CardBody, Row, Col } from "react-bootstrap";
+import React from "react";
+import { Card, CardBody } from "react-bootstrap";
 
 const About = () => {
 	return (

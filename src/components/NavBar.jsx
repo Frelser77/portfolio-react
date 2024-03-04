@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Navbar, Nav, Container, Form, FormControl } from "react-bootstrap";
 import "boxicons";
 import { Fade } from "react-awesome-reveal";

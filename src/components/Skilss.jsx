@@ -67,7 +67,7 @@ const Skills = () => {
 	// Decidi quale array di icone usare in base al valore di darkMode
 	const images = darkMode ? imagesLight : imagesDark;
 	return (
-		<Container>
+		<>
 			<h4 id="Skills" className="text-center">
 				My Skills
 			</h4>
@@ -84,7 +84,7 @@ const Skills = () => {
 					</Col>
 				))}
 			</Row>
-		</Container>
+		</>
 	);
 };
 
