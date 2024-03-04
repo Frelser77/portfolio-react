@@ -15,7 +15,9 @@ const MyNavbar = () => {
 	return (
 		<Navbar expand="lg" expanded={expanded} className="">
 			<Container>
-				<Navbar.Brand href="#">Logo</Navbar.Brand>
+				<Navbar.Brand href="#">
+					<img src="../../img/Logo_BW_sm.png" alt="" />
+				</Navbar.Brand>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" onClick={toggleNavbar} className="border-0">
 					<i className={`bx ${expanded ? "bx-x" : "bx-menu"}`} style={{ fontSize: "24px" }}></i>
 				</Navbar.Toggle>
