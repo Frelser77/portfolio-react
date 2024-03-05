@@ -4,6 +4,9 @@
 :root {
 	--primary-color: #7163d4;
 	--primary-dark: #1f252e;
+}
+
+html {
 	overflow-x: hidden;
 }
 

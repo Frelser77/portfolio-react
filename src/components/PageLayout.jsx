@@ -21,7 +21,7 @@ const PageLayout = () => {
 			<ScrollToTopButton />
 
 			<Container>
-				<Row className="mt-1 mt-lg-4 ms-auto">
+				<Row className="mt-1 mt-lg-4">
 					<Col xs={12} className="mb-5" data-aos="fade-right">
 						<MainComponent />
 					</Col>
