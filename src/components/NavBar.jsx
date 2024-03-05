@@ -39,7 +39,7 @@ const MyNavbar = () => {
 						<FormControl type="checkbox" id="darkModeToggle" checked={darkMode} onChange={toggleDarkMode} />
 						<label htmlFor="darkModeToggle" className="mode">
 							<Fade direction="right" delay={400}>
-								<i className="bx bxs-moon"></i>
+								<i className={`bx ${darkMode ? "bxs-moon" : "bxs-sun"}`}></i>
 							</Fade>
 						</label>
 					</Form>
