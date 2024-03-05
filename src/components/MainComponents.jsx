@@ -16,7 +16,7 @@ const MainComponent = () => {
 						</p>
 					</div>
 
-					<div className="d-flex align-items-center gap-4">
+					<div className="d-flex align-items-center custom-justify-xs-center gap-4">
 						<a
 							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
 							style={{ "--socialAni": "1" }}

@@ -6,6 +6,7 @@
 	--primary-dark: #1f252e;
 }
 
+body,
 html {
 	overflow-x: hidden;
 }
@@ -26,7 +27,10 @@ html {
 }
 
 .img-w {
-	width: 100%;
+	right: 25px;
+	position: absolute;
+	bottom: 0;
+	width: 87%;
 	height: auto;
 	transition: transform 0.6s ease-in-out;
 	-webkit-transition: -webkit-transform 0.6s ease-in-out;
@@ -114,8 +118,8 @@ nav {
 
 .images {
 	margin-left: auto;
-	width: 350px;
-	height: 350px;
+	width: 300px;
+	height: 300px;
 	text-align: center;
 	overflow: hidden;
 	background-color: #52489c;
@@ -235,18 +239,25 @@ label {
 }
 
 @media screen and (max-width: 1024px) {
-	.container {
+	/*.container {
 		padding: 0 4.4rem;
 	}
-
+*/
 	.main h3 {
 		color: #000;
 	}
 }
 
 @media screen and (max-width: 768px) {
-	.container {
-		padding: 0 1.6rem;
+	.images {
+		margin-inline: auto;
+	}
+}
+
+@media (max-width: 575.98px) {
+	.custom-justify-xs-center {
+		display: flex;
+		justify-content: center;
 	}
 }
 
@@ -298,8 +309,8 @@ label {
 	}
 
 	.images {
-		width: 100%;
-		margin: auto;
+		width: 342px;
+		height: 365px;
 	}
 
 	.main {
@@ -410,10 +421,10 @@ label {
 
 @media (max-width: 576px) {
 	.img-w {
-		right: 5px;
+		right: 25px;
 		position: absolute;
 		bottom: 0;
-		width: 100%;
+		width: 87%;
 		height: auto;
 	}
 }
