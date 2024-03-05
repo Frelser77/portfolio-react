@@ -107,7 +107,7 @@ const Footer = () => {
 				<Row>
 					<Col xs={12} md={{ span: 6, offset: 3 }}>
 						<span>..and don’t forget to leave your contact</span>
-						<Form onSubmit={sendEmail} noValidate>
+						<Form onSubmit={sendEmail}>
 							<Form.Group className="mb-3" controlId="fromName">
 								<Form.Label>Your Name</Form.Label>
 								<Form.Control
@@ -170,7 +170,7 @@ const Footer = () => {
 					</Col>
 				</Row>
 				<Row>
-					<Col className="mt-3">{`© ${year} Your Name. All rights reserved.`}</Col>
+					<Col className="mt-3">{`© ${year} D'Amico Salvatore || Frelser7. All rights reserved.`}</Col>
 				</Row>
 			</Container>
 		</footer>
