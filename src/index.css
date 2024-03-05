@@ -2,16 +2,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Roboto:wght@100;300;400&display=swap");
 
 :root {
-	/* --primary-color: #f9532d; */
-	/* --primary-dark: #1F252E; */
-	--primary-color: #52489c;
+	--primary-color: #7163d4;
 	--primary-dark: #1f252e;
+	overflow-x: hidden;
 }
 
 *,
 *:before,
 *:after {
 	scroll-behavior: smooth;
+	-webkit-scroll-behavior: smooth;
 }
 
 .logo {
@@ -26,19 +26,23 @@
 	width: 100%;
 	height: auto;
 	transition: transform 0.6s ease-in-out;
+	-webkit-transition: -webkit-transform 0.6s ease-in-out;
 }
 
 .img-w:hover {
 	transform: scale(1.05);
+	-webkit-transform: scale(1.05);
 }
 
 .images {
 	position: relative;
 	transition: transform 0.3s ease-in-out;
+	-webkit-transition: -webkit-transform 0.3s ease-in-out;
 }
 
 .images:hover {
 	transform: scale(0.95);
+	-webkit-transform: scale(0.95);
 }
 /* Nav */
 nav {
@@ -57,27 +61,19 @@ nav {
 	align-items: center;
 }
 
-.main h3 {
-	color: #000;
-	font-size: 1.5rem;
+.main h3,
+.main h1,
+.main p {
 	opacity: 0;
+	-webkit-animation: topSideAni 1s ease forwards;
 	animation: topSideAni 1s ease forwards;
 }
 
 .main h1 {
-	color: #000;
-	font-size: 4rem;
-	font-weight: 600;
-	opacity: 0;
-	animation: leftSideAni 1s ease forwards;
 	animation-delay: 1s;
+	-webkit-animation-delay: 1s;
 }
-.main p {
-	line-height: 1.7;
-	font-size: 1.15rem;
-	opacity: 0;
-	animation: topSideAni 1.5s ease forwards;
-}
+
 .social {
 	display: flex;
 	flex-wrap: wrap;
@@ -87,6 +83,7 @@ nav {
 
 .social a {
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+	-webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	display: grid;
 	place-items: center;
 	text-decoration: none;
@@ -99,7 +96,9 @@ nav {
 	text-align: center;
 	opacity: 0;
 	animation: SocialAni 1s ease forwards;
+	-webkit-animation: SocialAni 1s ease forwards;
 	animation-delay: calc(0.2s * var(--socialAni));
+	-webkit-animation-delay: calc(0.2s * var(--socialAni));
 }
 
 .social a:hover {
@@ -107,6 +106,7 @@ nav {
 	background-color: var(--primary-color);
 	box-shadow: 0 0 20px var(--primary-color);
 	transition: all 0.3s ease-in-out;
+	-webkit-transition: all 0.3s ease-in-out;
 }
 
 .images {
@@ -117,8 +117,8 @@ nav {
 	overflow: hidden;
 	background-color: #52489c;
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+	-webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
-
 /* Section 1 End */
 #darkModeToggle {
 	display: none;
@@ -198,27 +198,36 @@ label {
 	}
 }
 
-/* @keyframes ImgAni {
-    0% {
-        transform: translateX(0);
-    }
-    50% {
-        transform: translateX(-9px);
-    }
-    100% {
-        transform: translateX(0);
-    }
-} */
-
-@keyframes imageAni {
+@-webkit-keyframes leftSideAni {
 	0% {
+		-webkit-transform: translateX(-100px);
 		opacity: 0;
-		transform: scale(0);
 	}
-
 	100% {
+		-webkit-transform: translateX(0);
 		opacity: 1;
-		transform: scale(1);
+	}
+}
+
+@-webkit-keyframes topSideAni {
+	0% {
+		-webkit-transform: translateY(-100px);
+		opacity: 0;
+	}
+	100% {
+		-webkit-transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@-webkit-keyframes SocialAni {
+	0% {
+		-webkit-transform: translateY(100px);
+		opacity: 0;
+	}
+	100% {
+		-webkit-transform: translateY(0);
+		opacity: 1;
 	}
 }
 
@@ -235,7 +244,6 @@ label {
 @media screen and (max-width: 768px) {
 	.container {
 		padding: 0 1.6rem;
-		overflow-x: hidden;
 	}
 }
 
@@ -295,7 +303,6 @@ label {
 		margin-top: 2rem;
 	}
 }
-
 .dark-mode .card-link {
 	background-color: #2a333f96;
 }
@@ -331,6 +338,7 @@ label {
 .dark-mode .form-control:focus {
 	border-color: #86b7fe;
 	outline: 0;
+	-webkit-box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
 	box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
 }
 .dark-mode textarea.form-control {
@@ -344,19 +352,20 @@ label {
 	background-color: #1f252e;
 }
 
+.dark-mode .social {
+	background-color: #151b23;
+}
+
 .dark-mode .social:hover,
 .dark-mode .social.active,
 .dark-mode .social:active,
 .dark-mode .social:focus-within,
 .dark-mode .social:focus {
-	box-shadow: -15px 15px 30px rgba(255, 255, 255, 0.2);
+	-webkit-box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.2);
+	box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.2);
 }
 
-.dark-mode .social.socialLinkedin span {
-	color: black;
-	background-color: white;
-}
-
+.dark-mode .social.socialLinkedin span,
 .dark-mode .social.socialGitHub span {
 	color: black;
 	background-color: white;
@@ -372,6 +381,7 @@ label {
 }
 
 .my-bg {
+	-webkit-transition: all 0.25s ease-in-out;
 	transition: all 0.25s ease-in-out;
 }
 
@@ -380,13 +390,13 @@ label {
 	border-radius: 0;
 }
 
-/* POTRFOLIO CARD TEXT */
 .card-link {
 	color: #000;
 	text-decoration: none;
 	background-color: rgba(255, 255, 255, 0.2);
 	border-radius: 5px;
 	padding: 0.5em 1em;
+	-webkit-transition: background-color 0.3s ease-out;
 	transition: background-color 0.3s ease-out;
 	margin-top: 10px;
 }
@@ -395,7 +405,6 @@ label {
 	background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Media query for extra small devices (max-width: 576px) */
 @media (max-width: 576px) {
 	.img-w {
 		right: 5px;
@@ -418,24 +427,22 @@ label {
 	color: #000;
 }
 
-.detail .bx {
-	scale: 1.25;
-}
-
+.detail .bx,
 .social-icons .bx {
-	scale: 1.7;
+	-webkit-transform: scale(1.25);
+	transform: scale(1.25);
+	-webkit-transition: transform 0.3s ease;
 	transition: transform 0.3s ease;
 }
 
 .bx-x {
-	transform: rotate(45deg); /* O un angolo che preferisci per la "X" */
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg);
 }
 
 .ftr-lnk {
 	text-decoration: none;
 }
-
-/* button submit */
 
 .btn-hover {
 	width: 120px;
@@ -467,6 +474,7 @@ label {
 
 .btn-hover.bn20 {
 	background-image: linear-gradient(to right, #667eea, #764ba2, #6b8dd6, #8e37d7);
+	-webkit-box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.75);
 	box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.75);
 }
 
@@ -474,5 +482,53 @@ label {
 	color: rgb(173, 173, 173);
 	top: 30px;
 	right: 10px;
-	scale: 0.8;
+	-webkit-transform: scale(0.8);
+	transform: scale(0.8);
+}
+
+/* Stile base per la scrollbar (valido per Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+	width: 12px; /* Larghezza della scrollbar */
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1; /* Colore dello sfondo della traccia della scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+	background: #888; /* Colore della scrollbar stessa */
+}
+
+/* Cambia lo stile della scrollbar quando il dark mode è attivo */
+.dark-mode ::-webkit-scrollbar-track {
+	background: #2e2e2e; /* Sfondo della traccia più scuro per la dark mode */
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+	background: #555; /* Scrollbar più scura per la dark mode */
+}
+
+/* Opzionale: cambia lo stile al hover della scrollbar */
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+	background: #666; /* Colore della scrollbar al hover */
+}
+
+.top-button {
+	position: fixed;
+	top: 95%; /* Centra verticalmente */
+	right: 15px; /* Distanza dal lato destro */
+	transform: translateY(-50%); /* Sposta verso l'alto di metà della sua altezza */
+	background: #333;
+	color: #fff;
+	border: none;
+	border-radius: "5px";
+	padding: "10px";
+	cursor: "pointer";
+	font-size: "20px";
+	z-index: 1000; /* Assicurati che sia sopra gli altri elementi */
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.top-button:hover {
+	background-color: rgba(0, 0, 0, 0.7);
 }
