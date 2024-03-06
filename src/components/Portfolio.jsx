@@ -52,14 +52,16 @@ const Portfolio = () => {
 								<div className="position-absolute pstn-archiv">
 									<i className="bx bx-archive"></i>
 								</div>
-								<Card.Body className="d-flex flex-column aling-items-start justify-content-between">
+								<Card.Body className="d-flex flex-column aling-items-start justify-content-between my-bg-card">
 									<div>
 										<Card.Title className="fs-4">{repo.name}</Card.Title>
 										<Card.Text className="fs-6">{repo.description || "No description"}</Card.Text>
 									</div>
-									<Card.Link href={repo.html_url} target="_blank" className="nav-link link-hvr">
-										View on GitHub
-									</Card.Link>
+									<div className="d-flex align-items-start justify-content-between">
+										<Card.Link href={repo.html_url} target="_blank" className="btn btn-sm link-hvr">
+											View on GitHub
+										</Card.Link>
+									</div>
 								</Card.Body>
 							</Card>
 						</Col>

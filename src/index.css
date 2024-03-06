@@ -77,6 +77,14 @@ nav {
 	align-items: center;
 }
 
+.main h3 {
+	font-size: 2rem;
+}
+
+.main p {
+	font-size: 1.5rem;
+}
+
 .main h3,
 .main h1,
 .main p {
@@ -86,6 +94,7 @@ nav {
 }
 
 .main h1 {
+	font-size: 3rem;
 	animation-delay: 1s;
 	-webkit-animation-delay: 1s;
 }
@@ -94,7 +103,6 @@ nav {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1.4rem;
-	margin-top: 1.4rem;
 }
 
 .social a {
@@ -334,7 +342,7 @@ label {
 	}
 }
 .dark-mode .card-link {
-	background-color: #2a333f96;
+	background-color: #101010;
 }
 
 .dark-mode .h3 {
@@ -433,10 +441,6 @@ label {
 	-webkit-box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
 }
 
-.form-control.name {
-	width: 250px;
-}
-
 textarea.form-control {
 	color: rgb(23, 23, 23);
 	background-color: whitesmoke;
@@ -449,12 +453,13 @@ textarea.form-control {
 }
 
 .my-bg {
+	background-color: #52489c8b !important;
 	-webkit-transition: all 0.25s ease-in-out;
 	transition: all 0.25s ease-in-out;
 }
 
 .my-bg:hover {
-	background-color: #52489c8b;
+	background-color: #6a5bd88b !important;
 	border-radius: 0;
 }
 
@@ -470,7 +475,7 @@ textarea.form-control {
 }
 
 .card-link:hover {
-	background-color: rgba(255, 255, 255, 0.3);
+	background-color: #222222;
 }
 
 @media (max-width: 576px) {
@@ -488,11 +493,7 @@ textarea.form-control {
 	top: 18px;
 }
 .link-hvr {
-	color: #212529bf;
-}
-
-.link-hvr:hover {
-	color: #000;
+	color: #fff;
 }
 
 .detail .bx,

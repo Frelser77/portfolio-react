@@ -67,8 +67,8 @@
 
 .social.active span,
 .social:hover span {
-	transform: translateY(-80px);
-	-webkit-transform: translateY(-80px);
+	transform: translateY(-50px);
+	-webkit-transform: translateY(-50px);
 	visibility: visible;
 	opacity: 1;
 	transition-delay: 0.3s;
@@ -145,7 +145,8 @@
 
 .social.active span,
 .social:hover span {
-	transform: translateY(-80px);
+	transform: translateY(-50px);
+	-webkit-transform: translateY(-50px);
 	visibility: visible;
 	opacity: 1;
 	transition-delay: 0.3s;
