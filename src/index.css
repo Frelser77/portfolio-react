@@ -6,6 +6,14 @@
 	--primary-dark: #1f252e;
 }
 
+body {
+	background-color: whitesmoke;
+}
+
+.card {
+	background-color: whitesmoke;
+}
+
 body,
 html {
 	overflow-x: hidden;
@@ -51,6 +59,7 @@ html {
 	transform: scale(0.95);
 	-webkit-transform: scale(0.95);
 }
+
 /* Nav */
 nav {
 	box-shadow: 0 4px 17px rgba(0, 0, 0, 0.1);
@@ -317,6 +326,13 @@ label {
 		margin-top: 2rem;
 	}
 }
+
+@media screen and (max-width: 390px) {
+	.images {
+		width: 300px; /* o una dimensione specifica minore di 390px */
+		height: 330px; /* per mantenere le proporzioni */
+	}
+}
 .dark-mode .card-link {
 	background-color: #2a333f96;
 }
@@ -349,7 +365,15 @@ label {
 	color: #fff;
 }
 
-.dark-mode .form-control:focus {
+.dark-mode .form-control:focus,
+.dark-mode .form-control:active,
+.dark-mode .form-control:hover,
+.dark-mode .form-control:visited,
+.dark-mode .form-control:focus-within,
+.dark-mode .form-control:focus-visible,
+.dark-mode .form-control:target {
+	background-color: #1f252e;
+	color: rgb(222, 222, 222);
 	border-color: #86b7fe;
 	outline: 0;
 	-webkit-box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
@@ -385,8 +409,38 @@ label {
 	background-color: white;
 }
 
+.dark-mode .section-title {
+	color: aliceblue;
+}
+
+.form-control {
+	color: rgb(23, 23, 23);
+	background-color: whitesmoke;
+}
+
+.form-control:focus,
+.form-control:active,
+.form-control:hover,
+.form-control:visited,
+.form-control:focus-within,
+.form-control:focus-visible,
+.form-control:target {
+	color: var(--bs-body-color);
+	background-color: whitesmoke;
+	border-color: #86b7fe;
+	outline: 0;
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+	-webkit-box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+}
+
 .form-control.name {
 	width: 250px;
+}
+
+textarea.form-control {
+	color: rgb(23, 23, 23);
+	background-color: whitesmoke;
+	min-height: calc(1.5em + 0.75rem + calc(var(--bs-border-width) * 2));
 }
 
 .tec-icon {
@@ -545,4 +599,40 @@ label {
 
 .top-button:hover {
 	background-color: rgba(0, 0, 0, 0.7);
+}
+
+.section-title {
+	font-size: 5rem;
+	font-weight: 500;
+	color: var(--primary-color);
+	text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2); /* Effetto ombra per il 3D */
+}
+
+@keyframes rainbow-text {
+	0%,
+	100% {
+		color: #00ff00;
+	}
+	20% {
+		color: #33cc33;
+	}
+	40% {
+		color: #66ff66;
+	}
+	60% {
+		color: #009900;
+	}
+	80% {
+		color: #66cc66;
+	}
+}
+
+.special-paragraph {
+	font-size: 2.5rem;
+	animation: rainbow-text 10s linear infinite;
+	text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2); /* Effetto ombra per il 3D */
+}
+
+.paragraph {
+	font-size: 1.6rem;
 }

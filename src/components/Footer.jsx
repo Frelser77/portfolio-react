@@ -9,7 +9,7 @@ const Footer = () => {
 	const [fromEmail, setFromEmail] = useState("");
 	const [message, setMessage] = useState("");
 	const [alertInfo, setAlertInfo] = useState({ show: false, message: "", variant: "" });
-	const [isSubmitting, setIsSubmitting] = useState(false); // Nuovo stato per gestire l'invio
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const maxLength = 500;
 	const charactersLeft = maxLength - message.length;
 
@@ -21,31 +21,18 @@ const Footer = () => {
 		} else if (name === "from_email") {
 			setFromEmail(value);
 		} else if (name === "message") {
-			if (value.length <= maxLength) {
-				setMessage(value);
-				if (alertInfo.show) {
-					setAlertInfo({ ...alertInfo, show: false });
-				}
+			setMessage(value);
+			if (value.length > maxLength && !alertInfo.show) {
+				setAlertInfo({ show: true, message: "Message is too long.", variant: "warning" });
+			} else if (value.length <= maxLength && alertInfo.show) {
+				setAlertInfo({ ...alertInfo, show: false });
 			}
-		}
-	};
-
-	const handleTouchEnd = (e) => {
-		e.preventDefault();
-		if (!isSubmitting) {
-			sendEmail(e);
 		}
 	};
 
 	const sendEmail = async (e) => {
 		e.preventDefault();
 		setIsSubmitting(true);
-
-		if (!e.target.checkValidity()) {
-			setAlertInfo({ show: true, message: "Please fill in all required fields.", variant: "danger" });
-			setIsSubmitting(false);
-			return;
-		}
 
 		try {
 			const result = await emailjs.sendForm(
@@ -63,10 +50,9 @@ const Footer = () => {
 			console.log(error.text);
 			setAlertInfo({ show: true, message: "Failed to send email. Please try again.", variant: "danger" });
 		}
-		setIsSubmitting(false); // Completa l'invio
+		setIsSubmitting(false);
 		setTimeout(() => setAlertInfo((current) => ({ ...current, show: false })), 5000);
 	};
-
 	return (
 		<footer id="Contact" className="text-center p-4">
 			<Container>
@@ -104,7 +90,7 @@ const Footer = () => {
 						</a>
 					</Col>
 				</Row>
-				<Row>
+				<Row className="mt-2">
 					<Col xs={12} md={{ span: 6, offset: 3 }}>
 						<span>..and don’t forget to leave your contact</span>
 						<Form onSubmit={sendEmail}>
@@ -150,13 +136,7 @@ const Footer = () => {
 								/>
 								<Form.Text className="chart position-absolute">{charactersLeft}</Form.Text>
 							</Form.Group>
-							<Button
-								variant="primary"
-								type="submit"
-								disabled={isSubmitting}
-								onTouchEnd={handleTouchEnd}
-								className="btn-hover bn20"
-							>
+							<Button variant="primary" type="submit" disabled={isSubmitting} className="btn-hover bn20">
 								{isSubmitting ? (
 									<>
 										<Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />

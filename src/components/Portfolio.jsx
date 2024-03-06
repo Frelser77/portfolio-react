@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
+import styles from "./Portfolio.module.css";
 
 const Portfolio = () => {
 	const [repos, setRepos] = useState([]);
@@ -41,13 +42,13 @@ const Portfolio = () => {
 	return (
 		<div className="mt-2">
 			<Container fluid>
-				<h4 id="Portfolio" className="text-center mt-2 mb-3">
+				<h4 id="Portfolio" className="text-center mt-2 mb-3 section-title">
 					Portfolio
 				</h4>
 				<Row className="g-2">
 					{repos.map((repo, index) => (
 						<Col key={index} xs={12} lg={6}>
-							<Card className="border-0 my-bg h-100 position-relative">
+							<Card className={styles.cardprt + " " + "border-0 my-bg h-100 position-relative"}>
 								<div className="position-absolute pstn-archiv">
 									<i className="bx bx-archive"></i>
 								</div>

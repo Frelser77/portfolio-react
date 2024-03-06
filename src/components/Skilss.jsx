@@ -68,7 +68,7 @@ const Skills = () => {
 	const images = darkMode ? imagesLight : imagesDark;
 	return (
 		<>
-			<h4 id="Skills" className="text-center">
+			<h4 id="Skills" className="text-center section-title">
 				My Skills
 			</h4>
 			<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto">

@@ -12,7 +12,7 @@ import ScrollToTopButton from "./ScrollTopButton";
 const PageLayout = () => {
 	useEffect(() => {
 		AOS.init({
-			duration: 2000,
+			duration: 1300,
 		});
 
 		// Memorizza l'animazione AOS originale per ciascun elemento
@@ -24,7 +24,7 @@ const PageLayout = () => {
 		function updateAOSAnimations() {
 			const screenWidth = window.innerWidth;
 			document.querySelectorAll("[data-aos]").forEach((el, index) => {
-				if (screenWidth < 576) {
+				if (screenWidth < 768) {
 					// Applica "fade-up" per dispositivi mobili
 					el.setAttribute("data-aos", "fade-up");
 				} else {
