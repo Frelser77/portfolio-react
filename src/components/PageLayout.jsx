@@ -12,7 +12,7 @@ import ScrollToTopButton from "./ScrollTopButton";
 const PageLayout = () => {
 	useEffect(() => {
 		AOS.init({
-			duration: 1300,
+			duration: 700,
 		});
 
 		// Memorizza l'animazione AOS originale per ciascun elemento

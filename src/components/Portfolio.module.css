@@ -2,3 +2,12 @@
 	background-color: rgb(222, 222, 222);
 	border-radius: 0;
 }
+
+.touched {
+	filter: blur(10px);
+	transform: scale(0.9);
+	transition: filter 0.3s ease, transform 0.3s ease;
+	-webkit-transition: filter 0.3s ease, transform 0.3s ease;
+	-moz-transition: filter 0.3s ease, transform 0.3s ease;
+	-ms-transition: filter 0.3s ease, transform 0.3s ease;
+}

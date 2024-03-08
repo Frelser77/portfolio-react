@@ -102,8 +102,8 @@ const Footer = () => {
 									value={fromName}
 									onChange={handleInputChange}
 									required
-									placeholder="Enter your name"
-									className="name mx-auto"
+									placeholder="Your name"
+									className="place mx-auto"
 								/>
 							</Form.Group>
 							<Form.Group className="mb-3" controlId="fromEmail">
@@ -114,7 +114,8 @@ const Footer = () => {
 									value={fromEmail}
 									onChange={handleInputChange}
 									required
-									placeholder="Enter your email"
+									placeholder="mail@example.com"
+									className="place mx-auto"
 								/>
 							</Form.Group>
 
@@ -132,7 +133,8 @@ const Footer = () => {
 									onChange={handleInputChange}
 									maxLength={maxLength}
 									required
-									placeholder="Write your message here"
+									placeholder="Enter your message here..."
+									className="place mx-auto"
 								/>
 								<Form.Text className="chart position-absolute">{charactersLeft}</Form.Text>
 							</Form.Group>

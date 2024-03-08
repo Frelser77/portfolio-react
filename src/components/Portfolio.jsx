@@ -4,6 +4,7 @@ import styles from "./Portfolio.module.css";
 
 const Portfolio = () => {
 	const [repos, setRepos] = useState([]);
+	const [touchedIndex, setTouchedIndex] = useState(null); // Aggiunto per tracciare l'indice della card toccata
 
 	useEffect(() => {
 		async function fetchRepos() {
@@ -18,7 +19,6 @@ const Portfolio = () => {
 				}
 				const repoData = await response.json();
 
-				// Filtra i repository per nome
 				const filteredRepos = repoData.filter((repo) =>
 					[
 						"linkedin-redux",
@@ -45,14 +45,25 @@ const Portfolio = () => {
 				<h4 id="Portfolio" className="text-center mt-2 mb-3 section-title">
 					Portfolio
 				</h4>
-				<Row className="g-2">
+				<Row className="g-2 cards">
 					{repos.map((repo, index) => (
-						<Col key={index} xs={12} lg={6}>
-							<Card className={styles.cardprt + " " + "border-0 my-bg h-100 position-relative"}>
+						<Col
+							key={index}
+							xs={12}
+							lg={6}
+							className="cards-hvr"
+							onTouchStart={() => setTouchedIndex(index)} // Aggiungi il tocco iniziale
+							onTouchEnd={() => setTouchedIndex(null)} // Rimuovi il tocco quando finisce
+						>
+							<Card
+								className={`${styles.cardprt} border-0 my-bg h-100 position-relative ${
+									touchedIndex === index ? "touched" : ""
+								}`}
+							>
 								<div className="position-absolute pstn-archiv">
 									<i className="bx bx-archive"></i>
 								</div>
-								<Card.Body className="d-flex flex-column aling-items-start justify-content-between my-bg-card">
+								<Card.Body className="d-flex flex-column align-items-start justify-content-between my-bg-card">
 									<div>
 										<Card.Title className="fs-4">{repo.name}</Card.Title>
 										<Card.Text className="fs-6">{repo.description || "No description"}</Card.Text>

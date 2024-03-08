@@ -11,7 +11,27 @@ body {
 }
 
 .card {
+	border: 1px solid transparent !important;
 	background-color: whitesmoke;
+}
+
+.cards .cards-hvr {
+	/* Applica la transizione allo stato di base, così le transizioni saranno fluide in entrambe le direzioni */
+	transition: filter 0.3s ease, transform 0.3s ease;
+	-webkit-transition: filter 0.3s ease, -webkit-transform 0.3s ease; /* Prefisso per il supporto cross-browser */
+}
+
+@media (min-width: 769px) {
+	.cards .cards-hvr:hover {
+		transform: scale(1.1, 1.1);
+		-webkit-transform: scale(1.1, 1.1);
+	}
+
+	.cards:hover > .cards-hvr:not(:hover) {
+		filter: blur(10px);
+		transform: scale(0.9, 0.9);
+		-webkit-transform: scale(0.9, 0.9);
+	}
 }
 
 body,
@@ -28,10 +48,6 @@ html {
 
 .logo {
 	height: 30px;
-}
-
-.card {
-	border: 1px solid transparent !important;
 }
 
 .img-w {
@@ -381,7 +397,7 @@ label {
 .dark-mode .form-control:focus-visible,
 .dark-mode .form-control:target {
 	background-color: #1f252e;
-	color: rgb(222, 222, 222);
+	color: #17a2b8;
 	border-color: #86b7fe;
 	outline: 0;
 	-webkit-box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
@@ -394,7 +410,7 @@ label {
 }
 
 .dark-mode .form-control {
-	color: white;
+	color: #17a2b8;
 	background-color: #1f252e;
 }
 
@@ -441,6 +457,32 @@ label {
 	-webkit-box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
 }
 
+.place::placeholder {
+	color: #17a2b8;
+}
+.place::placeholder::-webkit-input-placeholder {
+	color: #17a2b8;
+}
+.place::placeholder:-moz-placeholder {
+	color: #17a2b8;
+}
+.place::placeholder::-moz-placeholder {
+	color: #17a2b8;
+}
+.place::placeholder:-ms-input-placeholder {
+	color: #17a2b8;
+}
+
+:where(
+		.place::placeholder,
+		.place::placeholder::-webkit-input-placeholder,
+		.place::placeholder:-moz-placeholder,
+		.place::placeholder::-moz-placeholder,
+		.place::placeholder:-ms-input-placeholder
+	) {
+	color: #17a2b8;
+}
+
 textarea.form-control {
 	color: rgb(23, 23, 23);
 	background-color: whitesmoke;
@@ -453,13 +495,13 @@ textarea.form-control {
 }
 
 .my-bg {
-	background-color: #52489c8b !important;
+	background-color: #52489c7a !important;
 	-webkit-transition: all 0.25s ease-in-out;
 	transition: all 0.25s ease-in-out;
 }
 
 .my-bg:hover {
-	background-color: #6a5bd88b !important;
+	background-color: #7d6ef2 !important;
 	border-radius: 0;
 }
 
