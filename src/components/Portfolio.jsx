@@ -9,7 +9,6 @@ const Portfolio = () => {
 	const [repos, setRepos] = useState([]);
 	const [hoveredIndex, setHoveredIndex] = useState(null);
 	const [isAutoPlay, setIsAutoPlay] = useState(true);
-	const hoverTimeoutRef = useRef();
 	const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 	useEffect(() => {
@@ -65,49 +64,45 @@ const Portfolio = () => {
 		},
 	};
 
-	const handleInteraction = (index, event) => {
-		// Per dispositivi non touch e eventi mouseenter
-		if (!isTouchDevice && event.type === "mouseenter") {
-			if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-			hoverTimeoutRef.current = setTimeout(() => {
-				setIsAutoPlay(false);
-				setHoveredIndex(index);
-			}, 500); // Aggiungi un ritardo
-		}
-		// Per dispositivi touch e eventi touchstart
-		else if (isTouchDevice && event.type === "touchstart") {
-			// Se l'indice corrente è già selezionato, deselezionalo
-			if (hoveredIndex === index) {
-				setHoveredIndex(null);
-				setIsAutoPlay(true); // Riattiva l'autoplay se nessuna card è espansa
-			} else {
-				setHoveredIndex(index);
-				setIsAutoPlay(false); // Disattiva l'autoplay durante l'interazione con una card
-			}
-		}
-	};
-
-	const handleMouseLeave = () => {
-		if (!isTouchDevice) {
-			setIsAutoPlay(true);
-			if (hoverTimeoutRef.current) {
-				clearTimeout(hoverTimeoutRef.current);
-				hoverTimeoutRef.current = null;
-			}
-			setHoveredIndex(null);
-		}
-	};
-
-	const handleContainerTouchStart = (event) => {
-		// Se non si è toccato una card, chiudi tutte le card espandendo `hoveredIndex` su `null`
-		if (!event.target.closest(`.${styles.cardprt}`)) {
-			setHoveredIndex(null);
-			setIsAutoPlay(true);
-		}
-	};
+	const renderCard = (repo, index) => (
+		<div
+			key={repo.id}
+			className={`${styles.cardprt} ${hoveredIndex === index ? "expandedCard" : ""}`}
+			onMouseEnter={!isTouchDevice ? () => setHoveredIndex(index) : undefined}
+			onMouseLeave={!isTouchDevice ? () => setHoveredIndex(null) : undefined}
+		>
+			<Card className={`${styles.cardprt} border-0 my-bg h-100 position-relative`}>
+				<Card.Img src="/img/placeholder.png" alt={repo.name} />
+				<Card.Body>
+					<Card.Title className="fs-4 text-truncate">{repo.name}</Card.Title>
+					{isTouchDevice || hoveredIndex === index ? (
+						<motion.div
+							initial={isTouchDevice ? {} : { maxHeight: 0, opacity: 0 }}
+							animate={{ maxHeight: 250, opacity: 1 }}
+							transition={{ duration: 0.2 }}
+							className={styles.additionalContent}
+						>
+							<Card.Text className="fs-6 text-truncate">{repo.description || "No description available"}</Card.Text>
+							<div className="d-flex flex-column align-items-center justify-content-center">
+								<Badge className={`${styles.myBadgeCreate} text-black`}>
+									First Commit: {formatDate(repo.created_at)}
+								</Badge>
+								<Badge className={`${styles.myBadgeUpdate} text-black`}>
+									Last Update: {formatDate(repo.pushed_at)}
+								</Badge>
+								<Card.Link href={repo.html_url} target="_blank" className="btn btn-sm btn-primary">
+									View on GitHub
+								</Card.Link>
+							</div>
+						</motion.div>
+					) : null}
+				</Card.Body>
+			</Card>
+		</div>
+	);
 
 	return (
-		<div className={styles.portfolio} onTouchStart={handleContainerTouchStart}>
+		<div className={styles.portfolio}>
 			<Container fluid>
 				<h4 id="Portfolio" className="text-center mt-2 mb-3">
 					Portfolio
@@ -120,58 +115,35 @@ const Portfolio = () => {
 					ssr={true}
 					infinite={true}
 					autoPlay={isAutoPlay}
-					autoPlaySpeed={3000}
+					autoPlaySpeed={5000}
 					keyBoardControl={true}
-					customTransition="all .5"
+					customTransition="all .2"
 					transitionDuration={500}
 					containerClass="carousel-container"
 					removeArrowOnDeviceType={["tablet", "mobile"]}
 					dotListClass="custom-dot-list-style"
 					itemClass="carousel-item-padding-40-px"
 				>
-					{repos.map((repo, index) => (
-						<motion.div
-							key={repo.id}
-							className={`${styles.slide} ${hoveredIndex === index ? "active" : ""}`}
-							onMouseEnter={!isTouchDevice ? (e) => handleInteraction(index, e) : undefined}
-							onMouseLeave={!isTouchDevice ? handleMouseLeave : undefined}
-							onClick={isTouchDevice ? undefined : (e) => handleInteraction(index, e)} // Rimuovi onClick per dispositivi touch
-							onTouchStart={isTouchDevice ? (e) => handleInteraction(index, e) : undefined} // Aggiungi onTouchStart per dispositivi touch
-							initial={{ scale: 1 }}
-							animate={hoveredIndex === index ? { scale: 1.1, zIndex: 100 } : { scale: 1, zIndex: 0 }}
-							transition={{ duration: 0.5 }}
-						>
-							<Card className={`${styles.cardprt} border-0 my-bg h-100 position-relative`}>
-								<Card.Img variant="top" src="/img/placeholder.png" alt={repo.name} />
-								<Card.Body>
-									<Card.Title className="fs-4 text-truncate">{repo.name}</Card.Title>
-									<motion.div
-										initial={{ maxHeight: 0, opacity: 0 }}
-										animate={
-											hoveredIndex === index
-												? { maxHeight: 250, opacity: 1, zIndex: 100 }
-												: { maxHeight: 0, opacity: 0 }
-										}
-										transition={{ duration: 0.5 }}
-										className={styles.additionalContent}
-									>
-										<Card.Text className="fs-6">{repo.description || "No description available"}</Card.Text>
-										<div className="d-flex flex-column align-items-center justify-content-center">
-											<Badge className={`${styles.myBadgeCreate} text-black`}>
-												First Commit: {formatDate(repo.created_at)}
-											</Badge>
-											<Badge className={`${styles.myBadgeUpdate} text-black`}>
-												Last Update: {formatDate(repo.pushed_at)}
-											</Badge>
-											<Card.Link href={repo.html_url} target="_blank" className="btn btn-sm btn-primary">
-												View on GitHub
-											</Card.Link>
-										</div>
-									</motion.div>
-								</Card.Body>
-							</Card>
-						</motion.div>
-					))}
+					{repos.map((repo, index) =>
+						isTouchDevice ? (
+							// Per dispositivi touch, sempre visibile
+							<div key={repo.id} className={styles.slide}>
+								{renderCard(repo, index)}
+							</div>
+						) : (
+							// Per desktop, usa motion.div per l'animazione
+							<motion.div
+								key={repo.id}
+								className={styles.slide}
+								onMouseEnter={() => setHoveredIndex(index)}
+								onMouseLeave={() => setHoveredIndex(null)}
+								animate={hoveredIndex === index ? { scale: 1.1, zIndex: 100 } : { scale: 1 }}
+								transition={{ duration: 0.2 }}
+							>
+								{renderCard(repo, index)}
+							</motion.div>
+						)
+					)}
 				</Carousel>
 			</Container>
 		</div>

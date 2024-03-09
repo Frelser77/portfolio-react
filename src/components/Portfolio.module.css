@@ -43,7 +43,7 @@
 	width: 100%;
 	top: 0;
 	left: 0;
-	transition: all 0.5s ease;
+	transition: all 0.2s ease;
 }
 
 @media (max-width: 464px) {

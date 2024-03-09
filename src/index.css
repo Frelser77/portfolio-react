@@ -693,6 +693,34 @@ textarea.form-control {
 	height: 3vh;
 }
 
+.react-multiple-carousel__arrow--right {
+	right: calc(1% + 1px);
+	bottom: 45px;
+}
+
+.react-multiple-carousel__arrow--left {
+	left: calc(1% + 1px);
+	bottom: 45px;
+}
+
+.react-multiple-carousel__arrow {
+	background: rgba(0, 0, 0, 0.3);
+	min-width: 25px;
+	min-height: 25px;
+	z-index: -1;
+}
+
+.react-multiple-carousel__arrow::before {
+	color: #a7a7a7;
+	font-family: revicons;
+}
+
+.card-img,
+.card-img-bottom {
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
 /* lista carosello */
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 568px) {
