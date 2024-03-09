@@ -69,27 +69,7 @@ const Footer = () => {
 						</Col>
 					)}
 				</Row>
-				<Row>
-					<Col className="social-icons mb-3">
-						<a
-							href="https://github.com/Frelser77"
-							className="me-3"
-							target="_blank"
-							rel="noreferrer"
-							title="Link to my GitHub profile"
-						>
-							<i className="bx bxl-github"></i>
-						</a>
-						<a
-							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
-							target="_blank"
-							rel="noreferrer"
-							title="Link to my LinkedIn profile"
-						>
-							<i className="bx bxl-linkedin"></i>
-						</a>
-					</Col>
-				</Row>
+
 				<Row className="mt-2">
 					<Col xs={12} md={{ span: 6, offset: 3 }}>
 						<span>..and don’t forget to leave your contact</span>
@@ -149,6 +129,27 @@ const Footer = () => {
 								)}
 							</Button>
 						</Form>
+					</Col>
+				</Row>
+				<Row>
+					<Col className="social-icons mb-3">
+						<a
+							href="https://github.com/Frelser77"
+							className="me-3"
+							target="_blank"
+							rel="noreferrer"
+							title="Link to my GitHub profile"
+						>
+							<i className="bx bxl-github"></i>
+						</a>
+						<a
+							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
+							target="_blank"
+							rel="noreferrer"
+							title="Link to my LinkedIn profile"
+						>
+							<i className="bx bxl-linkedin"></i>
+						</a>
 					</Col>
 				</Row>
 				<Row>

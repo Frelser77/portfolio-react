@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
 import { Col, Row, Image } from "react-bootstrap";
 import { motion } from "framer-motion";
@@ -53,31 +53,45 @@ const imagesDark = [
 	aspnetDarkIcon,
 	sqlserverDarkIcon,
 ];
-
 const Skills = () => {
-	const { darkMode, setDarkMode } = useContext(DarkModeContext);
+	const { darkMode } = useContext(DarkModeContext);
+	const images = darkMode ? imagesLight : imagesDark;
+	const [isVisible, setIsVisible] = useState(false);
+	const ref = useRef(null);
 
 	useEffect(() => {
-		const isDarkModeEnabled = localStorage.getItem("darkMode") === "enabled";
-		if (darkMode !== isDarkModeEnabled) {
-			setDarkMode(isDarkModeEnabled);
-		}
-	}, [darkMode, setDarkMode]);
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					setIsVisible(entry.isIntersecting);
+				});
+			},
+			{ threshold: 0.1 }
+		);
 
-	// Decidi quale array di icone usare in base al valore di darkMode
-	const images = darkMode ? imagesLight : imagesDark;
+		if (ref.current) {
+			observer.observe(ref.current);
+		}
+
+		return () => {
+			if (ref.current) {
+				observer.unobserve(ref.current);
+			}
+		};
+	}, [ref]);
+
 	return (
 		<>
 			<h4 id="Skills" className="text-center section-title">
 				My Skills
 			</h4>
-			<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto">
+			<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto" ref={ref}>
 				{images.map((imgSrc, index) => (
 					<Col key={index} className="text-center">
 						<motion.div
 							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							transition={{ duration: 1.5, delay: index * 0.2 }}
+							animate={isVisible ? { opacity: 1 } : {}}
+							transition={{ duration: 1.5, delay: isVisible ? index * 0.2 : 0 }}
 						>
 							<Image src={imgSrc} alt="Technology icon" fluid className="tec-icon" />
 						</motion.div>

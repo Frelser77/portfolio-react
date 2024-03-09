@@ -19,7 +19,8 @@
     "react-awesome-reveal": "^4.2.8",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
-    "react-helmet-async": "^2.0.4"
+    "react-helmet-async": "^2.0.4",
+    "react-multi-carousel": "^2.8.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",
