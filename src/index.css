@@ -689,6 +689,10 @@ textarea.form-control {
 	align-items: flex-start;
 }
 
+.react-multi-carousel-dot-list {
+	height: 3vh;
+}
+
 /* lista carosello */
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 568px) {
@@ -697,11 +701,10 @@ textarea.form-control {
 		align-items: start;
 		justify-content: center;
 		top: 10px;
-		height: 50vh;
 		z-index: -1;
 	}
 	.react-multi-carousel-track {
-		height: 65vh;
+		height: 45vh;
 		list-style: none;
 		padding: 0;
 		margin: 0;
@@ -723,22 +726,22 @@ textarea.form-control {
 		flex-direction: row;
 		align-items: start;
 		justify-content: center;
-		top: 0;
-		height: 3vh;
-		z-index: 101;
+		top: -15px;
+		right: -500px;
 	}
 	.react-multi-carousel-track {
 		height: 20vh;
 	}
 	.carousel-container {
-		min-height: 380px;
+		min-height: 400px;
 	}
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
 	.react-multi-carousel-dot-list {
-		top: -12px;
+		top: -40px;
+		right: -670px;
 	}
 	.carousel-container {
 		min-height: 400px;
@@ -748,7 +751,8 @@ textarea.form-control {
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
 	.react-multi-carousel-dot-list {
-		top: -12px;
+		top: -15px;
+		right: -800px;
 	}
 	.carousel-container {
 		min-height: 480px;
@@ -757,7 +761,7 @@ textarea.form-control {
 
 @media only screen and (min-width: 1025px) {
 	.react-multi-carousel-dot-list {
-		top: -12px;
+		top: -40px;
 	}
 	.carousel-container {
 		min-height: 415px;
@@ -767,7 +771,8 @@ textarea.form-control {
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
 	.react-multi-carousel-dot-list {
-		top: -12px;
+		top: -40px;
+		right: -1000px;
 	}
 	.carousel-container {
 		min-height: 465px;
@@ -777,6 +782,7 @@ textarea.form-control {
 /* XXL devices (larger desktops, 1400px and up) */
 @media only screen and (min-width: 1400px) {
 	.react-multi-carousel-dot-list {
-		top: -12px;
+		top: -40px;
+		right: -1200px;
 	}
 }
