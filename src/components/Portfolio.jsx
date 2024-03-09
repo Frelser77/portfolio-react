@@ -161,7 +161,7 @@ const Portfolio = () => {
 												First Commit: {formatDate(repo.created_at)}
 											</Badge>
 											<Badge className={`${styles.myBadgeUpdate} text-black`}>
-												Last Update: {formatDate(repo.updated_at)}
+												Last Update: {formatDate(repo.pushed_at)}
 											</Badge>
 											<Card.Link href={repo.html_url} target="_blank" className="btn btn-sm btn-primary">
 												View on GitHub
