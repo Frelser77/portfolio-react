@@ -144,7 +144,7 @@ const Portfolio = () => {
 							<Card className={`${styles.cardprt} border-0 my-bg h-100 position-relative`}>
 								<Card.Img variant="top" src="/img/placeholder.png" alt={repo.name} />
 								<Card.Body>
-									<Card.Title className="fs-4">{repo.name}</Card.Title>
+									<Card.Title className="fs-4 text-truncate">{repo.name}</Card.Title>
 									<motion.div
 										initial={{ maxHeight: 0, opacity: 0 }}
 										animate={

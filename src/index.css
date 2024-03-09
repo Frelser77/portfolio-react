@@ -712,6 +712,9 @@ textarea.form-control {
 		backface-visibility: hidden;
 		will-change: transform, transition;
 	}
+	.carousel-container {
+		min-height: 520px;
+	}
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
@@ -724,14 +727,11 @@ textarea.form-control {
 		height: 3vh;
 		z-index: 101;
 	}
-	.react-multi-carousel-item {
-		margin-top: 40px;
-	}
 	.react-multi-carousel-track {
 		height: 20vh;
 	}
 	.carousel-container {
-		min-height: 520px;
+		min-height: 380px;
 	}
 }
 
@@ -740,6 +740,9 @@ textarea.form-control {
 	.react-multi-carousel-dot-list {
 		top: -12px;
 	}
+	.carousel-container {
+		min-height: 400px;
+	}
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
@@ -747,12 +750,27 @@ textarea.form-control {
 	.react-multi-carousel-dot-list {
 		top: -12px;
 	}
+	.carousel-container {
+		min-height: 480px;
+	}
+}
+
+@media only screen and (min-width: 1025px) {
+	.react-multi-carousel-dot-list {
+		top: -12px;
+	}
+	.carousel-container {
+		min-height: 415px;
+	}
 }
 
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
 	.react-multi-carousel-dot-list {
 		top: -12px;
+	}
+	.carousel-container {
+		min-height: 465px;
 	}
 }
 
