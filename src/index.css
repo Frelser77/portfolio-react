@@ -6,6 +6,21 @@
 	--primary-dark: #1f252e;
 }
 
+html {
+	scroll-snap-type: y mandatory; /* y per lo scroll verticale, mandatory per forzare l'aggancio su tutti gli scorrimenti */
+	scroll-padding-top: 80px;
+}
+
+.scroll-snap-section {
+	height: 100vh; /* Altezza di ogni sezione */
+	scroll-snap-align: start; /* Assicura che l'inizio di ogni sezione si allinei con l'inizio del contenitore */
+	overflow: hidden;
+}
+
+nav {
+	height: 50px;
+}
+
 .bg-primary {
 	background-color: transparent !important;
 }
@@ -24,22 +39,11 @@ body {
 	transition: filter 0.3s ease, transform 0.3s ease;
 	-webkit-transition: filter 0.3s ease, -webkit-transform 0.3s ease; /* Prefisso per il supporto cross-browser */
 }
-/* DA AGGIUNGERE O TOGLEIRE 
-.cards .cards-hvr:hover {
-	transform: scale(1.1, 1.1);
-	-webkit-transform: scale(1.1, 1.1);
-}
 
-.cards:hover > .cards-hvr:not(:hover) {
-	filter: blur(10px);
-	transform: scale(0.9, 0.9);
-	-webkit-transform: scale(0.9, 0.9);
-}
-*/
-body,
+/* body,
 html {
 	overflow-x: hidden;
-}
+} */
 
 *,
 *:before,

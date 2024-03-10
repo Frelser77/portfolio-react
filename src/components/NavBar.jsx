@@ -13,7 +13,7 @@ const MyNavbar = () => {
 	};
 
 	return (
-		<Navbar expand="lg" expanded={expanded} className="">
+		<Navbar expand="lg" expanded={expanded} className="sticky-top">
 			<Container>
 				<Navbar.Brand href="/">
 					<img

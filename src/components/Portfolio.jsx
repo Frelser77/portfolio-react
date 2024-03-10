@@ -5,41 +5,10 @@ import "react-multi-carousel/lib/styles.css";
 import { motion } from "framer-motion";
 import styles from "./Portfolio.module.css";
 
-const Portfolio = () => {
-	const [repos, setRepos] = useState([]);
+const Portfolio = ({ repos }) => {
 	const [hoveredIndex, setHoveredIndex] = useState(null);
 	const [isAutoPlay, setIsAutoPlay] = useState(true);
 	const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-
-	useEffect(() => {
-		async function fetchRepos() {
-			try {
-				const response = await fetch("https://api.github.com/users/Frelser77/repos?per_page=100", {
-					headers: {
-						Authorization: `token ${import.meta.env.VITE_TOKEN}`,
-					},
-				});
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				const repoData = await response.json();
-				const filteredRepos = repoData.filter((repo) =>
-					[
-						"linkedin-redux",
-						"netflix-clone-route",
-						"weather_app",
-						"Spotify-clone",
-						"Spy-Ecommerce",
-						"Ecommerce-Esame",
-					].includes(repo.name)
-				);
-				setRepos(filteredRepos);
-			} catch (error) {
-				console.error("Error fetching repos: ", error);
-			}
-		}
-		fetchRepos();
-	}, []);
 
 	const formatDate = (dateString) => {
 		const options = { year: "numeric", month: "long", day: "numeric" };
@@ -64,17 +33,17 @@ const Portfolio = () => {
 		},
 	};
 
-	const renderCard = (repo, index) => (
+	const renderCard = (repos, index) => (
 		<div
-			key={repo.id}
+			key={repos.id}
 			className={`${styles.cardprt} ${hoveredIndex === index ? "expandedCard" : ""}`}
 			onMouseEnter={!isTouchDevice ? () => setHoveredIndex(index) : undefined}
 			onMouseLeave={!isTouchDevice ? () => setHoveredIndex(null) : undefined}
 		>
 			<Card className={`${styles.cardprt} border-0 my-bg h-100 position-relative`}>
-				<Card.Img src="/img/placeholder.png" alt={repo.name} />
+				<Card.Img src="/img/placeholder.png" alt={repos.name} />
 				<Card.Body>
-					<Card.Title className="fs-4 text-truncate">{repo.name}</Card.Title>
+					<Card.Title className="fs-4 text-truncate">{repos.name}</Card.Title>
 					{isTouchDevice || hoveredIndex === index ? (
 						<motion.div
 							initial={isTouchDevice ? {} : { maxHeight: 0, opacity: 0 }}
@@ -82,15 +51,15 @@ const Portfolio = () => {
 							transition={{ duration: 0.2 }}
 							className={styles.additionalContent}
 						>
-							<Card.Text className="fs-6 text-truncate">{repo.description || "No description available"}</Card.Text>
+							<Card.Text className="fs-6 text-truncate">{repos.description || "No description available"}</Card.Text>
 							<div className="d-flex flex-column align-items-center justify-content-center">
 								<Badge className={`${styles.myBadgeCreate} text-black`}>
-									First Commit: {formatDate(repo.created_at)}
+									First Commit: {formatDate(repos.created_at)}
 								</Badge>
 								<Badge className={`${styles.myBadgeUpdate} text-black`}>
-									Last Update: {formatDate(repo.pushed_at)}
+									Last Update: {formatDate(repos.pushed_at)}
 								</Badge>
-								<Card.Link href={repo.html_url} target="_blank" className="btn btn-sm btn-primary">
+								<Card.Link href={repos.html_url} target="_blank" className="btn btn-sm btn-primary">
 									View on GitHub
 								</Card.Link>
 							</div>
@@ -115,12 +84,13 @@ const Portfolio = () => {
 					ssr={true}
 					infinite={true}
 					autoPlay={isAutoPlay}
-					autoPlaySpeed={5000}
+					autoPlaySpeed={10000}
 					keyBoardControl={true}
 					customTransition="all .2"
 					transitionDuration={500}
 					containerClass="carousel-container"
-					removeArrowOnDeviceType={["tablet", "mobile"]}
+					removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
+					deviceType={isTouchDevice}
 					dotListClass="custom-dot-list-style"
 					itemClass="carousel-item-padding-40-px"
 				>

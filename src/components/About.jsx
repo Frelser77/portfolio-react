@@ -38,7 +38,7 @@ const About = () => {
 			whileInView="visible"
 			viewport={{ once: true }}
 		>
-			<div className="about-content">
+			<div className="about-content scroll-snap-section">
 				<motion.h2
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}

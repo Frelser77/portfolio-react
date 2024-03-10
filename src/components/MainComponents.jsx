@@ -1,9 +1,11 @@
 import "boxicons";
 import styles from "./MainComponentSocialIcons.module.css";
+import { Container } from "react-bootstrap";
+import LanguagesChart from "./LanguagesChart";
 
-const MainComponent = () => {
+const MainComponent = ({ repos }) => {
 	return (
-		<div className="container">
+		<Container>
 			<div className="main">
 				<div className="detail">
 					<div className="detail">
@@ -49,7 +51,8 @@ const MainComponent = () => {
 					/>
 				</div>
 			</div>
-		</div>
+			<LanguagesChart repos={repos} />
+		</Container>
 	);
 };
 
