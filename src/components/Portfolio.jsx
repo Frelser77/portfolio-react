@@ -1,15 +1,33 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Badge, Card, Container } from "react-bootstrap";
+import { useState } from "react";
+import { Container } from "react-bootstrap";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { motion } from "framer-motion";
 import styles from "./Portfolio.module.css";
 import RepoCard from "../components/RepoCard";
+import { useSelector } from "react-redux";
 
-const Portfolio = ({ repos }) => {
+const Portfolio = () => {
 	const [hoveredIndex, setHoveredIndex] = useState(null);
-	const [isAutoPlay, setIsAutoPlay] = useState(true);
+	// const [isAutoPlay, setIsAutoPlay] = useState(true);
 	const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+
+	const { items: allRepos, status } = useSelector((state) => state.repos);
+
+	// Supponiamo che tu voglia filtrare i repository qui:
+	const filteredRepos =
+		status === "succeeded"
+			? allRepos.filter((repo) =>
+					[
+						"linkedin-redux",
+						"netflix-clone-route",
+						"weather_app",
+						"Spotify-clone",
+						"Spy-Ecommerce",
+						"Ecommerce-Esame",
+					].includes(repo.name)
+			  )
+			: [];
 
 	const formatDate = (dateString) => {
 		const options = { year: "numeric", month: "long", day: "numeric" };
@@ -47,7 +65,7 @@ const Portfolio = ({ repos }) => {
 					responsive={responsive}
 					ssr={true}
 					infinite={true}
-					autoPlay={isAutoPlay}
+					autoPlay={true}
 					autoPlaySpeed={10000}
 					keyBoardControl={true}
 					customTransition="all .2"
@@ -58,7 +76,7 @@ const Portfolio = ({ repos }) => {
 					dotListClass="custom-dot-list-style"
 					itemClass="carousel-item-padding-40-px"
 				>
-					{repos.map((repo, index) =>
+					{filteredRepos.map((repo, index) =>
 						isTouchDevice ? (
 							// Per dispositivi touch, sempre visibile
 							<div key={repo.id} className={styles.slide}>

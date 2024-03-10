@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 import MainComponent from "./MainComponents";
 import About from "./About";
 import Portfolio from "./Portfolio";
@@ -8,43 +9,16 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Skills from "./Skills";
 import ScrollToTopButton from "./ScrollTopButton";
+import { fetchRepos } from "../redux/reducers/fetchRepo";
 
 const PageLayout = () => {
-	const [repos, setRepos] = useState([]);
-	const [allRepos, setAllRepos] = useState([]);
-	// useRef per tenere traccia degli elementi da osservare
+	const dispatch = useDispatch();
+
 	const sectionRefs = useRef([]);
 
 	useEffect(() => {
-		async function fetchRepos() {
-			try {
-				const response = await fetch("https://api.github.com/users/Frelser77/repos?per_page=100", {
-					headers: {
-						Authorization: `token ${import.meta.env.VITE_TOKEN}`,
-					},
-				});
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				const repoData = await response.json();
-				setAllRepos(repoData);
-				const filteredRepos = repoData.filter((repo) =>
-					[
-						"linkedin-redux",
-						"netflix-clone-route",
-						"weather_app",
-						"Spotify-clone",
-						"Spy-Ecommerce",
-						"Ecommerce-Esame",
-					].includes(repo.name)
-				);
-				setRepos(filteredRepos);
-			} catch (error) {
-				console.error("Error fetching repos: ", error);
-			}
-		}
-		fetchRepos();
-	}, []);
+		dispatch(fetchRepos());
+	}, [dispatch]);
 
 	useEffect(() => {
 		AOS.init({
@@ -61,7 +35,6 @@ const PageLayout = () => {
 						// Ri-attiva AOS per l'elemento
 						AOS.refresh();
 					} else {
-						// Opzionale: rimuovi la classe 'aos-animate' quando l'elemento esce dalla viewport
 						// per assicurarti che le animazioni si riavviino la prossima volta
 						entry.target.classList.remove("aos-animate");
 					}
@@ -92,7 +65,7 @@ const PageLayout = () => {
 						data-aos="fade-right"
 						ref={(el) => (sectionRefs.current[0] = el)}
 					>
-						<MainComponent allRepos={allRepos} />
+						<MainComponent />
 					</Col>
 					<Col
 						xs={12}
@@ -117,7 +90,7 @@ const PageLayout = () => {
 							data-aos="fade-left"
 							ref={(el) => (sectionRefs.current[3] = el)}
 						>
-							<Portfolio repos={repos} />
+							<Portfolio />
 						</Col>
 						<Col xs={12} className="my-2 scroll-snap-section">
 							<Footer />

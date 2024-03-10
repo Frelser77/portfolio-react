@@ -1,5 +1,4 @@
 // Skeleton.jsx
-import React from "react";
 import styles from "./Skeleton.module.css"; // Assicurati di creare questo file di stile
 
 const Skeleton = () => {

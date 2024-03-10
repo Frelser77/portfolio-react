@@ -1,5 +1,4 @@
-// RepoCard.jsx
-import React from "react";
+import PropTypes from "prop-types";
 import { Badge, Card } from "react-bootstrap";
 import { motion } from "framer-motion";
 import Skeleton from "./Skeleton"; // Assicurati che il percorso sia corretto
@@ -44,6 +43,15 @@ const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate
 			</Card>
 		</div>
 	);
+};
+
+RepoCard.propTypes = {
+	repo: PropTypes.object.isRequired,
+	isHovered: PropTypes.bool.isRequired,
+	isTouchDevice: PropTypes.bool.isRequired,
+	onHover: PropTypes.func.isRequired,
+	onLeave: PropTypes.func.isRequired,
+	formatDate: PropTypes.func.isRequired,
 };
 
 export default RepoCard;

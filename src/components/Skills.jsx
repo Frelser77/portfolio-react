@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
 import { Col, Row, Image } from "react-bootstrap";
 import { motion } from "framer-motion";
