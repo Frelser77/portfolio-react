@@ -47,8 +47,8 @@ const Portfolio = ({ repos }) => {
 					{isTouchDevice || hoveredIndex === index ? (
 						<motion.div
 							initial={isTouchDevice ? {} : { maxHeight: 0, opacity: 0 }}
-							animate={{ maxHeight: 250, opacity: 1 }}
-							transition={{ duration: 0.2 }}
+							animate={{ maxHeight: [0, 250], opacity: 1 }}
+							transition={{ duration: 0.2, times: [0, 0.8, 1] }}
 							className={styles.additionalContent}
 						>
 							<Card.Text className="fs-6 text-truncate">{repos.description || "No description available"}</Card.Text>

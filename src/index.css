@@ -6,17 +6,6 @@
 	--primary-dark: #1f252e;
 }
 
-html {
-	scroll-snap-type: y mandatory; /* y per lo scroll verticale, mandatory per forzare l'aggancio su tutti gli scorrimenti */
-	scroll-padding-top: 80px;
-}
-
-.scroll-snap-section {
-	height: 100vh; /* Altezza di ogni sezione */
-	scroll-snap-align: start; /* Assicura che l'inizio di ogni sezione si allinei con l'inizio del contenitore */
-	overflow: hidden;
-}
-
 nav {
 	height: 50px;
 }
@@ -40,16 +29,18 @@ body {
 	-webkit-transition: filter 0.3s ease, -webkit-transform 0.3s ease; /* Prefisso per il supporto cross-browser */
 }
 
-/* body,
+body,
 html {
 	overflow-x: hidden;
-} */
+}
 
 *,
 *:before,
 *:after {
+	box-sizing: border-box;
 	scroll-behavior: smooth;
 	-webkit-scroll-behavior: smooth;
+	font-size: clamp(12px, 4vw, 22px);
 }
 
 .logo {

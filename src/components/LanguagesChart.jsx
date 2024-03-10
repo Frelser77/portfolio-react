@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Bar } from "react-chartjs-2";
 import Chart from "chart.js/auto";
+import Loading from "./Loading";
+import { Col, Container, Row } from "react-bootstrap";
 
 const LanguagesChart = ({ repos }) => {
 	const [languagesData, setLanguagesData] = useState({});
@@ -60,21 +62,25 @@ const LanguagesChart = ({ repos }) => {
 		}
 	}, [repos]);
 
-	if (loading) {
-		return <div>Loading languages data...</div>;
-	}
-
-	if (error) {
-		return <div>Error fetching data: {error}</div>;
-	}
-
 	return (
-		<div>
-			<h3>Linguaggi Utilizzati</h3>
-			<div style={{ maxWidth: "600px", maxHeight: "600px" }}>
-				{languagesData && <Bar data={languagesData} options={{ maintainAspectRatio: true }} />}
-			</div>
-		</div>
+		<Suspense fallback={<Loading />}>
+			<Container className="mt-4 mb-3">
+				<Row>
+					<Col>
+						<h3>Linguaggi Utilizzati</h3>
+						<div style={{ maxWidth: "600px", maxHeight: "600px" }}>
+							{!loading && !error ? (
+								<Bar data={languagesData} options={{ maintainAspectRatio: true }} />
+							) : error ? (
+								<div>Error fetching data: {error}</div>
+							) : (
+								<Loading />
+							)}
+						</div>
+					</Col>
+				</Row>
+			</Container>
+		</Suspense>
 	);
 };
 
