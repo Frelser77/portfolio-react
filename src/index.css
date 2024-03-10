@@ -839,130 +839,138 @@ textarea.form-control {
 .paragraph {
 	font-size: 1.6rem;
 }
-
-.carousel-container {
-	display: flex;
-	overflow: visible;
-	position: relative;
-	min-height: 500px;
-	align-items: flex-start;
+.swiper-button-prev,
+.swiper-rtl .swiper-button-next {
+	top: 250px;
 }
 
-.react-multi-carousel-dot-list {
-	height: 3vh;
+.swiper-button-next,
+.swiper-rtl .swiper-button-prev {
+	top: 250px;
 }
 
-.react-multiple-carousel__arrow--right {
-	right: calc(1% + 1px);
-	bottom: 45px;
+.swiper-button-prev:after,
+.swiper-button-next:after {
+	color: #7d6ef2;
 }
 
-.react-multiple-carousel__arrow--left {
-	left: calc(1% + 1px);
-	bottom: 45px;
+.swiper-pagination-fraction,
+.swiper-pagination-custom,
+.swiper-horizontal > .swiper-pagination-bullets,
+.swiper-pagination-bullets.swiper-pagination-horizontal {
+	display: none;
 }
 
-.react-multiple-carousel__arrow {
-	background: rgba(0, 0, 0, 0.3);
-	min-width: 25px;
-	min-height: 25px;
-	z-index: -1;
-}
-
-.react-multiple-carousel__arrow::before {
-	color: #a7a7a7;
-	font-family: revicons;
-}
-
-/* lista carosello */
-/* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 568px) {
-	.react-multi-carousel-dot-list {
-		flex-direction: row;
-		align-items: start;
-		justify-content: center;
-		top: 10px;
+	.swiper-wrapper {
+		height: 450px;
 	}
-	.react-multi-carousel-track {
-		height: 45vh;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: flex;
-		flex-direction: row;
-		position: relative;
-		transform-style: preserve-3d;
-		backface-visibility: hidden;
-		will-change: transform, transition;
-	}
-	.carousel-container {
-		min-height: 520px;
+	.swiper-button-prev:after,
+	.swiper-button-next:after {
+		font-size: 2.6rem;
 	}
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 568px) {
-	.react-multi-carousel-dot-list {
-		flex-direction: row;
-		align-items: start;
-		justify-content: center;
-		top: -15px;
-		right: -500px;
-	}
-	.react-multi-carousel-track {
-		height: 20vh;
-	}
-	.carousel-container {
-		min-height: 400px;
+	.swiper-pagination {
+		bottom: -15px;
 	}
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
-	.react-multi-carousel-dot-list {
-		top: -40px;
-		right: -670px;
+	.swiper-pagination {
+		bottom: -40px;
 	}
-	.carousel-container {
+	.swiper-container {
 		min-height: 400px;
+	}
+	.swiper-button-prev,
+	.swiper-rtl .swiper-button-next {
+		top: 190px;
+	}
+
+	.swiper-button-next,
+	.swiper-rtl .swiper-button-prev {
+		top: 190px;
 	}
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
-	.react-multi-carousel-dot-list {
-		top: -15px;
-		right: -800px;
+	.swiper-pagination-fraction,
+	.swiper-pagination-custom,
+	.swiper-horizontal > .swiper-pagination-bullets,
+	.swiper-pagination-bullets.swiper-pagination-horizontal {
+		display: block;
+		top: -10px;
+		left: 400px;
 	}
-	.carousel-container {
-		min-height: 480px;
+	.swiper-container {
+		min-height: 500px;
 	}
-}
+	.swiper-button-prev,
+	.swiper-rtl .swiper-button-next {
+		top: 170px;
+	}
 
-@media only screen and (min-width: 1025px) {
-	.react-multi-carousel-dot-list {
-		top: -40px;
-	}
-	.carousel-container {
-		min-height: 415px;
+	.swiper-button-next,
+	.swiper-rtl .swiper-button-prev {
+		top: 170px;
 	}
 }
 
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
-	.react-multi-carousel-dot-list {
-		top: -40px;
-		right: -1000px;
+	.swiper-pagination {
+		bottom: -40px;
 	}
-	.carousel-container {
-		min-height: 465px;
+	.swiper-pagination-fraction,
+	.swiper-pagination-custom,
+	.swiper-horizontal > .swiper-pagination-bullets,
+	.swiper-pagination-bullets.swiper-pagination-horizontal {
+		display: block;
+		top: -10px;
+		left: 500px;
+	}
+	.swiper-container {
+		min-height: 500px;
+	}
+	.swiper-button-prev,
+	.swiper-rtl .swiper-button-next {
+		top: 190px;
+	}
+
+	.swiper-button-next,
+	.swiper-rtl .swiper-button-prev {
+		top: 190px;
 	}
 }
 
 /* XXL devices (larger desktops, 1400px and up) */
 @media only screen and (min-width: 1400px) {
-	.react-multi-carousel-dot-list {
-		top: -40px;
-		right: -1200px;
+	.swiper-pagination {
+		bottom: -40px;
+	}
+	.swiper-pagination-fraction,
+	.swiper-pagination-custom,
+	.swiper-horizontal > .swiper-pagination-bullets,
+	.swiper-pagination-bullets.swiper-pagination-horizontal {
+		display: block;
+		top: -10px;
+		left: 590px;
+	}
+	.swiper-container {
+		min-height: 500px;
+	}
+	.swiper-button-prev,
+	.swiper-rtl .swiper-button-next {
+		top: 230px;
+	}
+
+	.swiper-button-next,
+	.swiper-rtl .swiper-button-prev {
+		top: 230px;
 	}
 }
