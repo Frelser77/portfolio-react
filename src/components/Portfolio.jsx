@@ -4,6 +4,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { motion } from "framer-motion";
 import styles from "./Portfolio.module.css";
+import RepoCard from "../components/RepoCard";
 
 const Portfolio = ({ repos }) => {
 	const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -33,47 +34,10 @@ const Portfolio = ({ repos }) => {
 		},
 	};
 
-	const renderCard = (repos, index) => (
-		<div
-			key={repos.id}
-			className={`${styles.cardprt} ${hoveredIndex === index ? "expandedCard" : ""}`}
-			onMouseEnter={!isTouchDevice ? () => setHoveredIndex(index) : undefined}
-			onMouseLeave={!isTouchDevice ? () => setHoveredIndex(null) : undefined}
-		>
-			<Card className={`${styles.cardprt} border-0 my-bg h-100 position-relative`}>
-				<Card.Img src="/img/placeholder.png" alt={repos.name} />
-				<Card.Body>
-					<Card.Title className="fs-4 text-truncate">{repos.name}</Card.Title>
-					{isTouchDevice || hoveredIndex === index ? (
-						<motion.div
-							initial={isTouchDevice ? {} : { maxHeight: 0, opacity: 0 }}
-							animate={{ maxHeight: [0, 250], opacity: 1 }}
-							transition={{ duration: 0.2, times: [0, 0.8, 1] }}
-							className={styles.additionalContent}
-						>
-							<Card.Text className="fs-6 text-truncate">{repos.description || "No description available"}</Card.Text>
-							<div className="d-flex flex-column align-items-center justify-content-center">
-								<Badge className={`${styles.myBadgeCreate} text-black`}>
-									First Commit: {formatDate(repos.created_at)}
-								</Badge>
-								<Badge className={`${styles.myBadgeUpdate} text-black`}>
-									Last Update: {formatDate(repos.pushed_at)}
-								</Badge>
-								<Card.Link href={repos.html_url} target="_blank" className="btn btn-sm btn-primary">
-									View on GitHub
-								</Card.Link>
-							</div>
-						</motion.div>
-					) : null}
-				</Card.Body>
-			</Card>
-		</div>
-	);
-
 	return (
 		<div className={styles.portfolio}>
 			<Container fluid>
-				<h4 id="Portfolio" className="text-center mt-2 mb-3">
+				<h4 id="Portfolio" className="text-center mt-2 mb-3 section-title">
 					Portfolio
 				</h4>
 				<Carousel
@@ -98,7 +62,14 @@ const Portfolio = ({ repos }) => {
 						isTouchDevice ? (
 							// Per dispositivi touch, sempre visibile
 							<div key={repo.id} className={styles.slide}>
-								{renderCard(repo, index)}
+								<RepoCard
+									repo={repo}
+									isHovered={hoveredIndex === index}
+									isTouchDevice={isTouchDevice}
+									onHover={() => setHoveredIndex(index)}
+									onLeave={() => setHoveredIndex(null)}
+									formatDate={formatDate}
+								/>
 							</div>
 						) : (
 							// Per desktop, usa motion.div per l'animazione
@@ -110,7 +81,14 @@ const Portfolio = ({ repos }) => {
 								animate={hoveredIndex === index ? { scale: 1.1, zIndex: 100 } : { scale: 1 }}
 								transition={{ duration: 0.2 }}
 							>
-								{renderCard(repo, index)}
+								<RepoCard
+									repo={repo}
+									isHovered={hoveredIndex === index}
+									isTouchDevice={isTouchDevice}
+									onHover={() => setHoveredIndex(index)}
+									onLeave={() => setHoveredIndex(null)}
+									formatDate={formatDate}
+								/>
 							</motion.div>
 						)
 					)}

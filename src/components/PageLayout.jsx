@@ -11,9 +11,10 @@ import ScrollToTopButton from "./ScrollTopButton";
 
 const PageLayout = () => {
 	const [repos, setRepos] = useState([]);
-
+	const [allRepos, setAllRepos] = useState([]);
 	// useRef per tenere traccia degli elementi da osservare
 	const sectionRefs = useRef([]);
+
 	useEffect(() => {
 		async function fetchRepos() {
 			try {
@@ -26,6 +27,7 @@ const PageLayout = () => {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
 				const repoData = await response.json();
+				setAllRepos(repoData);
 				const filteredRepos = repoData.filter((repo) =>
 					[
 						"linkedin-redux",
@@ -90,7 +92,7 @@ const PageLayout = () => {
 						data-aos="fade-right"
 						ref={(el) => (sectionRefs.current[0] = el)}
 					>
-						<MainComponent repos={repos} />
+						<MainComponent allRepos={allRepos} />
 					</Col>
 					<Col
 						xs={12}

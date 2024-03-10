@@ -3,7 +3,7 @@ import styles from "./MainComponentSocialIcons.module.css";
 import { Container } from "react-bootstrap";
 import LanguagesChart from "./LanguagesChart";
 
-const MainComponent = ({ repos }) => {
+const MainComponent = ({ allRepos }) => {
 	return (
 		<Container>
 			<div className="main">
@@ -51,7 +51,7 @@ const MainComponent = ({ repos }) => {
 					/>
 				</div>
 			</div>
-			<LanguagesChart repos={repos} />
+			<LanguagesChart repos={allRepos} />
 		</Container>
 	);
 };

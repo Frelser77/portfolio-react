@@ -5,6 +5,7 @@ import Loading from "./Loading";
 import { Col, Container, Row } from "react-bootstrap";
 
 const LanguagesChart = ({ repos }) => {
+	console.log(repos);
 	const [languagesData, setLanguagesData] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -39,14 +40,7 @@ const LanguagesChart = ({ repos }) => {
 						{
 							label: "Bytes of Code",
 							data: Object.values(languagesStats),
-							backgroundColor: [
-								"#FF6384",
-								"#36A2EB",
-								"#FFCE56",
-								"#E7E9ED",
-								"#4BC0C0",
-								// Aggiungi altri colori se necessario
-							],
+							backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
 						},
 					],
 				});

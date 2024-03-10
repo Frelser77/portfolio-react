@@ -3,6 +3,7 @@
 	position: absolute;
 	background-color: transparent;
 	border-radius: 0;
+	display: none;
 }
 
 .myBadgeUpdate {
@@ -19,6 +20,12 @@
 	margin: 15px;
 }
 
+@media screen and (min-width: 768px) {
+	.myBadgeCreate,
+	.myBadgeUpdate {
+		display: block;
+	}
+}
 /* Stili predefiniti per la card */
 
 .additionalContent {
