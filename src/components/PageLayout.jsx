@@ -59,12 +59,7 @@ const PageLayout = () => {
 			<ScrollToTopButton />
 			<Container className="my-2">
 				<Row className="mt-1 mt-lg-4">
-					<Col
-						xs={12}
-						className="mb-5 scroll-snap-section"
-						data-aos="fade-right"
-						ref={(el) => (sectionRefs.current[0] = el)}
-					>
+					<Col xs={12} className="mb-5" data-aos="fade-right" ref={(el) => (sectionRefs.current[0] = el)}>
 						<MainComponent />
 					</Col>
 					<Col
@@ -92,7 +87,7 @@ const PageLayout = () => {
 						>
 							<Portfolio />
 						</Col>
-						<Col xs={12} className="my-2 scroll-snap-section">
+						<Col xs={12} className="my-2">
 							<Footer />
 						</Col>
 					</div>

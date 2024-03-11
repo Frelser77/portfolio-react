@@ -2,20 +2,20 @@ import "boxicons";
 import styles from "./MainComponentSocialIcons.module.css";
 import { Container } from "react-bootstrap";
 import LanguagesChart from "./LanguagesChart";
+import { useTranslation } from "react-i18next";
 
 const MainComponent = () => {
+	const { t } = useTranslation();
 	return (
 		<Container>
 			<div className="main">
 				<div className="detail">
 					<div className="detail">
-						<h3 className="h3">{`Hi, I'm`}</h3>
+						<h3 className="h3">{t("intro")}</h3>
 						<h1>
-							<span style={{ color: "#7163d4" }}>Salvatore</span> <span className="surname">{` D'Amico `}</span>
+							<span style={{ color: "#7163d4" }}>{t("fullName")}</span>
 						</h1>
-						<p>
-							{`As a Junior Web Developer, I'm very excited to start my journey in this fantastic world of web development.`}
-						</p>
+						<p>{t("juniorWebDeveloper")}</p>
 					</div>
 
 					<div className="d-flex align-items-center custom-justify-xs-center gap-4 mt-4">
@@ -51,7 +51,6 @@ const MainComponent = () => {
 					/>
 				</div>
 			</div>
-			<LanguagesChart />
 		</Container>
 	);
 };

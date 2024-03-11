@@ -854,51 +854,97 @@ textarea.form-control {
 	color: #7d6ef2;
 }
 
+.swiper-pagination-bullet {
+	width: 16px; /* Larghezza del rettangolo */
+	height: 8px; /* Altezza del rettangolo */
+	background: #000; /* Colore di sfondo */
+	opacity: 1; /* Opacità dei non attivi */
+	border-radius: 2px; /* Bordi arrotondati leggeri, metti 0 per bordi squadrati */
+}
+
+.swiper-pagination-bullet-active {
+	background: #007bff; /* Colore di sfondo per il bullet attivo */
+}
+
 .swiper-pagination-fraction,
 .swiper-pagination-custom,
 .swiper-horizontal > .swiper-pagination-bullets,
 .swiper-pagination-bullets.swiper-pagination-horizontal {
 	display: none;
+	height: 3vh;
 }
 
 @media only screen and (max-width: 568px) {
-	.swiper-wrapper {
-		height: 450px;
-	}
 	.swiper-button-prev:after,
 	.swiper-button-next:after {
 		font-size: 2.6rem;
+	}
+	.swiper-horizontal {
+		height: 500px;
+	}
+	.swiper-button-prev,
+	.swiper-rtl .swiper-button-next {
+		top: 180px;
+	}
+
+	.swiper-button-next,
+	.swiper-rtl .swiper-button-prev {
+		top: 180px;
 	}
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 568px) {
+	.swiper-button-prev:after,
+	.swiper-button-next:after {
+		font-size: 2.6rem;
+	}
 	.swiper-pagination {
 		bottom: -15px;
+	}
+	.swiper-horizontal {
+		height: 500px;
+	}
+	.swiper-button-prev,
+	.swiper-rtl .swiper-button-next {
+		top: 180px;
+	}
+
+	.swiper-button-next,
+	.swiper-rtl .swiper-button-prev {
+		top: 180px;
 	}
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
+	.swiper-button-prev:after,
+	.swiper-button-next:after {
+		font-size: 2.5rem;
+	}
 	.swiper-pagination {
 		bottom: -40px;
 	}
-	.swiper-container {
-		min-height: 400px;
+	.swiper-horizontal {
+		height: 400px;
 	}
 	.swiper-button-prev,
 	.swiper-rtl .swiper-button-next {
-		top: 190px;
+		top: 140px;
 	}
 
 	.swiper-button-next,
 	.swiper-rtl .swiper-button-prev {
-		top: 190px;
+		top: 140px;
 	}
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
+	.swiper-button-prev:after,
+	.swiper-button-next:after {
+		font-size: 2.6rem;
+	}
 	.swiper-pagination-fraction,
 	.swiper-pagination-custom,
 	.swiper-horizontal > .swiper-pagination-bullets,
@@ -907,22 +953,26 @@ textarea.form-control {
 		top: -10px;
 		left: 400px;
 	}
-	.swiper-container {
-		min-height: 500px;
+	.swiper-horizontal {
+		height: 420px;
 	}
 	.swiper-button-prev,
 	.swiper-rtl .swiper-button-next {
-		top: 170px;
+		top: 120px;
 	}
 
 	.swiper-button-next,
 	.swiper-rtl .swiper-button-prev {
-		top: 170px;
+		top: 120px;
 	}
 }
 
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
+	.swiper-button-prev:after,
+	.swiper-button-next:after {
+		font-size: 2.9rem;
+	}
 	.swiper-pagination {
 		bottom: -40px;
 	}
@@ -934,22 +984,26 @@ textarea.form-control {
 		top: -10px;
 		left: 500px;
 	}
-	.swiper-container {
-		min-height: 500px;
+	.swiper-horizontal {
+		height: 420px !important;
 	}
 	.swiper-button-prev,
 	.swiper-rtl .swiper-button-next {
-		top: 190px;
+		top: 140px;
 	}
 
 	.swiper-button-next,
 	.swiper-rtl .swiper-button-prev {
-		top: 190px;
+		top: 140px;
 	}
 }
 
 /* XXL devices (larger desktops, 1400px and up) */
 @media only screen and (min-width: 1400px) {
+	.swiper-button-prev:after,
+	.swiper-button-next:after {
+		font-size: 3.2rem;
+	}
 	.swiper-pagination {
 		bottom: -40px;
 	}
@@ -961,16 +1015,16 @@ textarea.form-control {
 		top: -10px;
 		left: 590px;
 	}
-	.swiper-container {
-		min-height: 500px;
+	.swiper-horizontal {
+		height: 450px !important;
 	}
 	.swiper-button-prev,
 	.swiper-rtl .swiper-button-next {
-		top: 230px;
+		top: 170px;
 	}
 
 	.swiper-button-next,
 	.swiper-rtl .swiper-button-prev {
-		top: 230px;
+		top: 170px;
 	}
 }

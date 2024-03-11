@@ -3,6 +3,7 @@ import { Navbar, Nav, Container, Form, FormControl } from "react-bootstrap";
 import "boxicons";
 import { Fade } from "react-awesome-reveal";
 import { DarkModeContext } from "../context/DarkModeContext"; // Assicurati che il percorso sia corretto
+import LanguageSelector from "../language/LanguageSelector";
 
 const MyNavbar = () => {
 	const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
@@ -43,6 +44,7 @@ const MyNavbar = () => {
 							</Fade>
 						</label>
 					</Form>
+					<LanguageSelector />
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

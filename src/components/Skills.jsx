@@ -25,6 +25,7 @@ import reduxDarkIcon from "/img/redux_dark_icon.png";
 import csharpDarkIcon from "/img/csharp_dark_icon.png";
 import aspnetDarkIcon from "/img/aspnet_dark_icon.png";
 import sqlserverDarkIcon from "/img/sqlserver_dark_icon.png";
+import LanguagesChart from "./LanguagesChart";
 
 const imagesLight = [
 	html5Icon,
@@ -98,6 +99,7 @@ const Skills = () => {
 					</Col>
 				))}
 			</Row>
+			<LanguagesChart />
 		</>
 	);
 };

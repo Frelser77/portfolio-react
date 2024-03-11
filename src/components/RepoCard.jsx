@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Badge, Card } from "react-bootstrap";
 import { motion } from "framer-motion";
-import Skeleton from "./Skeleton"; // Assicurati che il percorso sia corretto
+import Skeleton from "./Skeleton";
 import styles from "./Portfolio.module.css";
 
 const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate }) => {
