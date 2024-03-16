@@ -3,8 +3,10 @@ import { useSelector } from "react-redux";
 import Loading from "./Loading";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Container, Row, Col } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const LanguagesChart = () => {
+	const { t } = useTranslation();
 	const { items: repos, status, error } = useSelector((state) => state.repos);
 	const [languagesData, setLanguagesData] = useState([]);
 
@@ -30,7 +32,7 @@ const LanguagesChart = () => {
 		<Container className="mt-4 mb-3">
 			<Row>
 				<Col>
-					<h3 className="text-center">Linguaggi Utilizzati</h3>
+					<h3 className="text-center">{t("leanguge-chart")}</h3>
 					{status === "loading" && <Loading />}
 					{status !== "loading" && error && <div>Error fetching data: {error}</div>}
 					{status === "succeeded" && !error && (

@@ -6,6 +6,20 @@
 	--primary-dark: #1f252e;
 }
 
+.undecorated {
+	text-decoration: none;
+	-webkit-text-decoration: none;
+	-moz-text-decoration: none;
+	color: #000;
+}
+
+i img,
+svg {
+	vertical-align: middle;
+	margin-right: -4px;
+	margin-bottom: 3px;
+}
+
 .fs-7 {
 	font-size: 0.875rem; /* 1rem - 0.125rem */
 }

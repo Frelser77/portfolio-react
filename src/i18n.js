@@ -19,11 +19,11 @@ i18n
 		},
 		// Percorso per caricare le traduzioni
 		backend: {
-			loadPath: "/locales/{{lng}}/translation.json", // Assicurati che questo percorso sia corretto!
+			loadPath: "/locales/{{lng}}/translation.json",
 		},
 		// Lingua di fallback se la traduzione non è disponibile
 		fallbackLng: "en",
-		debug: true, // Imposta su true per vedere in console i messaggi di debug
+		debug: false, // Imposta su true per vedere in console i messaggi di debug
 		// Configurazione dell'interpolazione
 		interpolation: {
 			escapeValue: false, // Non è necessario per React

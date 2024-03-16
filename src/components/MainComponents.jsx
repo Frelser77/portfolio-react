@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 const MainComponent = () => {
 	const { t } = useTranslation();
+
 	return (
 		<Container>
 			<div className="main">

@@ -26,6 +26,7 @@ import csharpDarkIcon from "/img/csharp_dark_icon.png";
 import aspnetDarkIcon from "/img/aspnet_dark_icon.png";
 import sqlserverDarkIcon from "/img/sqlserver_dark_icon.png";
 import LanguagesChart from "./LanguagesChart";
+import { useTranslation } from "react-i18next";
 
 const imagesLight = [
 	html5Icon,
@@ -55,6 +56,7 @@ const imagesDark = [
 	sqlserverDarkIcon,
 ];
 const Skills = () => {
+	const { t } = useTranslation();
 	const { darkMode } = useContext(DarkModeContext);
 	const images = darkMode ? imagesLight : imagesDark;
 	const [isVisible, setIsVisible] = useState(false);
@@ -84,7 +86,7 @@ const Skills = () => {
 	return (
 		<>
 			<h4 id="Skills" className="text-center section-title">
-				My Skills
+				{t("skills")}
 			</h4>
 			<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto" ref={ref}>
 				{images.map((imgSrc, index) => (

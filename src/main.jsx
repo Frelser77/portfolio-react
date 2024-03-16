@@ -10,7 +10,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 
 const root = createRoot(document.getElementById("root"));
-console.log(i18n.t("intro"));
 root.render(
 	<Provider store={store}>
 		<PersistGate loading={null} persistor={persistor}>

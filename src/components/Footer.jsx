@@ -153,7 +153,7 @@ const Footer = () => {
 					</Col>
 				</Row>
 				<Row>
-					<Col className="mt-3">{`© ${year} D'Amico Salvatore || Frelser7. All rights reserved.`}</Col>
+					<Col className="mt-3">{`© ${year} D'Amico Salvatore || Frelser7. All rights reserved. PS:is a beta version, im working to finish it.`}</Col>
 				</Row>
 			</Container>
 		</footer>

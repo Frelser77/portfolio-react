@@ -4,8 +4,10 @@ import "boxicons";
 import { Fade } from "react-awesome-reveal";
 import { DarkModeContext } from "../context/DarkModeContext"; // Assicurati che il percorso sia corretto
 import LanguageSelector from "../language/LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 const MyNavbar = () => {
+	const { t } = useTranslation();
 	const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
 	const [expanded, setExpanded] = useState(false);
 
@@ -29,22 +31,22 @@ const MyNavbar = () => {
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="me-auto">
 						<Nav.Link href="/" className="active">
-							Home
+							{t("homenav")}
 						</Nav.Link>
-						<Nav.Link href="#About">About</Nav.Link>
-						<Nav.Link href="#Skills">Skills</Nav.Link>
-						<Nav.Link href="#Portfolio">Portfolio</Nav.Link>
-						<Nav.Link href="#Contact">Contact</Nav.Link>
+						<Nav.Link href="#About">{t("aboutnav")}</Nav.Link>
+						<Nav.Link href="#Skills">{t("skillnav")}</Nav.Link>
+						<Nav.Link href="#Portfolio">{t("portfolionav")}</Nav.Link>
+						<Nav.Link href="#Contact">{t("contactnav")}</Nav.Link>
 					</Nav>
-					<Form inline="true">
+					<Form inline="true" className="d-flex align-items-center justify-content-center gap-2">
 						<FormControl type="checkbox" id="darkModeToggle" checked={darkMode} onChange={toggleDarkMode} />
 						<label htmlFor="darkModeToggle" className="mode">
 							<Fade direction="right" delay={400}>
 								<i className={`bx ${darkMode ? "bxs-moon" : "bxs-sun"}`}></i>
 							</Fade>
 						</label>
+						<LanguageSelector />
 					</Form>
-					<LanguageSelector />
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

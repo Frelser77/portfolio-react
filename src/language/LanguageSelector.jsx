@@ -1,9 +1,6 @@
 import React from "react";
-import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { FaRegFlag } from "react-icons/fa"; // Un'icona generica di bandiera
-// import { GiItaly } from "react-icons/gi"; // Un'icona che rappresenta l'Italia
-import { FaRegCircle } from "react-icons/fa"; // Un cerchio come rappresentazione semplificata
+import { IT, GB } from "country-flag-icons/react/3x2";
 
 const LanguageSelector = () => {
 	const { i18n } = useTranslation();
@@ -13,11 +10,15 @@ const LanguageSelector = () => {
 	};
 
 	return (
-		<div>
-			<Button onClick={() => changeLanguage("it")} style={{ cursor: "pointer", fontSize: "1.5rem" }} title="Italiano" />
-			<FaRegCircle
+		<div className="d-flex gap-2">
+			<IT
+				onClick={() => changeLanguage("it")}
+				style={{ cursor: "pointer", width: "1.5rem", height: "1.5rem" }}
+				title="Italiano"
+			/>
+			<GB
 				onClick={() => changeLanguage("en")}
-				style={{ cursor: "pointer", fontSize: "1.5rem" }}
+				style={{ cursor: "pointer", width: "1.5rem", height: "1.5rem" }}
 				title="English"
 			/>
 		</div>
