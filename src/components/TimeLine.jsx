@@ -13,7 +13,8 @@ const timelineData = [
 		readMoreLink:
 			"https://www.linkedin.com/posts/salvatore-alessandro-d-amico-4a1551267_ho-appena-finito-il-pre-corso-per-full-stack-development-activity-7117134454703165441-ZpK_?utm_source=share&utm_medium=member_desktop",
 		// author: "Homeowner",
-		imageUrl: "/img/certificati-epicode/modulo-0.jpeg", // Assumi che questa sia la tua immagine caricata
+		imageUrl: "/img/certificati-epicode/modulo-0.jpeg",
+		svgUrl: "/img/epicode-svg.svg", // Assumi che questa sia la tua immagine caricata
 	},
 	{
 		iconClass: "fas fa-home",
@@ -23,7 +24,8 @@ const timelineData = [
 		readMoreLink:
 			"https://www.linkedin.com/posts/salvatore-alessandro-d-amico-4a1551267_la-dinamicit%C3%A0-e-il-cambiamento-sono-importanti-activity-7140316503425421312-5xf9?utm_source=share&utm_medium=member_desktop",
 		// author: "Homeowner",
-		imageUrl: "/img/certificati-epicode/modulo-6.jpeg", // Assumi che questa sia la tua immagine caricata
+		imageUrl: "/img/certificati-epicode/modulo-6.jpeg",
+		svgUrl: "/img/epicode-svg.svg", // Assumi che questa sia la tua immagine caricata
 	},
 	{
 		iconClass: "fas fa-home",
@@ -33,7 +35,8 @@ const timelineData = [
 		readMoreLink:
 			"https://www.linkedin.com/posts/salvatore-alessandro-d-amico-4a1551267_si-conclude-cos%C3%AC-una-parte-importante-del-activity-7157811699213819904-x8fk?utm_source=share&utm_medium=member_desktop",
 		// author: "Homeowner",
-		imageUrl: "/img/certificati-epicode/modulo-9.jpeg", // Assumi che questa sia la tua immagine caricata
+		imageUrl: "/img/certificati-epicode/modulo-9.jpeg",
+		svgUrl: "/img/epicode-svg.svg", // Assumi che questa sia la tua immagine caricata
 	},
 	{
 		iconClass: "fas fa-home",
@@ -44,6 +47,7 @@ const timelineData = [
 			"https://www.linkedin.com/posts/salvatore-alessandro-d-amico-4a1551267_fullstackdevelopment-entityframework-aspnetmvc-activity-7174766284419514368-ILNI?utm_source=share&utm_medium=member_desktop",
 		// author: "Homeowner",
 		imageUrl: "/img/certificati-epicode/modulo-16.jpg",
+		svgUrl: "/img/epicode-svg.svg",
 	},
 	{
 		iconClass: "fas fa-home",
@@ -54,6 +58,7 @@ const timelineData = [
 			"https://www.linkedin.com/posts/salvatore-alessandro-d-amico-4a1551267_fullstackdevelopment-entityframework-aspnetmvc-activity-7174766284419514368-ILNI?utm_source=share&utm_medium=member_desktop",
 		// author: "Homeowner",
 		imageUrl: "../../img/placeholder.png",
+		svgUrl: "/img/epicode-svg.svg",
 	},
 ];
 
@@ -68,9 +73,10 @@ const TimelineRow = ({ data, index }) => {
 			data-aos-delay={aosDelay} // non è necessario .toString(), React lo gestirà
 		>
 			<section>
-				<img src={data.imageUrl} alt={data.title} style={{ maxHeight: "240px", minHeight: "120px" }} />
+				{/* immagine da rendere responsive */}
+				<img src={data.imageUrl} alt={data.title} className={`${styles.timeImg} img-fluid`} />
 				<i className={`${styles.icon} ${data.iconClass}`}>
-					<img src={logosvg} alt={data.title} />
+					<img src={data.svgUrl || logosvg} alt={data.title} className="img-fluid" />
 				</i>
 				<div className={styles.details}>
 					<span className={styles.title}>{data.title}</span>
@@ -80,7 +86,6 @@ const TimelineRow = ({ data, index }) => {
 				<a href={data.readMoreLink} target="_blank" className="btn-hover bn20 undecorated p-2">
 					Read more
 				</a>
-				{/* La parte di author è stata commentata perché non è presente nei dati */}
 			</section>
 		</div>
 	);

@@ -122,30 +122,34 @@ body {
 .date {
 	color: #000;
 }
+
 @media (max-width: 790px) {
 	.timelineWrapper .centerLine {
 		left: 40px;
 	}
-	.timelineWrapper .centerLine {
-		margin: 30px 0 3px 60px;
+	.timelineWrapper .timelineRow section {
+		width: calc(100% - 80px); /* Aggiusta la larghezza */
+		margin-block: 15px;
+		margin-right: -40px;
 	}
-	.timelineWrapper .centerLine section {
-		width: 100%;
-	}
-	.timelineRow1 section::before {
-		left: -7px;
-	}
-	.timelineRow1 section .icon {
-		left: -60px;
+	.timelineWrapper .timelineRow {
+		flex-direction: column;
+		align-items: center; /* Centra il contenuto */
 	}
 }
+
 @media (max-width: 440px) {
 	.timelineWrapper .centerLine,
-	.timelineWrapper section::before,
-	.timelineWrapper section .icon {
-		display: none;
+	.timelineWrapper .timelineRow section::before,
+	.timelineWrapper .timelineRow section .icon {
+		display: none; /* Nasconde la linea centrale e altri elementi decorativi */
 	}
 	.timelineWrapper .timelineRow {
 		margin: 10px 0;
+	}
+	/* Aggiustamenti per l'immagine da renderla responsive */
+	.timelineWrapper .timelineRow section img {
+		max-width: 100%;
+		height: auto;
 	}
 }
