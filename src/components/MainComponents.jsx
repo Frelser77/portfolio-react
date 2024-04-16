@@ -21,7 +21,7 @@ const MainComponent = () => {
 
 					<div className="d-flex align-items-center custom-justify-xs-center gap-4 mt-4">
 						<a
-							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
+							href="https://www.linkedin.com/in/salvatore-dam/"
 							style={{ "--socialAni": "1" }}
 							target="_blank"
 							className={styles.socialLinkedin + " " + styles.social + " " + "social socialLinkedin"}

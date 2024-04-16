@@ -143,7 +143,7 @@ const Footer = () => {
 							<i className="bx bxl-github"></i>
 						</a>
 						<a
-							href="https://www.linkedin.com/in/salvatore-alessandro-d-amico-4a1551267/"
+							href="https://www.linkedin.com/in/salvatore-dam/"
 							target="_blank"
 							rel="noreferrer"
 							title="Link to my LinkedIn profile"

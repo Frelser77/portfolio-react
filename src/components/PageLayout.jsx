@@ -5,7 +5,6 @@ import MainComponent from "./MainComponents";
 import About from "./About";
 import Portfolio from "./Portfolio";
 import Footer from "./Footer";
-import TimelineWrapper from "./TimeLine";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Skills from "./Skills";
@@ -70,7 +69,7 @@ const PageLayout = () => {
 						<Skills />
 					</Col>
 					<Col xs={12} className="my-2" data-aos="fade-right" ref={(el) => (sectionRefs.current[2] = el)}>
-						<TimelineWrapper />
+						{/* <TimelineWrapper /> */}
 					</Col>
 					<div className="d-flex flex-column align-items-center justify-content-between">
 						<Col xs={12} className="my-2" data-aos="fade-left" ref={(el) => (sectionRefs.current[3] = el)}>
