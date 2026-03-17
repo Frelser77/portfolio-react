@@ -2,29 +2,29 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
 import { Col, Row, Image } from "react-bootstrap";
 import { motion } from "framer-motion";
-import html5Icon from "/img/html5_icon.png";
-import css3Icon from "/img/css3_icon.png";
-import bootstrapIcon from "/img/bootstrap_icon.png";
-import jsIcon from "/img/js_icon.png";
-import tsIcon from "/img/ts_icon.png";
-import sassIcon from "/img/sass_icon.png";
-import reactNativeIcon from "/img/react_native_icon.png";
-import reduxIcon from "/img/redux_icon.png";
-import csharpIcon from "/img/csharp.png";
-import aspnetIcon from "/img/aspnet.png";
-import sqlserverIcon from "/img/sqlserver.png";
-//dark icons
-import htmlDarkIcon from "/img/html_dark_icon.png";
-import cssDarkIcon from "/img/css_dark_icon.png";
-import bootstrapDarkIcon from "/img/bootstrap_dark_icon.png";
-import jsDarkIcon from "/img/js_dark_icon.png";
-import tsDarkIcon from "/img/ts_dark_icon.png";
-import sassDarkIcon from "/img/sass_dark_icon.png";
-import reactDarkIcon from "/img/react_dark_icon.png";
-import reduxDarkIcon from "/img/redux_dark_icon.png";
-import csharpDarkIcon from "/img/csharp_dark_icon.png";
-import aspnetDarkIcon from "/img/aspnet_dark_icon.png";
-import sqlserverDarkIcon from "/img/sqlserver_dark_icon.png";
+const html5Icon = "/img/html5_icon.png";
+const css3Icon = "/img/css3_icon.png";
+const bootstrapIcon = "/img/bootstrap_icon.png";
+const jsIcon = "/img/js_icon.png";
+const tsIcon = "/img/ts_icon.png";
+const sassIcon = "/img/sass_icon.png";
+const reactNativeIcon = "/img/react_native_icon.png";
+const reduxIcon = "/img/redux_icon.png";
+const csharpIcon = "/img/csharp.png";
+const aspnetIcon = "/img/aspnet.png";
+const sqlserverIcon = "/img/sqlserver.png";
+// dark icons
+const htmlDarkIcon = "/img/html_dark_icon.png";
+const cssDarkIcon = "/img/css_dark_icon.png";
+const bootstrapDarkIcon = "/img/bootstrap_dark_icon.png";
+const jsDarkIcon = "/img/js_dark_icon.png";
+const tsDarkIcon = "/img/ts_dark_icon.png";
+const sassDarkIcon = "/img/sass_dark_icon.png";
+const reactDarkIcon = "/img/react_dark_icon.png";
+const reduxDarkIcon = "/img/redux_dark_icon.png";
+const csharpDarkIcon = "/img/csharp_dark_icon.png";
+const aspnetDarkIcon = "/img/aspnet_dark_icon.png";
+const sqlserverDarkIcon = "/img/sqlserver_dark_icon.png";
 import LanguagesChart from "./LanguagesChart";
 import { useTranslation } from "react-i18next";
 import {
@@ -131,7 +131,7 @@ const Skills = () => {
 			<LanguagesChart />
 
 			<div className="mt-5 pt-3 border-top">
-				<h6 className="text-center text-muted mb-4 fw-semibold text-uppercase letter-spacing-1">
+				<h6 className="text-center mb-4 fw-semibold text-uppercase letter-spacing-1">
 					{t("newSkillsLabel")}
 				</h6>
 				<Row xs={3} md={4} lg={6} className="g-4 py-2 mx-auto justify-content-center">
