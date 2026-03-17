@@ -10,6 +10,7 @@ import "aos/dist/aos.css";
 import Skills from "./Skills";
 import ScrollToTopButton from "./ScrollTopButton";
 import { fetchRepos } from "../redux/reducers/fetchRepo";
+import Gestionale from "./Gestionale";
 
 const PageLayout = () => {
 	const dispatch = useDispatch();
@@ -40,7 +41,7 @@ const PageLayout = () => {
 					}
 				});
 			},
-			{ threshold: 0.1 }
+			{ threshold: 0.1 },
 		);
 
 		// Osserva gli elementi referenziati
@@ -74,7 +75,10 @@ const PageLayout = () => {
 					<div className="d-flex flex-column align-items-center justify-content-between">
 						<Col xs={12} className="my-2" data-aos="fade-left" ref={(el) => (sectionRefs.current[3] = el)}>
 							<Portfolio />
-						</Col>
+						</Col>{" "}
+						<Col xs={12} className="my-2" data-aos="fade-up" ref={(el) => (sectionRefs.current[4] = el)}>
+							<Gestionale />
+						</Col>{" "}
 						<Col xs={12} className="my-2">
 							<Footer />
 						</Col>

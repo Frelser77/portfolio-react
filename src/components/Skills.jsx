@@ -27,6 +27,18 @@ import aspnetDarkIcon from "/img/aspnet_dark_icon.png";
 import sqlserverDarkIcon from "/img/sqlserver_dark_icon.png";
 import LanguagesChart from "./LanguagesChart";
 import { useTranslation } from "react-i18next";
+import {
+	SiMongodb,
+	SiOracle,
+	SiMysql,
+	SiRedis,
+	SiNextdotjs,
+	SiNestjs,
+	SiTailwindcss,
+	SiCloudflare,
+	SiNginx,
+} from "react-icons/si";
+import { FaServer, FaLinux } from "react-icons/fa";
 
 const imagesLight = [
 	html5Icon,
@@ -55,6 +67,21 @@ const imagesDark = [
 	aspnetDarkIcon,
 	sqlserverDarkIcon,
 ];
+
+const additionalSkills = [
+	{ Icon: SiMongodb, name: "MongoDB", color: "#47A248" },
+	{ Icon: SiOracle, name: "Oracle", color: "#F80000" },
+	{ Icon: SiMysql, name: "MySQL", color: "#4479A1" },
+	{ Icon: SiRedis, name: "Redis", color: "#DC382D" },
+	{ Icon: SiNextdotjs, name: "Next.js", color: null },
+	{ Icon: SiNestjs, name: "NestJS", color: "#E0234E" },
+	{ Icon: SiTailwindcss, name: "Tailwind CSS", color: "#06B6D4" },
+	{ Icon: SiCloudflare, name: "Cloudflare", color: "#F38020" },
+	{ Icon: FaServer, name: "VPS", color: "#7163d4" },
+	{ Icon: FaLinux, name: "Linux", color: "#FCC624" },
+	{ Icon: SiNginx, name: "Nginx", color: "#009639" },
+];
+
 const Skills = () => {
 	const { t } = useTranslation();
 	const { darkMode } = useContext(DarkModeContext);
@@ -69,7 +96,7 @@ const Skills = () => {
 					setIsVisible(entry.isIntersecting);
 				});
 			},
-			{ threshold: 0.1 }
+			{ threshold: 0.1 },
 		);
 
 		if (ref.current) {
@@ -102,6 +129,30 @@ const Skills = () => {
 				))}
 			</Row>
 			<LanguagesChart />
+
+			<div className="mt-5 pt-3 border-top">
+				<h6 className="text-center text-muted mb-4 fw-semibold text-uppercase letter-spacing-1">
+					{t("newSkillsLabel")}
+				</h6>
+				<Row xs={3} md={4} lg={6} className="g-4 py-2 mx-auto justify-content-center">
+					{additionalSkills.map(({ Icon, name, color }, index) => {
+						const iconColor = color ?? (darkMode ? "#ffffff" : "#000000");
+						return (
+							<Col key={name} className="text-center">
+								<motion.div
+									className="d-flex flex-column align-items-center gap-2"
+									initial={{ opacity: 0, y: 12 }}
+									animate={isVisible ? { opacity: 1, y: 0 } : {}}
+									transition={{ duration: 0.5, delay: isVisible ? index * 0.08 : 0 }}
+								>
+									<Icon size={44} color={iconColor} />
+									<small className="fw-semibold">{name}</small>
+								</motion.div>
+							</Col>
+						);
+					})}
+				</Row>
+			</div>
 		</>
 	);
 };

@@ -35,7 +35,8 @@ const MyNavbar = () => {
 						</Nav.Link>
 						<Nav.Link href="#About">{t("aboutnav")}</Nav.Link>
 						<Nav.Link href="#Skills">{t("skillnav")}</Nav.Link>
-						<Nav.Link href="#Portfolio">{t("portfolionav")}</Nav.Link>
+						<Nav.Link href="#Portfolio">{t("portfolionav")}</Nav.Link>{" "}
+						<Nav.Link href="#Gestionale">{t("gestionaleNav")}</Nav.Link>{" "}
 						<Nav.Link href="#Contact">{t("contactnav")}</Nav.Link>
 					</Nav>
 					<Form inline="true" className="d-flex align-items-center justify-content-center gap-2">
