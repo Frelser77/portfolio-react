@@ -3,7 +3,6 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import MainComponent from "./MainComponents";
 import About from "./About";
-import Portfolio from "./Portfolio";
 import Footer from "./Footer";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -63,26 +62,34 @@ const PageLayout = () => {
 					<Col xs={12} className="mb-5" data-aos="fade-right" ref={(el) => (sectionRefs.current[0] = el)}>
 						<MainComponent />
 					</Col>
+
+					<Col xs={12}>
+						<hr className="section-divider" />
+					</Col>
+
 					<Col xs={12} className="my-2" data-aos="fade-left" ref={(el) => (sectionRefs.current[1] = el)}>
 						<About />
 					</Col>
+
+					<Col xs={12}>
+						<hr className="section-divider" />
+					</Col>
+
 					<Col xs={12} className="my-2" data-aos="fade-right" ref={(el) => (sectionRefs.current[2] = el)}>
 						<Skills />
 					</Col>
-					<Col xs={12} className="my-2" data-aos="fade-right" ref={(el) => (sectionRefs.current[2] = el)}>
-						{/* <TimelineWrapper /> */}
+
+					<Col xs={12}>
+						<hr className="section-divider" />
 					</Col>
-					<div className="d-flex flex-column align-items-center justify-content-between">
-						<Col xs={12} className="my-2" data-aos="fade-left" ref={(el) => (sectionRefs.current[3] = el)}>
-							<Portfolio />
-						</Col>{" "}
-						<Col xs={12} className="my-2" data-aos="fade-up" ref={(el) => (sectionRefs.current[4] = el)}>
-							<Gestionale />
-						</Col>{" "}
-						<Col xs={12} className="my-2">
-							<Footer />
-						</Col>
-					</div>
+
+					<Col xs={12} className="mb-2 mt-0" data-aos="fade-up" ref={(el) => (sectionRefs.current[4] = el)}>
+						<Gestionale />
+					</Col>
+
+					<Col xs={12} className="my-2">
+						<Footer />
+					</Col>
 				</Row>
 			</Container>
 		</>

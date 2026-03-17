@@ -33,9 +33,6 @@ const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate
 								<Badge className={`${styles.myBadgeUpdate} text-black`}>
 									Last Update: {formatDate && formatDate(repo.pushed_at)}
 								</Badge>
-								<Card.Link href={repo.html_url} target="_blank" className="btn btn-sm btn-primary">
-									View on GitHub
-								</Card.Link>
 							</div>
 						</motion.div>
 					) : null}

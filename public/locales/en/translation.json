@@ -20,5 +20,7 @@
 	"newSkillsLabel": "Additional Technologies & Tools",
 	"gestionaleSection": "My Management App – Restofull.it",
 	"gestionaleDesc": "Restofull.it is my web management system for restaurants, built with Next.js, NestJS, MongoDB, and Redis. It provides full management of orders, tables, menus, and reservations. Deployed on a Linux VPS with Cloudflare tunnels for secure and high-performance access.",
+	"arcadeSection": "Arcade – Play with Restofull!",
+	"arcadeDesc": "A mini-game built into the management app, accessible directly from your browser. Try to beat my high score!",
 	"visitSite": "Visit the site"
 }

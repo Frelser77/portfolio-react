@@ -34,7 +34,6 @@ const LanguagesChart = () => {
 				<Col>
 					<h3 className="text-center">{t("leanguge-chart")}</h3>
 					{status === "loading" && <Loading />}
-					{status !== "loading" && error && <div>Error fetching data: {error}</div>}
 					{status === "succeeded" && !error && (
 						<ResponsiveContainer width="100%" height={400}>
 							<RadarChart outerRadius={130} data={languagesData}>

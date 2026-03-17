@@ -4,6 +4,134 @@
 :root {
 	--primary-color: #7163d4;
 	--primary-dark: #1f252e;
+	--glass-bg: rgba(255, 255, 255, 0.55);
+	--glass-bg-dark: rgba(31, 37, 46, 0.65);
+	--glow: 0 0 18px rgba(113, 99, 212, 0.45);
+}
+
+/* ════════════════════════════════
+   SECTION TITLE – glow + underline
+════════════════════════════════ */
+.section-title {
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	background: linear-gradient(135deg, var(--primary-color) 0%, #a78bfa 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	position: relative;
+	display: inline-block;
+	left: 50%;
+	transform: translateX(-50%);
+	margin-bottom: 1.5rem;
+}
+
+.section-title::after {
+	content: "";
+	display: block;
+	height: 3px;
+	width: 60%;
+	margin: 6px auto 0;
+	border-radius: 99px;
+	background: linear-gradient(90deg, var(--primary-color), #a78bfa, transparent);
+}
+
+/* ════════════════════════════════
+   SECTION DIVIDER
+════════════════════════════════ */
+.section-divider {
+	border: none;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, rgba(113, 99, 212, 0.35), transparent);
+	margin: 2.5rem 0;
+}
+
+/* ════════════════════════════════
+   GLASSMORPHISM CARD
+════════════════════════════════ */
+.card {
+	background: var(--glass-bg) !important;
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
+	border: 1px solid rgba(255, 255, 255, 0.28) !important;
+	border-radius: 16px !important;
+	transition:
+		box-shadow 0.3s ease,
+		transform 0.3s ease;
+}
+
+.card:hover {
+	box-shadow: var(--glow);
+	transform: translateY(-3px);
+}
+
+.dark-mode .card {
+	background: var(--glass-bg-dark) !important;
+	border-color: rgba(113, 99, 212, 0.18) !important;
+}
+
+/* ════════════════════════════════
+   ABOUT CONTAINER
+════════════════════════════════ */
+.about-container {
+	max-width: 860px;
+}
+
+/* ════════════════════════════════
+   TEC ICON hover glow
+════════════════════════════════ */
+.tec-icon {
+	width: 56px;
+	height: 56px;
+	object-fit: contain;
+	filter: drop-shadow(0 0 0px transparent);
+	transition:
+		filter 0.3s ease,
+		transform 0.3s ease;
+}
+
+.tec-icon:hover {
+	filter: drop-shadow(0 0 8px var(--primary-color));
+	transform: translateY(-4px) scale(1.1);
+}
+
+/* ════════════════════════════════
+   GRADIENT ANIMATED BORDER (utility)
+════════════════════════════════ */
+.glow-border {
+	position: relative;
+	border-radius: 14px;
+}
+
+.glow-border::before {
+	content: "";
+	position: absolute;
+	inset: -2px;
+	border-radius: 14px;
+	background: linear-gradient(135deg, #7163d4, #a78bfa, #7163d4);
+	background-size: 200% 200%;
+	animation: gradientShift 4s ease infinite;
+	z-index: -1;
+	opacity: 0.7;
+}
+
+@keyframes gradientShift {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+/* ════════════════════════════════
+   SCROLL SNAP SECTION
+════════════════════════════════ */
+.scroll-snap-section {
+	scroll-margin-top: 80px;
 }
 
 .undecorated {
@@ -163,6 +291,12 @@ svg {
 
 body {
 	background-color: whitesmoke;
+	transition: background-color 0.4s ease;
+}
+
+.dark-mode body,
+body.dark-mode {
+	background-color: #0e0e1a;
 }
 
 .card {
@@ -172,8 +306,12 @@ body {
 
 .cards .cards-hvr {
 	/* Applica la transizione allo stato di base, così le transizioni saranno fluide in entrambe le direzioni */
-	transition: filter 0.3s ease, transform 0.3s ease;
-	-webkit-transition: filter 0.3s ease, -webkit-transform 0.3s ease; /* Prefisso per il supporto cross-browser */
+	transition:
+		filter 0.3s ease,
+		transform 0.3s ease;
+	-webkit-transition:
+		filter 0.3s ease,
+		-webkit-transform 0.3s ease; /* Prefisso per il supporto cross-browser */
 }
 
 body,
@@ -648,12 +786,12 @@ label {
 }
 
 :where(
-		.place::placeholder,
-		.place::placeholder::-webkit-input-placeholder,
-		.place::placeholder:-moz-placeholder,
-		.place::placeholder::-moz-placeholder,
-		.place::placeholder:-ms-input-placeholder
-	) {
+	.place::placeholder,
+	.place::placeholder::-webkit-input-placeholder,
+	.place::placeholder:-moz-placeholder,
+	.place::placeholder::-moz-placeholder,
+	.place::placeholder:-ms-input-placeholder
+) {
 	color: #17a2b8;
 }
 
