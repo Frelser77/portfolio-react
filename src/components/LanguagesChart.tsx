@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../hooks/redux";
 import Loading from "./Loading";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Container, Row, Col } from "react-bootstrap";
@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 const LanguagesChart = () => {
 	const { t } = useTranslation();
-	const { items: repos, status, error } = useSelector((state) => state.repos);
+	const { items: repos, status, error } = useAppSelector((state) => state.repos);
 	const [languagesData, setLanguagesData] = useState([]);
 
 	useEffect(() => {

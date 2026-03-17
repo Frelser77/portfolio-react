@@ -1,10 +1,14 @@
 import { createContext, useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import type { ReactNode } from "react";
+import type { DarkModeContextType } from "../types";
 
-export const DarkModeContext = createContext();
+export const DarkModeContext = createContext<DarkModeContextType>({
+	darkMode: false,
+	toggleDarkMode: () => { },
+});
 
-export const DarkModeProvider = ({ children }) => {
-	const [darkMode, setDarkMode] = useState(() => {
+export const DarkModeProvider = ({ children }: { children: ReactNode }) => {
+	const [darkMode, setDarkMode] = useState<boolean>(() => {
 		return localStorage.getItem("darkMode") === "enabled";
 	});
 
@@ -13,16 +17,13 @@ export const DarkModeProvider = ({ children }) => {
 	}, [darkMode]);
 
 	useEffect(() => {
-		const handleStorageChange = (e) => {
+		const handleStorageChange = (e: StorageEvent) => {
 			if (e.key === "darkMode") {
 				setDarkMode(e.newValue === "enabled");
 			}
 		};
-
 		window.addEventListener("storage", handleStorageChange);
-		return () => {
-			window.removeEventListener("storage", handleStorageChange);
-		};
+		return () => window.removeEventListener("storage", handleStorageChange);
 	}, []);
 
 	const toggleDarkMode = () => {
@@ -32,9 +33,4 @@ export const DarkModeProvider = ({ children }) => {
 	};
 
 	return <DarkModeContext.Provider value={{ darkMode, toggleDarkMode }}>{children}</DarkModeContext.Provider>;
-};
-
-// Definizione di propTypes per DarkModeProvider
-DarkModeProvider.propTypes = {
-	children: PropTypes.node,
 };

@@ -40,3 +40,5 @@ const persistor = persistStore(store);
 
 // Esporta sia lo store che il persistor
 export { store, persistor };
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

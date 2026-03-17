@@ -1,20 +1,21 @@
 import { useEffect, useRef, useContext } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
+import type { Particle } from "../types";
 
 const PARTICLE_COUNT = 55;
 const CONNECTION_DIST = 140;
 const BURST_COUNT = 14;
 
-function randomBetween(a, b) {
+function randomBetween(a: number, b: number): number {
 	return a + Math.random() * (b - a);
 }
 
 export default function ParticleBackground() {
-	const canvasRef = useRef(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { darkMode } = useContext(DarkModeContext);
-	const darkModeRef = useRef(darkMode);
-	const particlesRef = useRef([]);
-	const rafRef = useRef(null);
+	const darkModeRef = useRef<boolean>(darkMode);
+	const particlesRef = useRef<Particle[]>([]);
+	const rafRef = useRef<number | null>(null);
 
 	// keep ref in sync so the draw loop always has current value without restart
 	useEffect(() => {
@@ -23,7 +24,9 @@ export default function ParticleBackground() {
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
+		if (!canvas) return;
 		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
 
 		/* ── resize ── */
 		const resize = () => {
@@ -34,7 +37,7 @@ export default function ParticleBackground() {
 		window.addEventListener("resize", resize);
 
 		/* ── particle factory ── */
-		const makeParticle = (x, y, burst = false) => ({
+		const makeParticle = (x?: number, y?: number, burst = false): Particle => ({
 			x: x ?? randomBetween(0, canvas.width),
 			y: y ?? randomBetween(0, canvas.height),
 			vx: randomBetween(-0.35, 0.35) * (burst ? 3.5 : 1),
@@ -117,7 +120,7 @@ export default function ParticleBackground() {
 		rafRef.current = requestAnimationFrame(draw);
 
 		/* ── click / touch burst ── */
-		const spawnBurst = (clientX, clientY) => {
+		const spawnBurst = (clientX: number, clientY: number) => {
 			const rect = canvas.getBoundingClientRect();
 			const scrollY = window.scrollY;
 			const x = clientX - rect.left;
@@ -127,8 +130,8 @@ export default function ParticleBackground() {
 			}
 		};
 
-		const onClick = (e) => spawnBurst(e.clientX, e.clientY);
-		const onTouch = (e) => {
+		const onClick = (e: MouseEvent) => spawnBurst(e.clientX, e.clientY);
+		const onTouch = (e: TouchEvent) => {
 			const t = e.touches[0];
 			if (t) spawnBurst(t.clientX, t.clientY);
 		};

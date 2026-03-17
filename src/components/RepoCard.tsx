@@ -1,13 +1,20 @@
-import PropTypes from "prop-types";
 import { Badge, Card } from "react-bootstrap";
 import { motion } from "framer-motion";
 import Skeleton from "./Skeleton";
 import styles from "./Portfolio.module.css";
+import type { Repo } from "../types";
 
-const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate }) => {
-	if (!repo) {
-		return <Skeleton />;
-	}
+interface RepoCardProps {
+	repo: Repo;
+	isHovered: boolean;
+	isTouchDevice: boolean;
+	onHover: () => void;
+	onLeave: () => void;
+	formatDate: (date: string) => string;
+}
+
+const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate }: RepoCardProps) => {
+	if (!repo) return <Skeleton />;
 	return (
 		<div
 			className={`${styles.cardprt} ${isHovered ? "expandedCard" : ""}`}
@@ -40,15 +47,6 @@ const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate
 			</Card>
 		</div>
 	);
-};
-
-RepoCard.propTypes = {
-	repo: PropTypes.object.isRequired,
-	isHovered: PropTypes.bool.isRequired,
-	isTouchDevice: PropTypes.bool.isRequired,
-	onHover: PropTypes.func.isRequired,
-	onLeave: PropTypes.func.isRequired,
-	formatDate: PropTypes.func.isRequired,
 };
 
 export default RepoCard;
