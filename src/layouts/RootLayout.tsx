@@ -7,9 +7,9 @@ import WhatsAppFAB from "../components/WhatsAppFAB";
 import { useEffect } from "react";
 
 const pageVariants = {
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.38, ease: "easeOut" } },
-  exit: { opacity: 0, y: -12, transition: { duration: 0.22, ease: "easeIn" } },
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.28, ease: "easeOut" } },
+  exit: { opacity: 0, transition: { duration: 0.18, ease: "easeIn" } },
 };
 
 const RootLayout = () => {
@@ -17,7 +17,7 @@ const RootLayout = () => {
 
   // Scroll to top on route change
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [location.pathname]);
 
   return (
@@ -27,14 +27,14 @@ const RootLayout = () => {
         <MyNavbar />
         <ScrollToTopButton />
         <WhatsAppFAB />
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.main
             key={location.pathname}
             variants={pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            style={{ minHeight: "80vh", padding: "1rem 0 3rem" }}
+            style={{ minHeight: "80vh", padding: "1rem 0 3rem", willChange: "opacity" }}
           >
             <Outlet />
           </motion.main>
