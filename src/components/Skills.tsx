@@ -1,6 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
-import { Col, Row, Image } from "react-bootstrap";
 import { motion } from "framer-motion";
 const html5Icon = "/img/html5_icon.png";
 const css3Icon = "/img/css3_icon.png";
@@ -115,43 +114,42 @@ const Skills = () => {
 			<h4 id="Skills" className="text-center section-title">
 				{t("skills")}
 			</h4>
-			<Row xs={2} md={3} lg={6} className="g-5 py-3 my-1 mx-auto" ref={ref}>
+			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 py-3 my-1 max-w-7xl mx-auto px-4" ref={ref}>
 				{images.map((imgSrc, index) => (
-					<Col key={index} className="text-center">
+					<div key={index} className="text-center">
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={isVisible ? { opacity: 1 } : {}}
 							transition={{ duration: 1.5, delay: isVisible ? index * 0.2 : 0 }}
 						>
-							<Image src={imgSrc} alt="Technology icon" fluid className="tec-icon" />
+							<img src={imgSrc} alt="Technology icon" className="tec-icon max-w-full h-auto" />
 						</motion.div>
-					</Col>
+					</div>
 				))}
-			</Row>
+			</div>
 			<LanguagesChart />
 
-			<div className="mt-5 pt-3 border-top">
-				<h6 className="text-center mb-4 fw-semibold text-uppercase letter-spacing-1">
+			<div className="mt-5 pt-3 border-t border-gray-300">
+				<h6 className="text-center mb-4 font-semibold uppercase tracking-widest">
 					{t("newSkillsLabel")}
 				</h6>
-				<Row xs={3} md={4} lg={6} className="g-4 py-2 mx-auto justify-content-center">
+				<div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 py-2 max-w-7xl mx-auto px-4 justify-items-center">
 					{additionalSkills.map(({ Icon, name, color }, index) => {
 						const iconColor = color ?? (darkMode ? "#ffffff" : "#000000");
 						return (
-							<Col key={name} className="text-center">
-								<motion.div
-									className="d-flex flex-column align-items-center gap-2"
-									initial={{ opacity: 0, y: 12 }}
-									animate={isVisible ? { opacity: 1, y: 0 } : {}}
-									transition={{ duration: 0.5, delay: isVisible ? index * 0.08 : 0 }}
-								>
-									<Icon size={44} color={iconColor} />
-									<small className="fw-semibold">{name}</small>
-								</motion.div>
-							</Col>
+							<motion.div
+								key={name}
+								className="flex flex-col items-center gap-2 text-center"
+								initial={{ opacity: 0, y: 12 }}
+								animate={isVisible ? { opacity: 1, y: 0 } : {}}
+								transition={{ duration: 0.5, delay: isVisible ? index * 0.08 : 0 }}
+							>
+								<Icon size={44} color={iconColor} />
+								<small className="font-semibold">{name}</small>
+							</motion.div>
 						);
 					})}
-				</Row>
+				</div>
 			</div>
 		</>
 	);

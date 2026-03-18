@@ -1,6 +1,5 @@
 import "boxicons";
 import styles from "./MainComponentSocialIcons.module.css";
-import { Container } from "react-bootstrap";
 import LanguagesChart from "./LanguagesChart";
 import { useTranslation } from "react-i18next";
 
@@ -8,7 +7,7 @@ const MainComponent = () => {
 	const { t } = useTranslation();
 
 	return (
-		<Container>
+		<div className="max-w-7xl mx-auto px-4">
 			<div className="main">
 				<div className="detail">
 					<div className="detail">
@@ -19,12 +18,12 @@ const MainComponent = () => {
 						<p>{t("juniorWebDeveloper")}</p>
 					</div>
 
-					<div className="d-flex align-items-center custom-justify-xs-center gap-4 mt-4">
+					<div className="flex items-center justify-center sm:justify-start gap-4 mt-4">
 						<a
 							href="https://www.linkedin.com/in/salvatore-dam/"
-							style={{ "--socialAni": "1" }}
+							style={{ "--socialAni": "1" } as React.CSSProperties}
 							target="_blank"
-							className={styles.socialLinkedin + " " + styles.social + " " + "social socialLinkedin"}
+							className={styles.socialLinkedin + " " + styles.social + " social socialLinkedin"}
 							rel="noreferrer"
 							title="Link to my LinkedIn profile"
 						>
@@ -33,9 +32,9 @@ const MainComponent = () => {
 						</a>
 						<a
 							href="https://github.com/Frelser77"
-							style={{ "--socialAni": "3" }}
+							style={{ "--socialAni": "3" } as React.CSSProperties}
 							target="_blank"
-							className={styles.socialGitHub + " " + styles.social + " " + "social socialGitHub"}
+							className={styles.socialGitHub + " " + styles.social + " social socialGitHub"}
 							rel="noreferrer"
 							title="Link to my GitHub profile"
 						>
@@ -52,7 +51,7 @@ const MainComponent = () => {
 					/>
 				</div>
 			</div>
-		</Container>
+		</div>
 	);
 };
 

@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Roboto:wght@100;300;400&display=swap");
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
 	--primary-color: #7163d4;
 	--primary-dark: #1f252e;
@@ -695,12 +699,6 @@ label {
 		background: var(--primary-dark);
 	}
 
-	.mode {
-		position: absolute;
-		top: 1rem;
-		right: 11.5rem;
-	}
-
 	.images {
 		width: 342px;
 		height: 365px;
@@ -744,10 +742,19 @@ label {
 	color: #fff; /* Colore per il link attivo */
 }
 
-.dark-mode .navbar,
+.dark-mode .navbar {
+	background-color: #0d0b1e;
+	color: #fff;
+	border-bottom: 1px solid rgba(113, 99, 212, 0.22);
+}
+
 .dark-mode .card {
 	background-color: var(--primary-dark);
 	color: #fff;
+}
+
+.dark-mode .logo {
+	filter: brightness(0) invert(1);
 }
 
 .dark-mode .form-control:focus,

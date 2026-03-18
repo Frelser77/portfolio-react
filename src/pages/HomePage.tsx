@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import MainComponent from "../components/MainComponents";
 import {
@@ -55,48 +54,47 @@ const HomePage = () => {
 
       {/* ── STATS ── */}
       <section style={{ padding: "2.5rem 0" }}>
-        <Container>
-          <Row className="justify-content-center g-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-3 gap-4 justify-items-center max-w-lg mx-auto">
             {[
               { value: "2+", label: t("stats_years") },
               { value: "20+", label: t("stats_tech") },
               { value: "5+", label: t("stats_projects") },
             ].map((s, i) => (
-              <Col xs={4} md={3} key={s.label}>
-                <motion.div
-                  className="text-center"
-                  variants={fadeUp}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
+              <motion.div
+                key={s.label}
+                className="text-center"
+                variants={fadeUp}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div
+                  style={{
+                    fontSize: "2.8rem",
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    background: "linear-gradient(135deg, var(--primary-color) 0%, #a78bfa 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
                 >
-                  <div
-                    style={{
-                      fontSize: "2.8rem",
-                      fontWeight: 800,
-                      lineHeight: 1,
-                      background: "linear-gradient(135deg, var(--primary-color) 0%, #a78bfa 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    {s.value}
-                  </div>
-                  <div style={{ fontSize: ".85rem", opacity: 0.65, marginTop: "6px" }}>{s.label}</div>
-                </motion.div>
-              </Col>
+                  {s.value}
+                </div>
+                <div style={{ fontSize: ".85rem", opacity: 0.65, marginTop: "6px" }}>{s.label}</div>
+              </motion.div>
             ))}
-          </Row>
-        </Container>
+          </div>
+        </div>
       </section>
 
       <hr className="section-divider" />
 
       {/* ── COSA SO FARE ── */}
       <section style={{ padding: "2rem 0 2.5rem" }}>
-        <Container>
+        <div className="max-w-7xl mx-auto px-4">
           <motion.h2
             className="section-title"
             variants={fadeUp}
@@ -107,7 +105,7 @@ const HomePage = () => {
             {t("whatIDo")}
           </motion.h2>
 
-          <Row className="g-4 justify-content-center mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             {[
               {
                 icon: <FaCode size={30} color="var(--primary-color)" />,
@@ -128,33 +126,32 @@ const HomePage = () => {
                 i: 2,
               },
             ].map((card) => (
-              <Col xs={12} md={4} key={card.title}>
-                <motion.div
-                  className="card h-100 p-4"
-                  variants={fadeUp}
-                  custom={card.i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  whileHover={{ y: -6, boxShadow: "0 0 28px rgba(113,99,212,0.45)" }}
-                >
-                  <div style={{ marginBottom: "1rem" }}>{card.icon}</div>
-                  <h5 style={{ fontWeight: 700, color: "var(--primary-color)", marginBottom: ".5rem" }}>
-                    {card.title}
-                  </h5>
-                  <p style={{ fontSize: ".9rem", opacity: 0.75, marginBottom: 0 }}>{card.desc}</p>
-                </motion.div>
-              </Col>
+              <motion.div
+                key={card.title}
+                className="card h-full p-8"
+                variants={fadeUp}
+                custom={card.i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                whileHover={{ y: -6, boxShadow: "0 0 28px rgba(113,99,212,0.45)" }}
+              >
+                <div style={{ marginBottom: "1rem" }}>{card.icon}</div>
+                <h5 style={{ fontWeight: 700, color: "var(--primary-color)", marginBottom: ".5rem" }}>
+                  {card.title}
+                </h5>
+                <p style={{ fontSize: ".9rem", opacity: 0.75, marginBottom: 0 }}>{card.desc}</p>
+              </motion.div>
             ))}
-          </Row>
-        </Container>
+          </div>
+        </div>
       </section>
 
       <hr className="section-divider" />
 
       {/* ── TECH MARQUEE ── */}
       <section style={{ padding: "2rem 0", overflow: "hidden" }}>
-        <Container fluid>
+        <div className="w-full">
           <motion.p
             variants={fadeUp}
             initial="hidden"
@@ -181,14 +178,14 @@ const HomePage = () => {
               ))}
             </div>
           </div>
-        </Container>
+        </div>
       </section>
 
       <hr className="section-divider" />
 
       {/* ── CTA ── */}
       <section style={{ padding: "3rem 0 4.5rem" }}>
-        <Container className="text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -217,7 +214,7 @@ const HomePage = () => {
               {t("cta_title")}
             </h2>
             <p style={{ color: "#fff", marginBottom: "2rem" }}>{t("cta_desc")}</p>
-            <div className="d-flex gap-3 justify-content-center flex-wrap">
+            <div className="flex gap-3 justify-center flex-wrap">
               <Link
                 to="/contact"
                 className="btn"
@@ -248,7 +245,7 @@ const HomePage = () => {
               </Link>
             </div>
           </motion.div>
-        </Container>
+        </div>
       </section>
     </>
   );

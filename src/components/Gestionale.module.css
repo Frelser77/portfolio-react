@@ -3,6 +3,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 3.5rem;
+	padding: 0 1.5rem;
 }
 
 /* ── Singolo blocco (gestionale / arcade) ── */
@@ -178,6 +179,31 @@
    → phone tocca i bordi del viewport con 5px di margine
 ════════════════════════════════════ */
 @media (max-width: 576px) {
+	.section {
+		padding: 0 0.75rem;
+	}
+
+	.labelRow {
+		flex-wrap: wrap;
+		row-gap: 0.5rem;
+	}
+
+	.labelRow span {
+		flex-basis: 100%;
+		order: 1;
+	}
+
+	.labelRow svg:first-child {
+		order: 0;
+		align-self: flex-start;
+		margin-top: 2px;
+	}
+
+	.linkBtn {
+		order: 2;
+		align-self: flex-start;
+	}
+
 	.phone {
 		width: calc(100vw - 10px);
 		border-radius: 28px;

@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { FiExternalLink, FiMonitor } from "react-icons/fi";
-import { MdSportsEsports } from "react-icons/md";
+import { FiExternalLink } from "react-icons/fi";
 import styles from "./Gestionale.module.css";
 
 const Gestionale = () => {
@@ -18,7 +17,6 @@ const Gestionale = () => {
 				className={styles.block}
 			>
 				<div className={styles.labelRow}>
-					<FiMonitor size={22} />
 					<span>{t("gestionaleSection")}</span>
 					<a href="https://www.restofull.it" target="_blank" rel="noopener noreferrer" className={styles.linkBtn}>
 						<FiExternalLink size={15} /> {t("visitSite")}
@@ -53,7 +51,6 @@ const Gestionale = () => {
 				className={styles.block}
 			>
 				<div className={styles.labelRow}>
-					<MdSportsEsports size={24} />
 					<span>{t("arcadeSection")}</span>
 					<a
 						href="https://www.restofull.it/arcade"

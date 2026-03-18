@@ -1,4 +1,3 @@
-import { Badge, Card } from "react-bootstrap";
 import { motion } from "framer-motion";
 import Skeleton from "./Skeleton";
 import styles from "./Portfolio.module.css";
@@ -21,10 +20,10 @@ const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate
 			onMouseEnter={!isTouchDevice ? onHover : undefined}
 			onMouseLeave={!isTouchDevice ? onLeave : undefined}
 		>
-			<Card className={`${styles.cardprt} border-0 my-bg h-100 position-relative`}>
-				<Card.Img src="/img/placeholder.png" alt={repo.name} className="rounded-0" />
-				<Card.Body>
-					<Card.Title className="fs-4 text-truncate">{repo.name}</Card.Title>
+			<div className={`${styles.cardprt} my-bg h-full relative rounded-none border-0`}>
+				<img src="/img/placeholder.png" alt={repo.name} className="rounded-none w-full" />
+				<div className="p-4">
+					<h5 className="text-xl truncate font-semibold">{repo.name}</h5>
 					{isTouchDevice || isHovered ? (
 						<motion.div
 							initial={isTouchDevice ? {} : { maxHeight: 0, opacity: 0 }}
@@ -32,19 +31,19 @@ const RepoCard = ({ repo, isHovered, isTouchDevice, onHover, onLeave, formatDate
 							transition={{ duration: 0.2, times: [0, 0.8, 1] }}
 							className={styles.additionalContent}
 						>
-							<Card.Text className="fs-6 text-truncate">{repo.description || "No description available"}</Card.Text>
-							<div className="d-flex flex-column align-items-center justify-content-center">
-								<Badge className={`${styles.myBadgeCreate} text-black`}>
+							<p className="text-sm truncate">{repo.description || "No description available"}</p>
+							<div className="flex flex-col items-center justify-center gap-1">
+								<span className={`${styles.myBadgeCreate} text-black text-xs px-2 py-1 rounded`}>
 									First Commit: {formatDate && formatDate(repo.created_at)}
-								</Badge>
-								<Badge className={`${styles.myBadgeUpdate} text-black`}>
+								</span>
+								<span className={`${styles.myBadgeUpdate} text-black text-xs px-2 py-1 rounded`}>
 									Last Update: {formatDate && formatDate(repo.pushed_at)}
-								</Badge>
+								</span>
 							</div>
 						</motion.div>
 					) : null}
-				</Card.Body>
-			</Card>
+				</div>
+			</div>
 		</div>
 	);
 };

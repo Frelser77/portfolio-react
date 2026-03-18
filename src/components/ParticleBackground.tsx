@@ -42,7 +42,7 @@ export default function ParticleBackground() {
 			y: y ?? randomBetween(0, canvas.height),
 			vx: randomBetween(-0.35, 0.35) * (burst ? 3.5 : 1),
 			vy: randomBetween(-0.35, 0.35) * (burst ? 3.5 : 1),
-			size: burst ? randomBetween(1.5, 3) : randomBetween(1, 2.2),
+			size: burst ? randomBetween(3, 5.5) : randomBetween(2, 4),
 			alpha: burst ? 1 : randomBetween(0.3, 0.75),
 			life: burst ? 1 : Infinity, // burst particles fade out
 			burst,

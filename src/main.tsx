@@ -5,7 +5,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "../src/redux/store/store";
 import "boxicons/css/boxicons.min.css";
 import App from "./App";
-import "bootstrap/dist/css/bootstrap.min.css";
+
 import "./index.css";
 
 const container = document.getElementById("root");

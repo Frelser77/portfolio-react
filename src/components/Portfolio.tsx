@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Container } from "react-bootstrap";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
@@ -9,35 +8,36 @@ import "swiper/css/autoplay";
 import { motion } from "framer-motion";
 import styles from "./Portfolio.module.css";
 import RepoCard from "../components/RepoCard";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../hooks/redux";
+import { Repo } from "../types";
 const Portfolio = () => {
-	const [hoveredIndex, setHoveredIndex] = useState(null);
-	const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+	const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-	const { items: allRepos, status } = useSelector((state) => state.repos);
+	const { items: allRepos, status } = useAppSelector((state) => state.repos);
 
-	const filteredRepos =
+	const filteredRepos: Repo[] =
 		status === "succeeded"
-			? allRepos.filter((repo) =>
-					[
-						"linkedin-redux",
-						"netflix-clone-route",
-						"weather_app",
-						"Spotify-clone",
-						"Spy-Ecommerce",
-						"Ecommerce-Esame",
-					].includes(repo.name)
-			  )
+			? allRepos.filter((repo: Repo) =>
+				[
+					"linkedin-redux",
+					"netflix-clone-route",
+					"weather_app",
+					"Spotify-clone",
+					"Spy-Ecommerce",
+					"Ecommerce-Esame",
+				].includes(repo.name)
+			)
 			: [];
 
-	const formatDate = (dateString) => {
-		const options = { year: "numeric", month: "long", day: "numeric" };
+	const formatDate = (dateString: string) => {
+		const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" };
 		return new Date(dateString).toLocaleDateString(undefined, options);
 	};
 
 	return (
 		<div className={styles.portfolio}>
-			<Container fluid>
+			<div className="w-full px-4">
 				<h4 id="Portfolio" className="text-center mt-2 mb-3 section-title">
 					Portfolio
 				</h4>
@@ -49,11 +49,6 @@ const Portfolio = () => {
 					pagination={{ clickable: true }}
 					autoplay={{ delay: 10000 }}
 					breakpoints={{
-						// Extra small devices (phones, 600px and down)
-						600: {
-							slidesPerView: 1,
-						},
-						// Small devices (portrait tablets and large phones, 600px and up)
 						600: {
 							slidesPerView: 1,
 						},
@@ -75,7 +70,7 @@ const Portfolio = () => {
 						},
 					}}
 				>
-					{filteredRepos.map((repo, index) => (
+					{filteredRepos.map((repo: Repo, index: number) => (
 						<SwiperSlide key={repo.id}>
 							{isTouchDevice ? (
 								<div className={styles.slide}>
@@ -110,7 +105,7 @@ const Portfolio = () => {
 						</SwiperSlide>
 					))}
 				</Swiper>
-			</Container>
+			</div>
 		</div>
 	);
 };

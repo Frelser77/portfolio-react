@@ -11,7 +11,6 @@ export default defineConfig({
 					router: ["react-router-dom"],
 					"redux-vendor": ["@reduxjs/toolkit", "react-redux", "redux-persist"],
 					motion: ["framer-motion"],
-					bootstrap: ["bootstrap", "react-bootstrap"],
 					swiper: ["swiper"],
 					charts: ["recharts"],
 					icons: ["react-icons"],

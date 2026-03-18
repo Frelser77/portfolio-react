@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Container, Row, Col } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../hooks/redux";
 import MainComponent from "./MainComponents";
 import About from "./About";
 import Footer from "./Footer";
@@ -12,9 +11,9 @@ import { fetchRepos } from "../redux/reducers/fetchRepo";
 import Gestionale from "./Gestionale";
 
 const PageLayout = () => {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
-	const sectionRefs = useRef([]);
+	const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
 	useEffect(() => {
 		dispatch(fetchRepos());
@@ -57,41 +56,35 @@ const PageLayout = () => {
 	return (
 		<>
 			<ScrollToTopButton />
-			<Container className="my-2">
-				<Row className="mt-1 mt-lg-4">
-					<Col xs={12} className="mb-5" data-aos="fade-right" ref={(el) => (sectionRefs.current[0] = el)}>
+			<div className="max-w-7xl mx-auto px-4 my-2">
+				<div className="mt-1 lg:mt-4">
+					<div className="mb-5" data-aos="fade-right" ref={(el) => (sectionRefs.current[0] = el)}>
 						<MainComponent />
-					</Col>
+					</div>
 
-					<Col xs={12}>
-						<hr className="section-divider" />
-					</Col>
+					<hr className="section-divider" />
 
-					<Col xs={12} className="my-2" data-aos="fade-left" ref={(el) => (sectionRefs.current[1] = el)}>
+					<div className="my-2" data-aos="fade-left" ref={(el) => (sectionRefs.current[1] = el)}>
 						<About />
-					</Col>
+					</div>
 
-					<Col xs={12}>
-						<hr className="section-divider" />
-					</Col>
+					<hr className="section-divider" />
 
-					<Col xs={12} className="my-2" data-aos="fade-right" ref={(el) => (sectionRefs.current[2] = el)}>
+					<div className="my-2" data-aos="fade-right" ref={(el) => (sectionRefs.current[2] = el)}>
 						<Skills />
-					</Col>
+					</div>
 
-					<Col xs={12}>
-						<hr className="section-divider" />
-					</Col>
+					<hr className="section-divider" />
 
-					<Col xs={12} className="mb-2 mt-0" data-aos="fade-up" ref={(el) => (sectionRefs.current[4] = el)}>
+					<div className="mb-2 mt-0" data-aos="fade-up" ref={(el) => (sectionRefs.current[4] = el)}>
 						<Gestionale />
-					</Col>
+					</div>
 
-					<Col xs={12} className="my-2">
+					<div className="my-2">
 						<Footer />
-					</Col>
-				</Row>
-			</Container>
+					</div>
+				</div>
+			</div>
 		</>
 	);
 };

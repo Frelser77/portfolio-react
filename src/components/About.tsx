@@ -1,4 +1,3 @@
-import { Card, CardBody } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Suspense } from "react";
@@ -8,11 +7,11 @@ const About = () => {
 	const duration = 0.6;
 	const initialDelay = 0.2;
 
-	const calculateDelay = (index, duration) => initialDelay + index * (duration + 0.2);
+	const calculateDelay = (index: number, duration: number) => initialDelay + index * (duration + 0.2);
 
 	const paragraphVariants = {
 		hidden: { opacity: 0, y: 50 },
-		visible: (custom) => ({
+		visible: (custom: number) => ({
 			opacity: 1,
 			y: 0,
 			transition: { delay: custom, duration: duration },
@@ -47,8 +46,8 @@ const About = () => {
 					>
 						{t("aboutMe")}
 					</motion.h2>
-					<Card className="border-0">
-						<CardBody>
+					<div className="rounded-xl p-4">
+						<div>
 							{paragraphs.map((paragraph, index) => (
 								<motion.p
 									key={index}
@@ -59,8 +58,8 @@ const About = () => {
 									{paragraph}
 								</motion.p>
 							))}
-						</CardBody>
-					</Card>
+						</div>
+					</div>
 				</div>
 			</motion.div>
 		</Suspense>

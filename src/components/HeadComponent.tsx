@@ -4,7 +4,7 @@ const HeadComponent = () => {
 	return (
 		<Helmet>
 			<meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
-			<meta charset="utf-8" />
+			<meta charSet="utf-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<link rel="icon" type="image/svg+xml" href="./img//Logo_icon_2.ico" />
 			<link rel="apple-touch-icon" sizes="180x180" href="/img/Logo_BW_sm.png" />

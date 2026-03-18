@@ -9,7 +9,7 @@ const LanguageSelector = () => {
 	};
 
 	return (
-		<div className="d-flex gap-2">
+		<div className="flex gap-2">
 			<IT
 				onClick={() => changeLanguage("it")}
 				style={{ cursor: "pointer", width: "1.5rem", height: "1.5rem" }}
