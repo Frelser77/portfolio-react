@@ -4,6 +4,12 @@
       "NODE_VERSION": "22.x"
     }
   },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
