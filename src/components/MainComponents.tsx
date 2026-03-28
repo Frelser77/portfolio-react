@@ -45,7 +45,7 @@ const MainComponent = () => {
 				</div>
 				<div className="images">
 					<img
-						src="../img/profilo.png"
+						src="../img/imagecv.png"
 						alt="Immagine di me con occhiali da sole e berretto che guardo verso la tua destra, ho indosso una felpa con zip semi aperta e si intravede la maglia e la collana, la foto ha tonalitá bianco e nere."
 						className="img-w"
 					/>
