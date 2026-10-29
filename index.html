@@ -1,12 +1,70 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" data-theme="light">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="./img//Logo_icon_2.ico" />
-		<title>Salvatore D'Amico</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Salvatore D'Amico, sviluppatore full stack</title>
+		<meta
+			name="description"
+			content="Salvatore D'Amico, sviluppatore full stack: React, Next.js, NestJS, ASP.NET, Oracle e SQL, integrazioni e deploy su Cloudflare e VPS Linux. Progetti, percorso e contatti."
+		/>
+		<meta name="author" content="Salvatore Alessandro D'Amico" />
+		<meta name="robots" content="index, follow" />
+		<link rel="canonical" href="__SITE_URL__/" />
+		<meta name="theme-color" content="#f3f5f7" />
+		<meta name="color-scheme" content="light dark" />
+
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="it_IT" />
+		<meta property="og:locale:alternate" content="en_GB" />
+		<meta property="og:url" content="__SITE_URL__/" />
+		<meta property="og:title" content="Salvatore D'Amico, sviluppatore full stack" />
+		<meta
+			property="og:description"
+			content="Dal DNS all'ultimo pixel: interfacce React, API NestJS e .NET, database, integrazioni e deploy."
+		/>
+		<meta property="og:image" content="__SITE_URL__/og-image.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "Salvatore Alessandro D'Amico",
+				"jobTitle": "Full Stack Developer",
+				"url": "__SITE_URL__/",
+				"image": "__SITE_URL__/img/salvatore-320.webp",
+				"email": "mailto:damicosalvatorea@icloud.com",
+				"address": { "@type": "PostalAddress", "addressLocality": "Oria", "addressRegion": "BR", "addressCountry": "IT" },
+				"sameAs": ["https://github.com/Frelser77", "https://www.linkedin.com/in/salvatore-dam/"],
+				"knowsAbout": ["React", "Next.js", "TypeScript", "NestJS", "ASP.NET", "Oracle", "SQL Server", "MySQL", "MongoDB", "Redis", "Cloudflare", "Linux"]
+			}
+		</script>
+
+		<!-- Applica il tema prima del primo paint, così non c'è il lampo di colore sbagliato -->
+		<script>
+			(function () {
+				var t = null;
+				try { t = localStorage.getItem("theme"); } catch (e) {}
+				if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+				document.documentElement.dataset.theme = t;
+			})();
+		</script>
 	</head>
 	<body>
 		<div id="root"></div>
+		<noscript>
+			<p style="padding: 24px; font-family: system-ui, sans-serif">
+				Salvatore D'Amico, sviluppatore full stack. Scrivimi: damicosalvatorea@icloud.com
+			</p>
+		</noscript>
 		<script type="module" src="/src/main.tsx"></script>
 	</body>
 </html>
