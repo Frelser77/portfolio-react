@@ -7,9 +7,9 @@
 :root {
 	--bg: #070b1a;
 	--ink: #e8ecff;
-	--ink-2: #b9c2e6;
-	--ink-3: #aab4dc;
-	--accent: #8fa0ff;
+	--ink-2: #d0d7f5;
+	--ink-3: #c6cef0;
+	--accent: #a9b6ff;
 	--violet: #c4a8ff;
 	--cyan: #bfe9ff;
 	--ok: #6fe3a0;
@@ -4880,3 +4880,11 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 	.pc__go { top: 7px; right: 7px; width: 34px; height: 34px; }
 	.pc__go svg { width: 16px; height: 16px; }
 }
+
+/* leggibilità: testi piccoli sempre sopra uno sfondo scuro e con ombra */
+.eyebrow { color: #d6dcff; font-weight: 500; text-shadow: 0 1px 12px rgba(4, 7, 28, 0.9); }
+.eyebrow b { color: #c1ccff; }
+.ppage.glass { background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 55%, rgba(255, 255, 255, 0.05)), rgba(6, 9, 32, 0.82); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); }
+.ppage .psub, .ppage .dlg__meta, .ppage .shots__cap { color: #d6dcff !important; }
+.ppage .like { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.status { color: #fff; }
