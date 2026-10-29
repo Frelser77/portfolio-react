@@ -32,6 +32,7 @@ export interface Env {
 	DB?: D1;
 	ADMIN_TOKEN?: string;
 	NOTIFY_WEBHOOK?: string;
+	GITHUB_TOKEN?: string;
 	SALT?: string;
 }
 interface Ctx {
@@ -216,32 +217,132 @@ async function plan(req: Request, env: Env) {
 
 /* ------------------------------ GitHub ------------------------------ */
 
-async function github(ctx: Ctx) {
-	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
-	const key = new Request("https://cache.fr7.local/github-v1");
-	const hit = await cache?.match(key);
-	if (hit) return new Response(hit.body, { status: 200, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300", ...SECURITY } });
+const GH_USER = profile.github.split("/").filter(Boolean).pop()!;
+const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", ...SECURITY };
 
-	const user = profile.github.split("/").filter(Boolean).pop()!;
-	const gh = (path: string) => fetch(`https://api.github.com${path}`, { headers: { "user-agent": "fr7-portfolio", accept: "application/vnd.github+json" } });
-	try {
-		const [u, r] = await Promise.all([gh(`/users/${user}`), gh(`/users/${user}/repos?per_page=100&sort=pushed`)]);
-		if (!u.ok || !r.ok) return json({ error: "github_unavailable" }, 502);
-		const uj = (await u.json()) as { public_repos?: number; followers?: number };
-		const rj = (await r.json()) as { name: string; description: string | null; language: string | null; pushed_at: string; html_url: string; stargazers_count: number; fork: boolean }[];
-		const own = rj.filter((x) => !x.fork);
-		const langs = new Map<string, number>();
-		for (const x of own) if (x.language) langs.set(x.language, (langs.get(x.language) ?? 0) + 1);
-		const payload = {
-			repos: uj.public_repos ?? own.length,
-			followers: uj.followers ?? 0,
-			languages: [...langs].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count),
-			recent: own.slice(0, 6).map((x) => ({ name: x.name, description: x.description ?? "", language: x.language ?? "", pushedAt: x.pushed_at, url: x.html_url, stars: x.stargazers_count })),
-			fetchedAt: new Date().toISOString(),
+interface GqlRepo {
+	name: string;
+	isPrivate: boolean;
+	isFork: boolean;
+	url: string;
+	pushedAt: string;
+	stargazerCount: number;
+	description: string | null;
+	primaryLanguage: { name: string } | null;
+	languages?: { edges: { size: number; node: { name: string } }[] };
+}
+
+async function gql<T>(token: string, query: string, variables: Record<string, unknown> = {}): Promise<T> {
+	const r = await fetch("https://api.github.com/graphql", {
+		method: "POST",
+		headers: { authorization: `Bearer ${token}`, "user-agent": "fr7-portfolio", "content-type": "application/json" },
+		body: JSON.stringify({ query, variables }),
+	});
+	if (!r.ok) throw new Error(`github ${r.status}`);
+	const j = (await r.json()) as { data?: T; errors?: unknown[] };
+	if (!j.data) throw new Error("github_graphql");
+	return j.data;
+}
+
+/** Con un token: lingue e contributi comprendono anche i repository privati, ma in pubblico escono solo numeri aggregati, mai i nomi. */
+async function githubWithToken(token: string) {
+	const data = await gql<{
+		user: {
+			followers: { totalCount: number };
+			contributionsCollection: { contributionCalendar: { totalContributions: number; weeks: { contributionDays: { contributionCount: number }[] }[] } };
+			repositories: { totalCount: number; nodes: GqlRepo[] };
 		};
-		const res = new Response(JSON.stringify(payload), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=3600", ...SECURITY } });
+	}>(
+		token,
+		`query($login:String!){ user(login:$login){
+			followers{ totalCount }
+			contributionsCollection{ contributionCalendar{ totalContributions weeks{ contributionDays{ contributionCount } } } }
+			repositories(first:100, ownerAffiliations:[OWNER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount nodes{ name isPrivate isFork url pushedAt stargazerCount description primaryLanguage{ name } languages(first:6, orderBy:{field:SIZE,direction:DESC}){ edges{ size node{ name } } } } }
+		} }`,
+		{ login: GH_USER },
+	);
+	const u = data.user;
+	const own = u.repositories.nodes.filter((r) => !r.isFork);
+	const bytes = new Map<string, number>();
+	for (const r of own) for (const e of r.languages?.edges ?? []) bytes.set(e.node.name, (bytes.get(e.node.name) ?? 0) + e.size);
+	const total = [...bytes.values()].reduce((a, b) => a + b, 0) || 1;
+	const pub = own.filter((r) => !r.isPrivate && r.name.toLowerCase() !== GH_USER.toLowerCase() && r.primaryLanguage);
+	return {
+		repos: u.repositories.totalCount,
+		privateRepos: own.filter((r) => r.isPrivate).length,
+		followers: u.followers.totalCount,
+		percent: true,
+		languages: [...bytes].map(([name, n]) => ({ name, count: Math.round((n / total) * 100) })).filter((l) => l.count > 0).sort((a, b) => b.count - a.count),
+		contributions: u.contributionsCollection.contributionCalendar.totalContributions,
+		calendar: u.contributionsCollection.contributionCalendar.weeks.map((w) => w.contributionDays.map((d) => d.contributionCount)),
+		recent: pub.slice(0, 6).map((x) => ({ name: x.name, description: x.description ?? "", language: x.primaryLanguage?.name ?? "", pushedAt: x.pushedAt, url: x.url, stars: x.stargazerCount })),
+		fetchedAt: new Date().toISOString(),
+	};
+}
+
+/** Senza token: solo i dati pubblici (API REST senza autenticazione). */
+async function githubPublic() {
+	const gh = (path: string) => fetch(`https://api.github.com${path}`, { headers: { "user-agent": "fr7-portfolio", accept: "application/vnd.github+json" } });
+	const [u, r] = await Promise.all([gh(`/users/${GH_USER}`), gh(`/users/${GH_USER}/repos?per_page=100&sort=pushed`)]);
+	if (!u.ok || !r.ok) throw new Error("github_public");
+	const uj = (await u.json()) as { public_repos?: number; followers?: number };
+	const rj = (await r.json()) as { name: string; description: string | null; language: string | null; pushed_at: string; html_url: string; stargazers_count: number; fork: boolean }[];
+	const own = rj.filter((x) => !x.fork);
+	const langs = new Map<string, number>();
+	for (const x of own) if (x.language) langs.set(x.language, (langs.get(x.language) ?? 0) + 1);
+	return {
+		repos: uj.public_repos ?? own.length,
+		followers: uj.followers ?? 0,
+		languages: [...langs].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count),
+		recent: own.filter((x) => x.name.toLowerCase() !== GH_USER.toLowerCase() && x.language).slice(0, 6).map((x) => ({ name: x.name, description: x.description ?? "", language: x.language ?? "", pushedAt: x.pushed_at, url: x.html_url, stars: x.stargazers_count })),
+		fetchedAt: new Date().toISOString(),
+	};
+}
+
+async function github(env: Env, ctx: Ctx) {
+	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
+	const key = new Request(`https://cache.fr7.local/github-v2-${env.GITHUB_TOKEN ? "t" : "p"}`);
+	const hit = await cache?.match(key);
+	if (hit) return new Response(hit.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=300" } });
+	try {
+		let payload: unknown;
+		if (env.GITHUB_TOKEN) {
+			try {
+				payload = await githubWithToken(env.GITHUB_TOKEN);
+			} catch {
+				payload = await githubPublic(); // token scaduto o limite raggiunto: si ricade sui dati pubblici
+			}
+		} else payload = await githubPublic();
+		const res = new Response(JSON.stringify(payload), { headers: { ...JSON_HEADERS, "cache-control": "public, max-age=3600" } });
 		if (cache) ctx.waitUntil(cache.put(key, res.clone()));
-		return new Response(res.body, { status: 200, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300", ...SECURITY } });
+		return new Response(res.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=300" } });
+	} catch {
+		return json({ error: "github_unavailable" }, 502);
+	}
+}
+
+/** Solo per l'amministratore: tutti i repository a cui hai accesso, privati e di collaborazione compresi. */
+async function adminRepos(env: Env) {
+	if (!env.GITHUB_TOKEN) return json({ error: "no_token" }, 404);
+	try {
+		const data = await gql<{
+			viewer: { login: string; repositories: { totalCount: number; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; viewerPermission: string | null })[] } };
+		}>(
+			env.GITHUB_TOKEN,
+			`query{ viewer{ login repositories(first:100, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount nodes{ nameWithOwner isPrivate isFork isArchived url pushedAt viewerPermission primaryLanguage{ name } } } } }`,
+		);
+		const rows = data.viewer.repositories.nodes.map((r) => ({
+			name: r.nameWithOwner,
+			private: r.isPrivate,
+			fork: r.isFork,
+			archived: r.isArchived,
+			mine: r.nameWithOwner.toLowerCase().startsWith(`${data.viewer.login.toLowerCase()}/`),
+			language: r.primaryLanguage?.name ?? "",
+			pushedAt: r.pushedAt,
+			url: r.url,
+			permission: r.viewerPermission ?? "",
+		}));
+		return json({ total: data.viewer.repositories.totalCount, rows });
 	} catch {
 		return json({ error: "github_unavailable" }, 502);
 	}
@@ -322,11 +423,16 @@ async function brief(req: Request, env: Env, ctx: Ctx) {
 	return saved || notified ? json({ ok: true }) : json({ ok: false, error: "not_delivered" }, 502);
 }
 
+async function isAdmin(req: Request, env: Env) {
+	const given = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
+	const [x, y] = await Promise.all([sha(given), sha((env.ADMIN_TOKEN ?? "").trim())]);
+	return x === y;
+}
+
 async function adminBriefs(req: Request, env: Env) {
-	if (!env.ADMIN_TOKEN || !env.DB) return json({ error: "not_found" }, 404);
-	const given = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-	const [a, b] = await Promise.all([sha(given), sha(env.ADMIN_TOKEN)]);
-	if (a !== b) return json({ error: "unauthorized" }, 401);
+	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	if (!env.DB) return json({ error: "no_db" }, 404);
 	await init(env.DB);
 	const rows = await env.DB.prepare("SELECT id, created_at, name, reach, need, message FROM briefs ORDER BY id DESC LIMIT 100").all();
 	return json({ rows: rows.results });
@@ -349,7 +455,7 @@ export default {
 				case "/api/health":
 					return json({ ai: !!env.AI, db: !!env.DB, brief: !!(env.DB || env.NOTIFY_WEBHOOK) }, 200, { "cache-control": "public, max-age=60" });
 				case "/api/github":
-					return req.method === "GET" ? await github(ctx) : json({ error: "method" }, 405);
+					return req.method === "GET" ? await github(env, ctx) : json({ error: "method" }, 405);
 				case "/api/stats":
 					return req.method === "GET" ? await stats(req, env) : json({ error: "method" }, 405);
 				case "/api/visit":
@@ -373,6 +479,11 @@ export default {
 				case "/api/admin/briefs":
 					if (limited(`admin:${who}`, 10, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminBriefs(req, env);
+				case "/api/admin/repos":
+					if (limited(`admin:${who}`, 10, 60_000)) return json({ error: "rate_limited" }, 429);
+					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+					if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+					return await adminRepos(env);
 				default:
 					return json({ error: "not_found" }, 404);
 			}

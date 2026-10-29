@@ -50,10 +50,11 @@ Il sito è multipagina (`/`, `/progetti`, `/progetti/:id`, `/stack`, `/lab`, `/c
 | `POST /api/visit`, `GET /api/stats`, `POST /api/likes` | visite anonime e "mi piace" | binding `DB` (D1) |
 | `POST /api/brief` | richieste dal modulo contatti | `DB` e/o secret `NOTIFY_WEBHOOK` |
 | `GET /api/admin/briefs` | elenco richieste (pagina `/admin`) | `DB` + secret `ADMIN_TOKEN` |
+| `GET /api/admin/repos` | tutti i repo (privati e di collaborazione), solo in `/admin` | `ADMIN_TOKEN` + `GITHUB_TOKEN` |
 
 Senza uno di questi pezzi il sito continua a funzionare: la chat risponde dai dati del sito, i contatori spariscono, il modulo usa email/WhatsApp.
 
 ### Attivare database e notifiche
 1. **D1**: in `wrangler.jsonc` aggiungi `"d1_databases": [{ "binding": "DB" }]` (provisioning automatico) oppure crea il database dalla dashboard e inserisci `database_name` e `database_id`. Le tabelle si creano da sole alla prima richiesta.
-2. **Secret** (dashboard → Worker → Settings → Variables and Secrets): `ADMIN_TOKEN` (una password lunga per `/admin`), facoltativo `NOTIFY_WEBHOOK` (URL webhook Slack/Discord per ricevere le richieste), facoltativo `SALT` (stringa casuale per gli hash anonimi).
+2. **Secret** (dashboard → Worker → Settings → Variables and Secrets): `ADMIN_TOKEN` (una password lunga per `/admin`), facoltativo `GITHUB_TOKEN` (token GitHub in sola lettura: la pagina Stack mostra lingue e contributi anche dei repo privati, ma solo come numeri; i nomi compaiono solo in `/admin`), facoltativo `NOTIFY_WEBHOOK` (URL webhook Slack/Discord per ricevere le richieste), facoltativo `SALT` (stringa casuale per gli hash anonimi).
 3. Workers AI ha una quota gratuita giornaliera; se finisce, il sito ricade sulle risposte locali.

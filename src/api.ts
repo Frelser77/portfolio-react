@@ -34,9 +34,15 @@ export interface GithubData {
 	repos: number;
 	followers: number;
 	languages: { name: string; count: number }[];
+	/** true se `count` è già una percentuale (dati con token: includono i repository privati, solo come aggregato) */
+	percent?: boolean;
+	privateRepos?: number;
+	contributions?: number;
+	calendar?: number[][];
 	recent: { name: string; description: string; language: string; pushedAt: string; url: string; stars: number }[];
 	fetchedAt: string;
 }
+export interface AdminRepo { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string }
 export const getGithub = () => json<GithubData>("/api/github");
 
 export const likeProject = (id: string) => json<{ likes: number; liked: boolean }>("/api/likes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) });

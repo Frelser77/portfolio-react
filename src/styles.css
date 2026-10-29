@@ -4106,3 +4106,27 @@ html[data-refract="off"] .lens {
 		animation: none;
 	}
 }
+
+/* GitHub: calendario dei contributi e elenco admin */
+.heat {
+	display: flex;
+	gap: 3px;
+	margin: 0.8rem 0 0.2rem;
+	overflow: hidden;
+}
+.heat span {
+	display: grid;
+	gap: 3px;
+	flex: 1 1 0;
+	min-width: 0;
+}
+.heat i {
+	aspect-ratio: 1;
+	border-radius: 2px;
+	background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.heat i[data-l="1"] { background: color-mix(in srgb, var(--accent, #7cf) 28%, transparent); }
+.heat i[data-l="2"] { background: color-mix(in srgb, var(--accent, #7cf) 50%, transparent); }
+.heat i[data-l="3"] { background: color-mix(in srgb, var(--accent, #7cf) 75%, transparent); }
+.heat i[data-l="4"] { background: var(--accent, #7cf); }
+.repolist li { display: flex; flex-direction: column; gap: 0.15rem; }

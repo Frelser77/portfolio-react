@@ -35,6 +35,9 @@ export default function GithubLive() {
 	}, []);
 
 	const max = Math.max(1, ...(data?.languages.map((l) => l.count) ?? [1]));
+	const weeks = data?.calendar?.slice(-26) ?? [];
+	const peak = Math.max(1, ...weeks.flat());
+	const lvl = (n: number) => (n === 0 ? 0 : Math.min(4, Math.ceil((n / peak) * 4)));
 	return (
 		<section className="sec" aria-labelledby="gh-title">
 			<div className="card gh">
@@ -54,21 +57,38 @@ export default function GithubLive() {
 						<>
 							<dl className="ghnum">
 								<div>
-									<dt>{t(ui2.stack.live.repos)}</dt>
+									<dt>{t(data?.percent ? ui2.stack.live.reposAll : ui2.stack.live.repos)}</dt>
 									<dd>{data.repos}</dd>
 								</div>
 								<div>
 									<dt>{t(ui2.stack.live.followers)}</dt>
 									<dd>{data.followers}</dd>
 								</div>
+								{typeof data.contributions === "number" && (
+									<div>
+										<dt>{t(ui2.stack.live.contrib)}</dt>
+										<dd>{data.contributions}</dd>
+									</div>
+								)}
 							</dl>
+							{weeks.length > 0 && (
+								<div className="heat" role="img" aria-label={t(ui2.stack.live.contrib)}>
+									{weeks.map((w, i) => (
+										<span key={i}>
+											{w.map((n, j) => (
+												<i key={j} data-l={lvl(n)} />
+											))}
+										</span>
+									))}
+								</div>
+							)}
 							<p className="psub">{t(ui2.stack.live.langs)}</p>
 							<ul className="bars" role="list">
 								{data.languages.slice(0, 5).map((l) => (
 									<li key={l.name}>
 										<span>{l.name}</span>
 										<i style={{ ["--w" as string]: `${Math.round((l.count / max) * 100)}%` }} />
-										<b>{l.count}</b>
+										<b>{data.percent ? `${l.count}%` : l.count}</b>
 									</li>
 								))}
 							</ul>
