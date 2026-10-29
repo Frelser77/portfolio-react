@@ -3,6 +3,8 @@ import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { profile } from "../content/data";
 import { ui } from "../content/ui";
 import { usePrefs } from "../prefs";
+import Terminal from "./Terminal";
+import Typer from "./Typer";
 
 const chips = [
 	{ name: "React", mark: "Re", color: "#61dafb" },
@@ -12,7 +14,7 @@ const chips = [
 ];
 
 export default function Hero() {
-	const { t } = usePrefs();
+	const { t, lang } = usePrefs();
 	return (
 		<section className="hero" id="home" aria-labelledby="hero-title">
 			<div>
@@ -23,6 +25,7 @@ export default function Hero() {
 					D'Amico
 				</h1>
 				<p className="role">{t(ui.hero.role)}</p>
+					<Typer lang={lang} />
 				<p className="lead">{t(ui.hero.lead)}</p>
 				<div className="row">
 					<a className="btn pri" href="#progetti">
@@ -48,17 +51,8 @@ export default function Hero() {
 			</div>
 
 			<div className="hero__side">
-				<div className="glass code" aria-hidden="true">
-					<div className="dots">
-						<i />
-						<i />
-						<i />
-					</div>
-					<div className="ln" style={{ width: "42%" }} />
-					<div className="ln" style={{ width: "70%", marginLeft: "6%", background: "#c4a8ff55" }} />
-					<div className="ln" style={{ width: "55%", marginLeft: "6%" }} />
-					<div className="ln" style={{ width: "30%", marginLeft: "12%", background: "#7fdcff55" }} />
-					<div className="ln" style={{ width: "62%" }} />
+				<Terminal />
+				<div className="glass tilt chipsbox" aria-hidden="true">
 					<div className="chips">
 						{chips.map((c) => (
 							<div key={c.name} className="chip">
@@ -68,7 +62,7 @@ export default function Hero() {
 						))}
 					</div>
 				</div>
-				<a className="glass quote" href="#competenze">
+				<a className="glass quote tilt" href="#competenze">
 					<p>
 						{t(ui.hero.quote)}
 						<span className="sr-only"> {t(ui.hero.quoteGo)}</span>

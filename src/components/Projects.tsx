@@ -40,7 +40,7 @@ export default function Projects() {
 					{projects.map((p) => {
 						const live = p.status === "live" ? p.links?.[0] : undefined;
 						return (
-							<li key={p.id} className="pc">
+							<li key={p.id} className="pc tilt">
 								<button type="button" className="pc__open" aria-haspopup="dialog" onClick={() => setOpenId(p.id)}>
 									<span className="thumb" style={{ background: gradient(p) }}>
 										<span className={`status status--${p.status}`}>{t(statusLabel[p.status])}</span>

@@ -26,7 +26,7 @@ export default function Skills() {
 							<h3 className="gtitle">{t(g.title)}</h3>
 							<ul className="tiles" role="list">
 								{g.items.map((s) => (
-									<li key={s.name} className="tile">
+									<li key={s.name} className="tile tilt">
 										<span aria-hidden="true" style={{ background: s.color }}>
 											{s.mark}
 										</span>

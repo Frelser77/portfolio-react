@@ -15,7 +15,7 @@ export const profile = {
 	fullName: "Salvatore Alessandro D'Amico",
 	/** Da aggiornare al prossimo compleanno */
 	age: 30,
-	email: "damicosalvatorea@icloud.com",
+	email: "damicosalvatorealessandro@gmail.com",
 	whatsapp: "393792242254",
 	github: "https://github.com/Frelser77",
 	linkedin: "https://www.linkedin.com/in/salvatore-dam/",

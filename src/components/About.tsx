@@ -1,10 +1,25 @@
 import { useRef } from "react";
-import { FiAward, FiCalendar, FiDownload, FiMapPin, FiTrendingUp } from "react-icons/fi";
-import { journey, profile } from "../content/data";
+import { FiAward, FiCalendar, FiDownload, FiMapPin, FiNavigation, FiTrendingUp } from "react-icons/fi";
+import { certificates, journey, profile, projects, skillGroups } from "../content/data";
 import { ui, withAge } from "../content/ui";
+import { useCountUp } from "../hooks";
 import { usePrefs } from "../prefs";
 import Certificates, { type CertificatesHandle } from "./Certificates";
-import Mascot from "./Mascot";
+
+function Stat({ value, plus, label }: { value: number; plus?: boolean; label: string }) {
+	const { ref, value: v } = useCountUp(value);
+	return (
+		<li className="stat">
+			<b ref={ref}>
+				{v}
+				{plus ? "+" : ""}
+			</b>
+			<span>{label}</span>
+		</li>
+	);
+}
+
+const techCount = skillGroups.reduce((n, g) => n + g.items.length, 0);
 
 export default function About() {
 	const { t } = usePrefs();
@@ -27,7 +42,16 @@ export default function About() {
 						</a>
 					</div>
 					<div className="about__side">
-						<Mascot />
+						<div className="tour glass tilt">
+							<div>
+								<h3>{t(ui.tour.title)}</h3>
+								<p>{t(ui.tour.text)}</p>
+							</div>
+							<button type="button" className="btn pri" onClick={() => window.dispatchEvent(new Event("guide:tour"))}>
+								{t(ui.tour.cta)}
+								<FiNavigation aria-hidden="true" />
+							</button>
+						</div>
 						<ul className="info" role="list">
 							<li>
 								<FiMapPin aria-hidden="true" />
@@ -44,6 +68,13 @@ export default function About() {
 						</ul>
 					</div>
 				</div>
+
+				<ul className="stats" role="list">
+					<Stat value={3} plus label={t(ui.stats.years)} />
+					<Stat value={projects.length} label={t(ui.stats.projects)} />
+					<Stat value={techCount} label={t(ui.stats.tech)} />
+					<Stat value={certificates.length} label={t(ui.stats.certs)} />
+				</ul>
 
 				<div className="path">
 					<h3>{t(ui.about.path)}</h3>

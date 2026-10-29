@@ -45,12 +45,81 @@ export const ui = {
 		back: { it: "Torna alla griglia", en: "Back to grid" },
 	},
 
-	mascot: {
-		label: { it: "FR7 Bot, la mascotte: toccala", en: "FR7 Bot, the mascot: poke it" },
-		bubble: {
-			it: "Ciao! Sono FR7 Bot. Qui trovi chi è Salvatore, le sue competenze e i suoi progetti: scorri giù o usa il menu in alto.",
-			en: "Hi! I'm FR7 Bot. Here you'll find who Salvatore is, his skills and his projects: scroll down or use the menu above.",
+	guide: {
+		label: { it: "FR7 Bot, la tua guida: toccalo", en: "FR7 Bot, your guide: poke it" },
+		next: { it: "Avanti", en: "Next" },
+		top: { it: "Torna su", en: "Back to top" },
+		close: { it: "Chiudi il fumetto", en: "Close the speech bubble" },
+		home: [
+			{
+				it: "Ciao! Sono FR7 Bot, la tua guida. Ti porto a conoscere Salvatore: tocca il mio fumetto o scorri la pagina.",
+				en: "Hi! I'm FR7 Bot, your guide. I'll walk you through Salvatore's work: poke me or just scroll.",
+			},
+			{
+				it: "Salvatore costruisce software dal database all'interfaccia e lo mette anche online.",
+				en: "Salvatore builds software from the database to the interface, and puts it online too.",
+			},
+		],
+		"chi-sono": [
+			{
+				it: "Eccolo: {age} anni, di Oria, sviluppatore full stack da tre anni. Qui sotto c'è il suo percorso.",
+				en: "That's him: {age} years old, from Oria, a full stack developer for three years. His path is just below.",
+			},
+			{
+				it: "Ha iniziato con il corso Epicode e poi è passato a software vero, in azienda.",
+				en: "He started with the Epicode course, then moved on to real software at work.",
+			},
+		],
+		competenze: [
+			{
+				it: "Frontend, backend, database, infrastruttura e integrazioni. Passa il mouse sulle tessere!",
+				en: "Frontend, backend, databases, infrastructure and integrations. Hover the tiles!",
+			},
+			{
+				it: "React davanti e NestJS dietro sono la sua coppia di tutti i giorni.",
+				en: "React in front and NestJS behind are his everyday pair.",
+			},
+		],
+		progetti: [
+			{
+				it: "Questi sono lavori veri. Quello con il pallino verde è online: aprilo e guardalo dal vivo!",
+				en: "These are real projects. The one with the green dot is online: open it and see it live!",
+			},
+			{
+				it: "Gli altri sono offline, ma nelle schede trovi cosa ha fatto Salvatore.",
+				en: "The others are offline, but their cards tell you what Salvatore did.",
+			},
+		],
+		contatti: [
+			{
+				it: "Eccoci! Scrivi a Salvatore: ti risponde volentieri.",
+				en: "Here we are! Write to Salvatore: he'll gladly answer.",
+			},
+			{
+				it: "Puoi anche copiare l'email con il bottone e mandargli due righe.",
+				en: "You can also copy the email with the button and send him a few lines.",
+			},
+		],
+	},
+
+	tour: {
+		title: { it: "Ti faccio fare il giro", en: "Let me show you around" },
+		text: {
+			it: "FR7 Bot ti accompagna tra le sezioni e ti dice cosa guardare.",
+			en: "FR7 Bot walks you through the sections and tells you what to look at.",
 		},
+		cta: { it: "Parti con FR7 Bot", en: "Start with FR7 Bot" },
+	},
+
+	stats: {
+		years: { it: "anni di lavoro", en: "years of work" },
+		projects: { it: "progetti", en: "projects" },
+		certs: { it: "attestati", en: "certificates" },
+		tech: { it: "tecnologie", en: "technologies" },
+	},
+
+	terminal: {
+		hint: { it: "Clicca per rivedere", en: "Click to replay" },
 	},
 
 	skills: {

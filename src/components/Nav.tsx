@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useActiveSection } from "../hooks";
 import { usePrefs } from "../prefs";
 import { ui } from "../content/ui";
 
@@ -13,22 +13,7 @@ const links = [
 
 export default function Nav() {
 	const { t, lang, toggleLang } = usePrefs();
-	const [active, setActive] = useState("home");
-
-	// Evidenzia la sezione che sta al centro dello schermo
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) if (entry.isIntersecting) setActive(entry.target.id);
-			},
-			{ rootMargin: "-40% 0px -55% 0px" },
-		);
-		links
-			.map((l) => document.getElementById(l.id))
-			.filter((el): el is HTMLElement => !!el)
-			.forEach((el) => observer.observe(el));
-		return () => observer.disconnect();
-	}, []);
+	const active = useActiveSection(links.map((l) => l.id));
 
 	return (
 		<header className="nav">
