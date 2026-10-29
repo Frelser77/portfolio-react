@@ -56,7 +56,7 @@ export default function ProjectPage({ id }: { id: string }) {
 							{t(ui.projects.quest)}
 						</p>
 						{p.logo ? (
-							<h1 id="project-title" className="plogo-title">
+							<h1 id="project-title" className={`plogo-title${p.logo.plate ? " plate" : ""}`}>
 								<img src={p.logo.src} width={p.logo.w} height={p.logo.h} alt={p.name} decoding="async" />
 							</h1>
 						) : (

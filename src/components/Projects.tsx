@@ -1,15 +1,17 @@
 import { FiArrowRight, FiArrowUpRight, FiUsers } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa6";
-import { profile, projects, statusLabel, type Project } from "../content/data";
+import { profile, statusLabel, type Project } from "../content/data";
 import { ui } from "../content/ui";
 import { ui2 } from "../content/ui2";
 import { Link } from "../router";
 import { usePrefs } from "../prefs";
+import { useProjects } from "../projectOrder";
 
 const gradient = (p: Project) => `linear-gradient(35deg, ${p.tint[0]} 0%, ${p.tint[1]} 55%, ${p.tint[2]} 100%)`;
 
 export default function Projects() {
 	const { t } = usePrefs();
+	const projects = useProjects();
 	return (
 		<section className="sec" id="progetti" aria-labelledby="projects-title">
 			<div className="card proj">

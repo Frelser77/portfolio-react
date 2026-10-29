@@ -4748,3 +4748,15 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .shots--phone .shots__slide { transition: transform 0.25s; }
 @media (max-width: 720px) { .shots--phone .shots__track > li { flex-basis: 62%; } .shots--phone .shots__stage { margin: 0 -4px; } }
 @media (prefers-reduced-motion: reduce) { .shots--phone .shots__slide { transition: none; } }
+
+/* ordine delle schede progetto (admin) */
+.adm__ord{list-style:none;margin:14px 0;padding:0;display:grid;gap:8px}
+.adm__ord li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
+.adm__ord li.off{opacity:.55}
+.adm__ordn{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);font-size:12px;font-weight:700}
+.adm__ord b{flex:1;min-width:120px}
+.adm__ordbtns{display:flex;gap:6px;margin-left:auto}
+.adm__ordbtns .adm__mini{min-width:44px;min-height:40px}
+.plogo-title.plate { display: inline-block; padding: 14px 24px; border-radius: 20px; background: linear-gradient(135deg, #fff8ec, #ffe7c2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.plogo-title.plate img { height: 72px; filter: none; }
+@media (max-width: 720px) { .plogo-title.plate { padding: 10px 16px; } .plogo-title.plate img { height: 56px; } }

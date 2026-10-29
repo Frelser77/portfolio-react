@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone, FiMonitor, FiGitBranch, FiSettings } from "react-icons/fi";
 import type { AdminRepo } from "../api";
 import { ui2 } from "../content/ui2";
-import type { L } from "../content/data";
+import { projects as allProjects, type L } from "../content/data";
 import { usePrefs } from "../prefs";
 
 interface Row {
@@ -72,6 +72,10 @@ export default function AdminPage() {
 	const [picks, setPicks] = useState<Pick[]>([]);
 	const [saved, setSaved] = useState<"" | "ok" | "fail">("");
 	const [base, setBase] = useState("[]");
+	interface Ord { id: string; hidden: boolean }
+	const [ord, setOrd] = useState<Ord[]>([]);
+	const [ordBase, setOrdBase] = useState("[]");
+	const [ordSaved, setOrdSaved] = useState<"" | "ok" | "fail">("");
 	const [q, setQ] = useState("");
 	const [flt, setFlt] = useState<"active" | "all" | "pub" | "priv" | "mine" | "collab" | "arch">("active");
 	const [chosen, setChosen] = useState<string[]>([]);
@@ -112,6 +116,17 @@ export default function AdminPage() {
 			}
 		} catch {
 			/* nessuna selezione */
+		}
+		try {
+			const o = await fetch("/api/admin/projects", { credentials: "same-origin" });
+			const rows = o.ok && isJson(o) ? ((await o.json()) as { rows: { id: string; hidden: number }[] }).rows : [];
+			const pos = new Map(rows.map((r, n) => [r.id, n] as const));
+			const hid = new Set(rows.filter((r) => r.hidden).map((r) => r.id));
+			const list = allProjects.map((p, n) => ({ id: p.id, hidden: hid.has(p.id), k: pos.get(p.id) ?? 1000 + n })).sort((a, b) => a.k - b.k).map(({ id, hidden }) => ({ id, hidden }));
+			setOrd(list);
+			setOrdBase(JSON.stringify(list));
+		} catch {
+			/* ordine di default */
 		}
 		try {
 			const g = await fetch("/api/admin/repos", { credentials: "same-origin" });
@@ -237,6 +252,27 @@ export default function AdminPage() {
 			return n;
 		});
 	const edit = (i: number, k: "label" | "blurb" | "link", v: string) => setPicks((p) => p.map((x, n) => (n === i ? { ...x, [k]: v } : x)));
+	const ordDirty = JSON.stringify(ord) !== ordBase;
+	const ordMove = (i: number, d: number) =>
+		setOrd((p) => {
+			const j = i + d;
+			if (j < 0 || j >= p.length) return p;
+			const n = [...p];
+			[n[i], n[j]] = [n[j], n[i]];
+			return n;
+		});
+	const saveOrd = async () => {
+		setBusy(true);
+		setOrdSaved("");
+		try {
+			const r = await fetch("/api/admin/projects", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ items: ord }) });
+			setOrdSaved(r.ok ? "ok" : "fail");
+			if (r.ok) setOrdBase(JSON.stringify(ord));
+		} catch {
+			setOrdSaved("fail");
+		}
+		setBusy(false);
+	};
 	const savePicks = async () => {
 		setBusy(true);
 		setSaved("");
@@ -483,7 +519,7 @@ export default function AdminPage() {
 						{(
 							[
 								["req", FiInbox, A.tabReq, (rows ?? []).filter((x) => !x.archived).length, false],
-								["site", FiMonitor, A.tabSite, picks.length, dirty],
+								["site", FiMonitor, A.tabSite, picks.length, dirty || ordDirty],
 								["repos", FiGitBranch, A.tabRepos, Array.isArray(repos) ? repos.length : 0, false],
 							] as const
 						).map(([k, Ico, label, n, dot]) => (
@@ -613,6 +649,56 @@ export default function AdminPage() {
 
 					{tab === "site" && (
 						<div role="tabpanel" id="panel-site" aria-labelledby="tab-site">
+							<div className="glass adm__card" data-lg-bezel="26">
+								<div className="adm__top">
+									<div>
+										<h2 className="h3">{t(A.ordTitle)}</h2>
+										<p className="muted adm__sub">{t(A.ordText)}</p>
+									</div>
+								</div>
+								<ol className="adm__ord" role="list">
+									{ord.map((o, i) => {
+										const p = allProjects.find((x) => x.id === o.id);
+										return (
+											<li key={o.id} className={o.hidden ? "off" : ""}>
+												<span className="adm__ordn">{i + 1}</span>
+												<b>{p?.name ?? o.id}</b>
+												{o.hidden && <span className="adm__tag">{t(A.ordHidden)}</span>}
+												<span className="adm__ordbtns">
+													<button type="button" className="adm__mini" onClick={() => ordMove(i, -1)} disabled={i === 0} aria-label={t(A.up)}>
+														↑
+													</button>
+													<button type="button" className="adm__mini" onClick={() => ordMove(i, 1)} disabled={i === ord.length - 1} aria-label={t(A.down)}>
+														↓
+													</button>
+													<button type="button" className="adm__mini" onClick={() => setOrd((x) => x.map((y, n) => (n === i ? { ...y, hidden: !y.hidden } : y)))}>
+														{t(o.hidden ? A.ordShow : A.ordHide)}
+													</button>
+												</span>
+											</li>
+										);
+									})}
+								</ol>
+								<div className={`adm__save${ordDirty ? " dirty" : ""}`}>
+									<span>{ordDirty ? t(A.unsaved) : t(A.inSync)}</span>
+									<span className="adm__tools">
+										{ordDirty && (
+											<button type="button" className="btn glass sm" onClick={() => setOrd(JSON.parse(ordBase) as Ord[])} disabled={busy}>
+												{t(A.cancel)}
+											</button>
+										)}
+										<button type="button" className="btn pri sm" onClick={saveOrd} disabled={busy || !ordDirty}>
+											{t(A.save)}
+										</button>
+									</span>
+								</div>
+								{ordSaved && (
+									<p className={`adm__note ${ordSaved === "ok" ? "ok" : "warn"}`} role="status">
+										{ordSaved === "ok" ? <FiCheckCircle aria-hidden="true" /> : <FiAlertTriangle aria-hidden="true" />}
+										<span>{t(ordSaved === "ok" ? A.saved : A.saveFail)}</span>
+									</p>
+								)}
+							</div>
 							<div className="glass adm__card" data-lg-bezel="26">
 								<div className="adm__top">
 									<div>

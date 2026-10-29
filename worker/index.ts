@@ -95,6 +95,7 @@ function init(db: D1) {
 			db.prepare("CREATE TABLE IF NOT EXISTS visits (day TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (day, h))"),
 			db.prepare("CREATE TABLE IF NOT EXISTS likes (project TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (project, h))"),
 			db.prepare("CREATE TABLE IF NOT EXISTS featured (name TEXT PRIMARY KEY, pos INTEGER NOT NULL, label TEXT, blurb TEXT, private INTEGER, url TEXT, language TEXT, pushed_at TEXT, link TEXT)"),
+			db.prepare("CREATE TABLE IF NOT EXISTS project_order (id TEXT PRIMARY KEY, pos INTEGER NOT NULL, hidden INTEGER NOT NULL DEFAULT 0)"),
 			db.prepare("CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT)"),
 			db.prepare("CREATE TABLE IF NOT EXISTS admin_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, ok INTEGER NOT NULL, ip TEXT, country TEXT, ua TEXT)"),
 			db.prepare("CREATE TABLE IF NOT EXISTS briefs (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT NOT NULL, name TEXT, reach TEXT, need TEXT, message TEXT, h TEXT)"),
@@ -859,6 +860,38 @@ async function adminBriefs(req: Request, env: Env) {
 	return json({ rows: rows.results });
 }
 
+/* ---- ordine e visibilità delle schede progetto: si decidono dal pannello, il sito le legge da qui ---- */
+
+async function loadProjectOrder(env: Env) {
+	if (!env.DB) return [] as { id: string; pos: number; hidden: number }[];
+	try {
+		await init(env.DB);
+		return ((await env.DB.prepare("SELECT id, pos, hidden FROM project_order ORDER BY pos").all()).results ?? []) as unknown as { id: string; pos: number; hidden: number }[];
+	} catch {
+		return [];
+	}
+}
+
+async function publicProjects(env: Env) {
+	const rows = await loadProjectOrder(env);
+	return json({ order: rows.map((r) => r.id), hidden: rows.filter((r) => r.hidden).map((r) => r.id) }, 200, { "cache-control": "public, max-age=30" });
+}
+
+async function adminProjects(req: Request, env: Env) {
+	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	if (!env.DB) return json({ error: "no_db" }, 404);
+	if (req.method === "GET") return json({ rows: await loadProjectOrder(env) });
+	const b = await body<{ items?: { id?: string; hidden?: boolean }[] }>(req, 6000);
+	if (!b || !Array.isArray(b.items) || b.items.length > 60) return json({ error: "bad_request" }, 400);
+	const known = new Set(projects.map((x) => x.id));
+	const seen = new Set<string>();
+	const items = b.items.flatMap((it) => (typeof it.id === "string" && known.has(it.id) && !seen.has(it.id) && seen.add(it.id) ? [{ id: it.id, hidden: it.hidden ? 1 : 0 }] : []));
+	await init(env.DB);
+	await env.DB.batch([env.DB.prepare("DELETE FROM project_order"), ...items.map((x, pos) => env.DB!.prepare("INSERT INTO project_order (id, pos, hidden) VALUES (?, ?, ?)").bind(x.id, pos, x.hidden))]);
+	return json({ rows: await loadProjectOrder(env) });
+}
+
 /** Richieste: archivia (si nascondono ma restano), ripristina o elimina per sempre. Fino a 100 per volta. */
 async function adminBriefAction(req: Request, env: Env) {
 	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
@@ -929,6 +962,11 @@ export default {
 				case "/api/admin/briefs":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminBriefs(req, env);
+				case "/api/projects":
+					return req.method === "GET" ? await publicProjects(env) : json({ error: "method" }, 405);
+				case "/api/admin/projects":
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
+					return await adminProjects(req, env);
 				case "/api/admin/briefs-action":
 					if (!post) return json({ error: "method" }, 405);
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);

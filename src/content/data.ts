@@ -94,7 +94,7 @@ export interface Project {
 	/** sigla grande sulla copertina della scheda */
 	mark: string;
 	/** logo del progetto (in /img/progetti), mostrato sulla copertina al posto della sigla */
-	logo?: { src: string; w: number; h: number };
+	logo?: { src: string; w: number; h: number; plate?: boolean };
 	/** schermate ottimizzate per il web, mostrate nella pagina del progetto */
 	shots?: { src: string; w: number; h: number; alt: L; thumb?: string }[];
 	/** le schermate sono verticali (app per telefono): si mostrano affiancate */
@@ -218,7 +218,7 @@ export const projects: Project[] = [
 			{ it: "Identità verificabile dei dispositivi e PIN di ricezione", en: "Verifiable device identity and a receive PIN" },
 			{ it: "Test automatici: unitari, end-to-end e sulla ricezione", en: "Automated tests: unit, end-to-end and receiving" },
 		],
-		collab: { note: { it: "Progettata e sviluppata insieme a un collega", en: "Designed and built together with a colleague" } },
+		collab: { note: { it: "Progettata e sviluppata insieme al collega", en: "Designed and built together with colleague" }, name: "lonelyfrank", url: "https://lonelyfrank.github.io/web-portfolio/" },
 		stack: ["Rust", "Tauri 2", "tokio", "LocalSend v2"],
 		links: [{ label: { it: "Codice su GitHub", en: "Code on GitHub" }, href: "https://github.com/lonelyfrank/cable" }],
 		shots: [
@@ -250,7 +250,7 @@ export const projects: Project[] = [
 			{ it: "Testata con Vitest e Playwright", en: "Tested with Vitest and Playwright" },
 		],
 		stack: ["React", "TypeScript", "Fastify", "Cloudflare", "SQLite"],
-		collab: { note: { it: "Progettata e sviluppata insieme a un collega", en: "Designed and built together with a colleague" } },
+		collab: { note: { it: "Progettata e sviluppata insieme al collega", en: "Designed and built together with colleague" }, name: "lonelyfrank", url: "https://lonelyfrank.github.io/web-portfolio/" },
 		links: [{ label: { it: "Codice su GitHub", en: "Code on GitHub" }, href: "https://github.com/lonelyfrank/BT-score-board" }],
 		shotsPortrait: true,
 		shots: [
@@ -290,22 +290,24 @@ export const projects: Project[] = [
 		id: "restofull",
 		name: "Restofull",
 		mark: "Rf",
-		tint: ["#3a1020", "#a8325a", "#f08a6b"],
-		tag: { it: "Gestionale web | Next.js + NestJS", en: "Web app | Next.js + NestJS" },
-		status: "offline",
+		logo: { src: "/img/progetti/restofull-logo.webp", w: 392, h: 110, plate: true },
+		tint: ["#fff8ec", "#ffe7c2", "#f6c98a"],
+		tag: { it: "Menu digitali per locali | Next.js + Prisma", en: "Digital menus for venues | Next.js + Prisma" },
+		status: "code",
 		summary: {
-			it: "Gestionale web per ristoranti: ordini, tavoli, menu e prenotazioni. Con un mini-gioco arcade integrato.",
-			en: "Web app for restaurants: orders, tables, menus and bookings. Ships with a small arcade game.",
+			it: "Piattaforma SaaS di menu digitali per bar e ristoranti: più locali per account, QR code, abbonamenti con pagamenti ricorrenti.",
+			en: "SaaS platform of digital menus for bars and restaurants: several venues per account, QR codes, recurring-payment subscriptions.",
 		},
 		details: {
-			it: "Un prodotto completo, dal database al deploy: frontend Next.js, API NestJS, MySQL e Redis per la cache, pubblicato su una VPS Linux dietro un tunnel Cloudflare.",
-			en: "A full product, from database to deploy: Next.js frontend, NestJS API, MySQL with Redis caching, hosted on a Linux VPS behind a Cloudflare Tunnel.",
+			it: "Un prodotto completo: area per i gestori con catalogo prodotti, tematizzazione di ogni locale e generazione del QR del menu; ruoli (admin, gestore, utente) con login su cookie HttpOnly e JWT; piani a pagamento con Stripe e moduli aggiuntivi come tavoli, collaboratori e vista cucina.",
+			en: "A complete product: an area for owners with a product catalogue, per-venue theming and menu QR generation; roles (admin, owner, user) with HttpOnly-cookie JWT login; paid plans with Stripe and add-on modules such as tables, staff accounts and a kitchen view.",
 		},
 		highlights: [
-			{ it: "Gestione completa di ordini, tavoli, menu e prenotazioni", en: "Orders, tables, menus and bookings in one place" },
-			{ it: "Deploy su VPS Linux con tunnel Cloudflare", en: "Deployed on a Linux VPS through a Cloudflare Tunnel" },
+			{ it: "Multi-locale e multi-abbonamento, con limite di locali per piano", en: "Multi-venue and multi-subscription, with a venue limit per plan" },
+			{ it: "Pagamenti ricorrenti con Stripe e moduli addon", en: "Recurring payments with Stripe and add-on modules" },
+			{ it: "Input validati con Zod, autenticazione JWT su cookie HttpOnly", en: "Zod-validated input, JWT auth in HttpOnly cookies" },
 		],
-		stack: ["Next.js", "NestJS", "MySQL", "Redis", "Nginx", "Cloudflare Tunnel"],
+		stack: ["Next.js", "React", "TypeScript", "Prisma", "MySQL", "Tailwind CSS", "Stripe", "Zod"],
 	},
 ];
 
