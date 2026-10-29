@@ -385,6 +385,10 @@ export const ui2 = {
 		nothing: { it: "Nessun repository corrisponde.", en: "No repository matches." },
 	},
 
+	avail: {
+		cta: { it: "Disponibile · Scrivimi", en: "Available · Get in touch" },
+	},
+
 	pet: {
 		hide: { it: "Nascondi il bassotto", en: "Hide the dog" },
 		home: { it: "Rimetti il bassotto al suo posto", en: "Put the dog back in its spot" },

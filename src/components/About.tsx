@@ -22,7 +22,7 @@ function Stat({ value, plus, label }: { value: number; plus?: boolean; label: st
 const techCount = skillGroups.reduce((n, g) => n + g.items.length, 0);
 
 export default function About() {
-	const { t } = usePrefs();
+	const { t, lang } = usePrefs();
 	const certs = useRef<CertificatesHandle>(null);
 
 	return (
@@ -36,10 +36,15 @@ export default function About() {
 						</p>
 						<h2 id="about-title">{t(ui.about.title)}</h2>
 						<p className="muted">{withAge(t(ui.about.text), profile.age)}</p>
-						<a className="btn glass" href={profile.cv} download data-lg-bezel="14">
-							{t(ui.about.cv)}
-							<FiDownload aria-hidden="true" />
-						</a>
+						<div className="cvrow">
+							<a className="btn glass" href={lang === "it" ? profile.cv : profile.cvEn} download data-lg-bezel="14">
+								{t(ui.about.cv)}
+								<FiDownload aria-hidden="true" />
+							</a>
+							<a className="cvother" href={lang === "it" ? profile.cvEn : profile.cv} download>
+								{t(ui.about.cvOther)}
+							</a>
+						</div>
 					</div>
 					<div className="about__side">
 						<div className="tour glass tilt" data-lg-bezel="26">

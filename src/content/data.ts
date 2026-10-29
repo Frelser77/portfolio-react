@@ -20,6 +20,7 @@ export const profile = {
 	github: "https://github.com/Frelser77",
 	linkedin: "https://www.linkedin.com/in/salvatore-dam/",
 	cv: "/cv/Salvatore-DAmico-CV.pdf",
+	cvEn: "/cv/Salvatore-DAmico-CV-EN.pdf",
 	town: "Oria (BR)",
 	location: { it: "Oria (BR), Puglia", en: "Oria (Brindisi), Apulia, Italy" } as L,
 };
