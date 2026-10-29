@@ -1,59 +1,13 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { FiArrowRight, FiBox, FiCloud, FiDatabase, FiLayout, FiLink, FiServer } from "react-icons/fi";
-import { FaDatabase, FaPhoneVolume, FaSalesforce, FaSlack } from "react-icons/fa6";
-import {
-	SiCloudflare,
-	SiDotnet,
-	SiGit,
-	SiJavascript,
-	SiLinux,
-	SiMongodb,
-	SiMui,
-	SiMysql,
-	SiNextdotjs,
-	SiNginx,
-	SiNestjs,
-	SiNodedotjs,
-	SiReact,
-	SiRedis,
-	SiSharp,
-	SiStripe,
-	SiTailwindcss,
-	SiTypescript,
-} from "react-icons/si";
+import { icons } from "../content/icons";
 import { unlock } from "../achievements";
 import { certificates, profile, projects, skillGroups } from "../content/data";
 import { openProject } from "../bus";
 import { Link } from "../router";
 import { ui } from "../content/ui";
 import { usePrefs } from "../prefs";
-
-const icons: Record<string, IconType> = {
-	React: SiReact,
-	"Next.js": SiNextdotjs,
-	TypeScript: SiTypescript,
-	JavaScript: SiJavascript,
-	"Tailwind CSS": SiTailwindcss,
-	MUI: SiMui,
-	NestJS: SiNestjs,
-	"Node.js": SiNodedotjs,
-	"ASP.NET Core": SiDotnet,
-	"C#": SiSharp,
-	Oracle: FaDatabase,
-	"SQL Server": FaDatabase,
-	MySQL: SiMysql,
-	MongoDB: SiMongodb,
-	Redis: SiRedis,
-	Cloudflare: SiCloudflare,
-	Linux: SiLinux,
-	Nginx: SiNginx,
-	Git: SiGit,
-	"3CX": FaPhoneVolume,
-	Slack: FaSlack,
-	Salesforce: FaSalesforce,
-	Stripe: SiStripe,
-};
 
 const bagIcons: IconType[] = [FiLayout, FiServer, FiDatabase, FiCloud, FiLink];
 const bagColors = ["#b08cff", "#6aa2ff", "#ffb347", "#6fe3a0", "#ff8fd0"];
@@ -66,7 +20,7 @@ const usage = (name: string) => {
 };
 
 /** Scheda personaggio + inventario: le competenze come oggetti, con dettaglio dei progetti dove le ho usate. */
-export default function Skills() {
+export default function Skills({ between }: { between?: ReactNode }) {
 	const { t } = usePrefs();
 	const [bag, setBag] = useState(0);
 	const [sel, setSel] = useState(skillGroups[0].items[0].name);
@@ -118,6 +72,8 @@ export default function Skills() {
 						<i className="xp__fill" />
 					</div>
 				</div>
+
+				{between}
 
 				<p className="muted">{t(ui.skills.text)}</p>
 

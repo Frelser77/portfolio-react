@@ -148,8 +148,8 @@ export const ui = {
 		],
 		competenze: [
 			{
-				it: "Frontend, backend, database, infrastruttura e integrazioni. Passa il mouse sulle tessere!",
-				en: "Frontend, backend, databases, infrastructure and integrations. Hover the tiles!",
+				it: "Al centro c'è un progetto, intorno le tecnologie che usa: tocca un pianeta e guarda i dati viaggiare!",
+				en: "A project in the middle, the technologies it uses all around: tap a planet and watch the data travel!",
 			},
 			{
 				it: "React davanti e NestJS dietro sono la sua coppia di tutti i giorni.",

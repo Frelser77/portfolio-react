@@ -3778,3 +3778,331 @@ html[data-refract="off"] .lens {
 .guide.nogo {
 	display: none;
 }
+
+/* Leggibilità dei testi dei progetti: pannello di vetro scuro dietro */
+.pjhead {
+	align-self: start;
+	padding: 28px;
+	border-radius: 28px;
+	background-color: rgba(6, 9, 32, 0.5);
+}
+.pjhead .muted {
+	color: #eef1ff;
+}
+.pc .pcb {
+	background: rgba(6, 9, 32, 0.62);
+	color: #fff;
+}
+.pc .pcb small {
+	color: #d6dcff;
+}
+.ppage.glass {
+	padding: 32px;
+	border-radius: 34px;
+	background:
+		linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03) 55%, rgba(255, 255, 255, 0.08)),
+		rgba(6, 9, 32, 0.62);
+}
+.ppage .pdetail__text p,
+.ppage .ticks li,
+.ppage .dlg__meta {
+	color: #eef1ff;
+}
+.ppage .tags li {
+	background: rgba(255, 255, 255, 0.16);
+	color: #fff;
+}
+.ppage .back {
+	color: #dfe5ff;
+}
+@media (max-width: 720px) {
+	.pjhead {
+		padding: 20px;
+	}
+	.ppage.glass {
+		padding: 18px;
+		border-radius: 26px;
+	}
+}
+
+/* Ecosistema: sistema solare digitale */
+.eco {
+	display: grid;
+	gap: 14px;
+	margin: 8px 0 28px;
+}
+.eco__head .muted {
+	max-width: 620px;
+	margin-bottom: 4px !important;
+}
+.eco__modes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.eco__sky {
+	position: relative;
+	width: min(100%, 640px);
+	aspect-ratio: 1;
+	margin-inline: auto;
+	border-radius: 50%;
+	touch-action: pan-y;
+	background: radial-gradient(closest-side, rgba(120, 130, 255, 0.16), rgba(10, 14, 50, 0.4) 70%, transparent);
+}
+.eco__svg {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+.eco__orbit {
+	fill: none;
+	stroke: rgba(255, 255, 255, 0.16);
+	stroke-width: 1;
+	stroke-dasharray: 3 7;
+}
+.eco__link line {
+	stroke: var(--c);
+	stroke-width: 1.2;
+	opacity: 0.18;
+	transition: opacity 0.3s;
+}
+.eco__link circle {
+	fill: var(--c);
+	opacity: 0.35;
+	filter: drop-shadow(0 0 4px var(--c));
+}
+.eco__link.on line {
+	opacity: 0.55;
+}
+.eco__link.on circle {
+	opacity: 1;
+}
+.eco__center {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	display: grid;
+	place-content: center;
+	justify-items: center;
+	gap: 2px;
+	margin: 0;
+	translate: -50% -50%;
+	border-radius: 50%;
+	background: radial-gradient(circle at 30% 25%, #b9a6ff, #6a5cf0 55%, #2a1c6e);
+	box-shadow:
+		0 0 50px rgba(140, 120, 255, 0.55),
+		inset 0 2px 6px rgba(255, 255, 255, 0.5),
+		inset 0 -10px 20px rgba(0, 0, 0, 0.3);
+	text-align: center;
+	animation: ecopulse 4s ease-in-out infinite;
+}
+.eco__center b {
+	font-family: var(--font-title);
+	font-size: clamp(18px, 6vw, 34px);
+	line-height: 1;
+}
+.eco__center small {
+	max-width: 90%;
+	font-size: clamp(9px, 2.6vw, 12px);
+	line-height: 1.1;
+	color: #f3f0ff;
+}
+@keyframes ecopulse {
+	50% {
+		box-shadow:
+			0 0 80px rgba(160, 140, 255, 0.8),
+			inset 0 2px 6px rgba(255, 255, 255, 0.5),
+			inset 0 -10px 20px rgba(0, 0, 0, 0.3);
+	}
+}
+.eco__node {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: grid;
+	place-items: center;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid color-mix(in srgb, var(--c) 70%, #fff 20%);
+	background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--c) 45%, #1a2050), rgba(8, 12, 40, 0.92));
+	color: var(--c);
+	box-shadow:
+		0 0 14px color-mix(in srgb, var(--c) 45%, transparent),
+		inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	transition:
+		opacity 0.3s,
+		box-shadow 0.3s;
+	will-change: transform;
+	-webkit-tap-highlight-color: transparent;
+}
+.eco__node svg {
+	width: 52%;
+	height: 52%;
+}
+.eco__node span {
+	font-size: 12px;
+	font-weight: 800;
+}
+.eco__node em {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	translate: -50% 2px;
+	padding: 1px 6px;
+	border-radius: 8px;
+	background: rgba(6, 9, 32, 0.7);
+	color: #fff;
+	font-size: 10.5px;
+	font-style: normal;
+	font-weight: 600;
+	white-space: nowrap;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s;
+}
+.eco__node:hover em,
+.eco__node:focus-visible em,
+.eco__node.sel em {
+	opacity: 1;
+}
+@media (min-width: 900px) {
+	.eco__node em {
+		opacity: 0.9;
+	}
+}
+.eco__node.dim {
+	opacity: 0.28;
+}
+.eco__node.sel {
+	box-shadow:
+		0 0 0 3px rgba(255, 255, 255, 0.85),
+		0 0 28px var(--c);
+	z-index: 3;
+}
+.eco__legend {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px;
+}
+.eco__pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 38px;
+	padding: 0 14px;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	background: rgba(8, 12, 40, 0.5);
+	color: var(--ink);
+	font: inherit;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+}
+.eco__pill i {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--c);
+	box-shadow: 0 0 8px var(--c);
+}
+.eco__pill[aria-pressed="true"] {
+	border-color: var(--c);
+	background: color-mix(in srgb, var(--c) 28%, rgba(8, 12, 40, 0.6));
+}
+.eco__info {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	min-height: 84px;
+	padding: 16px 20px;
+	border-radius: 24px;
+	background-color: rgba(6, 9, 32, 0.5);
+}
+.eco__info b {
+	display: block;
+	font-family: var(--font-title);
+	font-size: 18px;
+}
+.eco__info small {
+	color: var(--ink-2);
+}
+.eco__info p {
+	margin-top: 4px;
+	color: #eef1ff;
+	font-size: 14px;
+}
+.eco__ico {
+	display: grid;
+	flex: none;
+	place-items: center;
+	width: 52px;
+	height: 52px;
+	border-radius: 16px;
+	background: color-mix(in srgb, var(--c) 22%, rgba(8, 12, 40, 0.8));
+	color: var(--c);
+}
+.eco__ico svg {
+	width: 28px;
+	height: 28px;
+}
+.eco .link {
+	background: none;
+	border: 0;
+	padding: 0 4px 0 0;
+	color: #cfd8ff;
+	font: inherit;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/* Inventario su telefono: zaini scorrevoli, caselle a tre colonne */
+@media (max-width: 720px) {
+	.bags {
+		flex-wrap: nowrap;
+		margin-inline: -22px;
+		padding: 4px 22px 8px;
+		overflow-x: auto;
+		scroll-snap-type: x proximity;
+		scrollbar-width: none;
+	}
+	.bags::-webkit-scrollbar {
+		display: none;
+	}
+	.bagtab {
+		flex: none;
+		scroll-snap-align: start;
+		min-height: 44px;
+		padding: 0 16px;
+		white-space: nowrap;
+	}
+	.slots {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 10px;
+	}
+	.eco__modes {
+		flex-wrap: nowrap;
+		margin-inline: -22px;
+		padding: 2px 22px 6px;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.eco__modes::-webkit-scrollbar {
+		display: none;
+	}
+	.eco__modes .cchip {
+		flex: none;
+		white-space: nowrap;
+	}
+	.eco__sky {
+		margin-inline: -6px;
+		width: calc(100% + 12px);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.eco__center {
+		animation: none;
+	}
+}

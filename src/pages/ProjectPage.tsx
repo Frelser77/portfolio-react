@@ -43,7 +43,7 @@ export default function ProjectPage({ id }: { id: string }) {
 
 	return (
 		<section className="sec" aria-labelledby="project-title">
-			<div className="card ppage">
+			<div className="card ppage glass" data-lg-bezel="30">
 				<Link className="back" to="/progetti">
 					<FiArrowLeft aria-hidden="true" />
 					{t(ui2.project.back)}

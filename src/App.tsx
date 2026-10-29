@@ -6,6 +6,7 @@ import Guide from "./components/Guide";
 import World from "./components/World";
 import About from "./components/About";
 import Skills from "./components/Skills";
+import Ecosystem from "./components/Ecosystem";
 import GithubLive from "./components/GithubLive";
 import Projects from "./components/Projects";
 import Contact from "./components/Contact";
@@ -35,7 +36,7 @@ function Page({ path }: { path: string }) {
 		case "stack":
 			return (
 				<>
-					<Skills />
+					<Skills between={<Ecosystem />} />
 					<GithubLive />
 				</>
 			);

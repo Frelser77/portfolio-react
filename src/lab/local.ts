@@ -28,7 +28,7 @@ export function localAnswer(question: string, lang: Lang): string {
 	}
 	if (has(q, ["gestionale", "management", "prenotaz", "booking"])) {
 		const n = needs.find((x) => x.id === "gestionale")!;
-		return (it ? n.pitch.it : n.pitch.en) + " " + (it ? "Esempio: Domus per Casaurea." : "Example: Domus for Casaurea.");
+		return (it ? n.pitch.it : n.pitch.en) + " " + (it ? "Esempio: il gestionale di Casaurea." : "Example: Casaurea's management tool.");
 	}
 	if (has(q, ["progett", "project", "esempi", "example", "portfolio", "lavori", "work"])) {
 		return (it ? "Alcuni lavori: " : "Some of his work: ") + names(projects.map((p) => p.name)) + (it ? ". Aprili dalla pagina Progetti." : ". Open them from the Projects page.");

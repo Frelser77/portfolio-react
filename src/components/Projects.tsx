@@ -12,7 +12,7 @@ export default function Projects() {
 	return (
 		<section className="sec" id="progetti" aria-labelledby="projects-title">
 			<div className="card proj">
-				<div>
+				<div className="pjhead glass" data-lg-bezel="26">
 					<p className="eyebrow">
 						<b>01.</b>
 						{t(ui.projects.eyebrow)}

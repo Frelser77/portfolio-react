@@ -143,7 +143,7 @@ export const projects: Project[] = [
 	},
 	{
 		id: "casaurea",
-		name: "Domus per Casaurea",
+		name: "Casaurea",
 		mark: "Ca",
 		tint: ["#0a2748", "#1a6aa6", "#4cc3d9"],
 		tag: { it: "Gestionale | Lodgify", en: "Management tool | Lodgify" },
@@ -153,8 +153,8 @@ export const projects: Project[] = [
 			en: "Management software for a short-term rental business: Lodgify bookings, accounts and admin in one place.",
 		},
 		details: {
-			it: "Domus importa i dati da Lodgify e li usa per gestire l'intera parte economica e amministrativa di Casaurea: ricavi, calendario, ruoli degli utenti. Lo sto sviluppando per Casaurea insieme al loro nuovo sito web, con un'architettura pensata per diventare un SaaS.",
-			en: "Domus pulls data from Lodgify and uses it to run Casaurea's whole financial and administrative side: revenue, calendar, user roles. I'm building it for Casaurea together with their new website, on an architecture designed to become a SaaS.",
+			it: "Il gestionale importa i dati da Lodgify e li usa per gestire l'intera parte economica e amministrativa di Casaurea: ricavi, calendario, ruoli degli utenti. Lo sto sviluppando per Casaurea insieme al loro nuovo sito web, con un'architettura pensata per diventare un SaaS.",
+			en: "The management tool pulls data from Lodgify and uses it to run Casaurea's whole financial and administrative side: revenue, calendar, user roles. I'm building it for Casaurea together with their new website, on an architecture designed to become a SaaS.",
 		},
 		highlights: [
 			{ it: "Integrazione con le API di Lodgify", en: "Lodgify API integration" },
@@ -389,7 +389,7 @@ export const needs: Need[] = [
 			{ it: "Porto i dati in un solo gestionale chiaro", en: "I bring the data into one clear system" },
 			{ it: "Lo collego agli strumenti che usi già (es. Lodgify)", en: "I connect it to the tools you already use (e.g. Lodgify)" },
 		],
-		example: { projectId: "casaurea", label: { it: "Domus per Casaurea", en: "Domus for Casaurea" } },
+		example: { projectId: "casaurea", label: { it: "Il gestionale di Casaurea", en: "Casaurea's management tool" } },
 		brief: { it: "Mi serve un gestionale su misura.", en: "I need custom management software." },
 	},
 	{

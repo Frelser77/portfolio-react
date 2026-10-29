@@ -50,6 +50,24 @@ export const ui2 = {
 	},
 
 	stack: {
+		eco: {
+			eyebrow: { it: "Ecosistema", en: "Ecosystem" },
+			title: { it: "Come parlano tra loro i pezzi", en: "How the pieces talk to each other" },
+			text: {
+				it: "Al centro c'è un progetto, intorno le tecnologie che lo fanno vivere. Le linee sono i dati che viaggiano: dal browser al server, al database, ai servizi esterni.",
+				en: "A project sits in the middle, the technologies that bring it to life orbit around it. The lines are data travelling: from browser to server, to database, to outside services.",
+			},
+			all: { it: "Tutto", en: "All" },
+			pick: { it: "Scegli un progetto", en: "Pick a project" },
+			hint: { it: "Tocca un pianeta per vedere cosa fa.", en: "Tap a planet to see what it does." },
+			layers: { it: "Livelli", en: "Layers" },
+			canvas: { it: "Schema animato: un progetto al centro e le tecnologie che usa in orbita, collegate da linee di dati.", en: "Animated diagram: a project in the middle with the technologies it uses in orbit, linked by data lines." },
+			center: { it: "Centro", en: "Center" },
+			used: { it: "Usata in", en: "Used in" },
+			missions: { it: "progetti", en: "projects" },
+			inThis: { it: "In questo progetto", en: "In this project" },
+			open: { it: "Apri la scheda", en: "Open the page" },
+		},
 		live: {
 			eyebrow: { it: "Dal vivo", en: "Live" },
 			title: { it: "Cosa sto costruendo adesso", en: "What I'm building right now" },
@@ -241,8 +259,8 @@ export const ui2 = {
 		],
 		stack: [
 			{
-				it: "Le tessere sono il suo inventario. Più giù trovi cosa fa davvero su GitHub, dal vivo.",
-				en: "The tiles are his inventory. Further down you'll see what he really does on GitHub, live.",
+				it: "Più giù trovi l'inventario e cosa fa davvero Salvatore su GitHub, dal vivo.",
+				en: "Further down you'll find the inventory and what Salvatore really does on GitHub, live.",
 			},
 		],
 		progetto: [
