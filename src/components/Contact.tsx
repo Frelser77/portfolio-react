@@ -129,7 +129,7 @@ export default function Contact() {
 					}} data-lg-bezel="26">
 					<fieldset>
 						<legend>{t(ui.contact.needLabel)}</legend>
-						<div className="cfg__chips">
+						<div className="cfg__chips scrollrow">
 							{needs.map((n) => (
 								<button key={n.id} type="button" className="cchip" aria-pressed={need === n.id} onClick={() => setNeed(need === n.id ? null : n.id)}>
 									{t(n.title)}

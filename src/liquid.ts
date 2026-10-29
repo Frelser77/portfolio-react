@@ -177,6 +177,12 @@ export function initLiquidGlass(): () => void {
 		const key = `${w}x${h}`;
 		if (key === e.key) return;
 		e.key = key;
+		// i pannelli grandi non si rifrangono: il bordo luminoso su un'area così ampia disturba la lettura
+		if (w * h > 110_000) {
+			e.css = "";
+			apply(e);
+			return;
+		}
 		const cs = getComputedStyle(e.el);
 		const radius = parseFloat(cs.borderTopLeftRadius) || Math.min(w, h) / 2;
 		const lens = e.el.dataset.lg === "lens";
