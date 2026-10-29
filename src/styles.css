@@ -1947,7 +1947,7 @@ main:focus,
 		inset -18px -24px 60px #00000055,
 		0 40px 90px -30px var(--b);
 	opacity: 0.92;
-	translate: 0 calc(var(--p, 0) * var(--par) * -1px);
+	translate: 0 calc(var(--sy, 0) * var(--par) * -0.00025px);
 	animation: orbfloat 14s ease-in-out infinite alternate;
 	will-change: transform, translate;
 }
@@ -3018,7 +3018,6 @@ main:focus,
 @keyframes pagein {
 	from {
 		opacity: 0;
-		transform: translateY(16px);
 	}
 }
 .back {

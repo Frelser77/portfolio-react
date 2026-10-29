@@ -47,6 +47,7 @@ export function usePointerFx() {
 			raf = requestAnimationFrame(() => {
 				const max = root.scrollHeight - window.innerHeight;
 				root.style.setProperty("--p", String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
+				root.style.setProperty("--sy", String(Math.round(window.scrollY)));
 			});
 		};
 		onScroll();
