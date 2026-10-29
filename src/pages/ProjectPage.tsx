@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiArrowLeft, FiArrowRight, FiArrowUpRight, FiHeart } from "react-icons/fi";
+import { FiArrowLeft, FiArrowRight, FiArrowUpRight, FiHeart, FiUsers } from "react-icons/fi";
 import { projects, statusLabel } from "../content/data";
 import { ui } from "../content/ui";
 import { ui2 } from "../content/ui2";
@@ -77,11 +77,31 @@ export default function ProjectPage({ id }: { id: string }) {
 					)}
 				</div>
 
-				{p.shots && <Shots shots={p.shots} />}
+				{p.shots && <Shots shots={p.shots} portrait={p.shotsPortrait} />}
 
 				<div className={`pdetail${p.preview ? " has-preview" : ""}`}>
 					<div className="pdetail__text">
 						<p className="pdetail__lead">{t(p.summary)}</p>
+						{p.collab && (
+							<p className="collab">
+								<FiUsers aria-hidden="true" />
+								<span>
+									{t(p.collab.note)}
+									{p.collab.name && (
+										<>
+											{": "}
+											{p.collab.url ? (
+												<a href={p.collab.url} target="_blank" rel="noopener noreferrer">
+													{p.collab.name}
+												</a>
+											) : (
+												p.collab.name
+											)}
+										</>
+									)}
+								</span>
+							</p>
+						)}
 						<p>{t(p.details)}</p>
 						<ul className="ticks" role="list">
 							{p.highlights.map((h) => (

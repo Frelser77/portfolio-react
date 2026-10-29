@@ -4731,3 +4731,20 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .adm__mini.danger.on { background: linear-gradient(135deg, #d93a4a, #ff6b6b); color: #fff; }
 .adm__sticky--b { position: static; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0; margin: 0 0 4px; }
 @media (max-width: 720px) { .adm__rowacts .adm__mini { min-height: 44px; flex: 1; } .adm__briefs { padding-bottom: 110px; } }
+
+/* progetti fatti in coppia */
+.collab { display: flex; align-items: center; gap: 10px; margin: 10px 0 14px; padding: 10px 14px; border-radius: 14px; background: rgba(255, 191, 90, 0.12); border: 1px solid rgba(255, 191, 90, 0.35); font-size: 14.5px; color: #ffe2b0; }
+.collab svg { flex: none; width: 18px; height: 18px; }
+.collab a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.pcb .collabline { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; color: #ffd9a0; font-weight: 600; }
+.pcb .collabline svg { width: 13px; height: 13px; }
+
+/* schermate verticali (app per telefono): affiancate */
+.shots--phone .shots__stage { background: none; border: 0; box-shadow: none; overflow: visible; }
+.shots--phone .shots__track { gap: 14px; padding: 4px 2px 14px; scroll-snap-type: x proximity; justify-content: flex-start; }
+.shots--phone .shots__track > li { flex: 0 0 clamp(190px, 23%, 250px); scroll-snap-align: start; }
+.shots--phone .shots__slide { border-radius: 26px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); background: #0a0710; }
+.shots--phone .shots__slide:hover { transform: translateY(-3px); }
+.shots--phone .shots__slide { transition: transform 0.25s; }
+@media (max-width: 720px) { .shots--phone .shots__track > li { flex-basis: 62%; } .shots--phone .shots__stage { margin: 0 -4px; } }
+@media (prefers-reduced-motion: reduce) { .shots--phone .shots__slide { transition: none; } }

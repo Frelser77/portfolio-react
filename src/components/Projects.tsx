@@ -1,7 +1,8 @@
-import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
+import { FiArrowRight, FiArrowUpRight, FiUsers } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa6";
 import { profile, projects, statusLabel, type Project } from "../content/data";
 import { ui } from "../content/ui";
+import { ui2 } from "../content/ui2";
 import { Link } from "../router";
 import { usePrefs } from "../prefs";
 
@@ -49,6 +50,12 @@ export default function Projects() {
 										<span>
 											<b>{p.name}</b>
 											<small>{t(p.tag)}</small>
+											{p.collab && (
+												<small className="collabline">
+													<FiUsers aria-hidden="true" />
+													{t(ui2.project.collabShort)}
+												</small>
+											)}
 										</span>
 										<FiArrowRight aria-hidden="true" />
 									</span>

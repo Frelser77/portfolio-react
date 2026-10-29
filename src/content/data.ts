@@ -96,7 +96,11 @@ export interface Project {
 	/** logo del progetto (in /img/progetti), mostrato sulla copertina al posto della sigla */
 	logo?: { src: string; w: number; h: number };
 	/** schermate ottimizzate per il web, mostrate nella pagina del progetto */
-	shots?: { src: string; w: number; h: number; alt: L }[];
+	shots?: { src: string; w: number; h: number; alt: L; thumb?: string }[];
+	/** le schermate sono verticali (app per telefono): si mostrano affiancate */
+	shotsPortrait?: boolean;
+	/** progetto fatto insieme a qualcun altro */
+	collab?: { note: L; name?: string; url?: string };
 	/** tre colori del gradiente della copertina, dal più scuro al più chiaro */
 	tint: [string, string, string];
 	/** riga sotto il nome, nella scheda */
@@ -214,12 +218,46 @@ export const projects: Project[] = [
 			{ it: "Identità verificabile dei dispositivi e PIN di ricezione", en: "Verifiable device identity and a receive PIN" },
 			{ it: "Test automatici: unitari, end-to-end e sulla ricezione", en: "Automated tests: unit, end-to-end and receiving" },
 		],
+		collab: { note: { it: "Progettata e sviluppata insieme a un collega", en: "Designed and built together with a colleague" } },
 		stack: ["Rust", "Tauri 2", "tokio", "LocalSend v2"],
 		links: [{ label: { it: "Codice su GitHub", en: "Code on GitHub" }, href: "https://github.com/lonelyfrank/cable" }],
 		shots: [
 			{ src: "/img/progetti/cable-home.webp", w: 1070, h: 845, alt: { it: "Cable: schermata Home con destinatario, invio file e appunti condivisi", en: "Cable: Home screen with recipient, file sending and shared clipboard" } },
 			{ src: "/img/progetti/cable-condividi.webp", w: 1070, h: 825, alt: { it: "Cable: elenco dei dispositivi vicini e trasferimenti", en: "Cable: nearby devices and transfers" } },
 			{ src: "/img/progetti/cable-schermo.webp", w: 1070, h: 670, alt: { it: "Cable: schermo dell'iPhone sul PC", en: "Cable: iPhone screen on the PC" } },
+		],
+	},
+	{
+		id: "bt-darts",
+		name: "BT Darts Score Board",
+		mark: "BD",
+		logo: { src: "/img/progetti/darts-logo.webp", w: 300, h: 293 },
+		tint: ["#1c0b1f", "#a3135a", "#ff4fa3"],
+		tag: { it: "Web app PWA | React + TypeScript", en: "PWA web app | React + TypeScript" },
+		status: "code",
+		summary: {
+			it: "Il segnapunti delle serate freccette del Bite the Trouble: partite, tornei e Hi-Score Nights, anche senza connessione.",
+			en: "The scoreboard for Bite the Trouble's darts nights: matches, tournaments and Hi-Score Nights, even offline.",
+		},
+		details: {
+			it: "Un'app pensata per il telefono, accanto al totem delle freccette del locale: si segnano i tre tiri di ogni giocatore, si gestiscono gironi, eliminazione diretta e finali dei migliori quattro, e la classifica si aggiorna da sola. Funziona offline come app installabile; in modalità cloud ci sono account con password o passkey, più telefoni sulla stessa partita e un solo segnapunti per volta.",
+			en: "A phone-first app that sits next to the venue's darts machine: you log each player's three throws, run round-robin groups, knockouts and top-four finals, and the standings update on their own. It works offline as an installable app; in cloud mode there are accounts with password or passkey, several phones on the same match and a single scorer at a time.",
+		},
+		highlights: [
+			{ it: "Segnapunti con tastierino, correzioni e annullamento dei turni", en: "Scoring keypad with corrections and undo" },
+			{ it: "Tornei a gironi, eliminazione diretta e Hi-Score Nights", en: "Round-robin, knockout and Hi-Score Nights tournaments" },
+			{ it: "PWA offline-first, con modalità cloud su Cloudflare e API Fastify", en: "Offline-first PWA, with a Cloudflare cloud mode and a Fastify API" },
+			{ it: "Testata con Vitest e Playwright", en: "Tested with Vitest and Playwright" },
+		],
+		stack: ["React", "TypeScript", "Fastify", "Cloudflare", "SQLite"],
+		collab: { note: { it: "Progettata e sviluppata insieme a un collega", en: "Designed and built together with a colleague" } },
+		links: [{ label: { it: "Codice su GitHub", en: "Code on GitHub" }, href: "https://github.com/lonelyfrank/BT-score-board" }],
+		shotsPortrait: true,
+		shots: [
+			{ src: "/img/progetti/darts-home.webp", thumb: "/img/progetti/darts-home-s.webp", w: 780, h: 1688, alt: { it: "BT Darts: schermata Home con ripresa della partita", en: "BT Darts: Home screen with resume match" } },
+			{ src: "/img/progetti/darts-turno.webp", thumb: "/img/progetti/darts-turno-s.webp", w: 780, h: 1688, alt: { it: "BT Darts: turno attivo con le tre freccette", en: "BT Darts: active turn with three darts" } },
+			{ src: "/img/progetti/darts-podio.webp", thumb: "/img/progetti/darts-podio-s.webp", w: 780, h: 1688, alt: { it: "BT Darts: Hi-Score Nights con il podio finale", en: "BT Darts: Hi-Score Nights with the final podium" } },
+			{ src: "/img/progetti/darts-risultato.webp", thumb: "/img/progetti/darts-risultato-s.webp", w: 780, h: 1688, alt: { it: "BT Darts: risultato finale e classifica", en: "BT Darts: final result and standings" } },
 		],
 	},
 	{
@@ -268,77 +306,6 @@ export const projects: Project[] = [
 			{ it: "Deploy su VPS Linux con tunnel Cloudflare", en: "Deployed on a Linux VPS through a Cloudflare Tunnel" },
 		],
 		stack: ["Next.js", "NestJS", "MySQL", "Redis", "Nginx", "Cloudflare Tunnel"],
-	},
-	{
-		id: "crypto-monitor",
-		name: "Crypto Monitor",
-		mark: "CM",
-		tint: ["#1a1440", "#5b3fd0", "#2fd0c4"],
-		tag: { it: "Web app | React + ASP.NET", en: "Web app | React + ASP.NET" },
-		status: "offline",
-		summary: {
-			it: "Monitoraggio di criptovalute con account, ruoli e pagamenti.",
-			en: "Crypto tracking app with accounts, roles and payments.",
-		},
-		details: {
-			it: "Frontend Vite + React, API in ASP.NET Core con autenticazione JWT e ruoli, pagamenti con Stripe e dati di mercato da Coinbase.",
-			en: "Vite + React frontend, ASP.NET Core API with JWT auth and roles, Stripe payments and market data from Coinbase.",
-		},
-		highlights: [
-			{ it: "Autenticazione JWT con ruoli", en: "JWT authentication with roles" },
-			{ it: "Pagamenti Stripe e dati Coinbase", en: "Stripe payments and Coinbase data" },
-		],
-		stack: ["React", "Vite", "ASP.NET Core", "C#", "SQL Server", "Stripe", "Coinbase API"],
-	},
-	{
-		id: "crud-builder",
-		name: "CRUD Builder",
-		mark: "CB",
-		tint: ["#10223a", "#2d5b9e", "#8fa0ff"],
-		tag: { it: "App desktop | Electron + React", en: "Desktop app | Electron + React" },
-		status: "desktop",
-		summary: {
-			it: "Genera interfacce e schemi tipizzati partendo da una collezione MongoDB.",
-			en: "Generates typed schemas and admin screens from a MongoDB collection.",
-		},
-		details: {
-			it: "Un'app desktop in Electron + React che legge le collezioni MongoDB e produce schemi tipizzati e schermate CRUD pronte all'uso.",
-			en: "An Electron + React desktop app that reads MongoDB collections and outputs typed schemas and ready-to-use CRUD screens.",
-		},
-		highlights: [
-			{ it: "Schemi tipizzati generati in automatico", en: "Typed schemas generated automatically" },
-			{ it: "Schermate CRUD pronte da usare", en: "Ready-to-use CRUD screens" },
-		],
-		stack: ["Electron", "React", "MongoDB", "TypeScript"],
-	},
-	{
-		id: "epicode",
-		name: "Progetti Epicode",
-		mark: "Ep",
-		tint: ["#241046", "#7a2fa0", "#d85ab8"],
-		tag: { it: "Formazione | React + ASP.NET", en: "Training | React + ASP.NET" },
-		status: "code",
-		years: "2023 – 2024",
-		summary: {
-			it: "I progetti con cui ho imparato: cloni di app note, e-commerce, meteo.",
-			en: "The projects I learned with: well-known app clones, e-commerce, weather.",
-		},
-		details: {
-			it: "Esercitazioni e progetti d'esame del corso Full-Stack Developer. Il codice è pubblico su GitHub.",
-			en: "Exercises and exam projects from the Full-Stack Developer course. All code is public on GitHub.",
-		},
-		highlights: [
-			{ it: "Redux Toolkit, routing, chiamate API, autenticazione", en: "Redux Toolkit, routing, API calls, authentication" },
-			{ it: "E-commerce d'esame con backend ASP.NET", en: "Final e-commerce project with an ASP.NET backend" },
-		],
-		stack: ["React", "Redux", "JavaScript", "ASP.NET", "C#", "SQL Server"],
-		links: [
-			{ label: { it: "LinkedIn (Redux)", en: "LinkedIn (Redux)" }, href: "https://github.com/Frelser77/linkedin-redux" },
-			{ label: { it: "Netflix", en: "Netflix" }, href: "https://github.com/Frelser77/netflix-clone-route" },
-			{ label: { it: "Spotify", en: "Spotify" }, href: "https://github.com/Frelser77/Spotify-clone" },
-			{ label: { it: "Meteo", en: "Weather" }, href: "https://github.com/Frelser77/weather_app" },
-			{ label: { it: "E-commerce", en: "E-commerce" }, href: "https://github.com/Frelser77/Ecommerce-Esame" },
-		],
 	},
 ];
 

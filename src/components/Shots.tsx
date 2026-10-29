@@ -11,7 +11,7 @@ type Shot = NonNullable<Project["shots"]>[number];
  * Galleria di schermate: una grande alla volta (si scorre con il dito o con le frecce), anteprime sotto,
  * e un tocco apre la schermata a pieno schermo, dove si può anche ingrandirla alla dimensione reale.
  */
-export default function Shots({ shots }: { shots: Shot[] }) {
+export default function Shots({ shots, portrait = false }: { shots: Shot[]; portrait?: boolean }) {
 	const { t } = usePrefs();
 	const track = useRef<HTMLUListElement>(null);
 	const [i, setI] = useState(0);
@@ -58,23 +58,25 @@ export default function Shots({ shots }: { shots: Shot[] }) {
 
 	const cur = shots[i];
 	return (
-		<div className="shots" role="group" aria-roledescription="carousel" aria-label={t(ui2.shots.label)}>
+		<div className={`shots${portrait ? " shots--phone" : ""}`} role="group" aria-roledescription="carousel" aria-label={t(ui2.shots.label)}>
 			<div className="shots__stage">
 				<ul className="shots__track" ref={track} onScroll={onScroll}>
 					{shots.map((sh, n) => (
-						<li key={sh.src} aria-hidden={n !== i}>
+						<li key={sh.src} aria-hidden={portrait ? undefined : n !== i}>
 							<button
 								type="button"
 								className="shots__slide"
 								style={{ aspectRatio: `${shots[0].w} / ${shots[0].h}` }}
 								onClick={(e) => {
 									opener.current = e.currentTarget;
+									setI(n);
+									setZoom(false);
 									setOpen(true);
 								}}
 								aria-label={`${t(ui2.shots.enlarge)}: ${t(sh.alt)}`}
-								tabIndex={n === i ? 0 : -1}
+								tabIndex={portrait || n === i ? 0 : -1}
 							>
-								<img src={sh.src} width={sh.w} height={sh.h} alt={t(sh.alt)} loading={n === 0 ? "eager" : "lazy"} decoding="async" draggable={false} />
+								<img src={portrait ? (sh.thumb ?? sh.src) : sh.src} width={sh.w} height={sh.h} alt={t(sh.alt)} loading={n === 0 ? "eager" : "lazy"} decoding="async" draggable={false} />
 								<span className="shots__zoom" aria-hidden="true">
 									<FiMaximize2 />
 								</span>
@@ -82,7 +84,7 @@ export default function Shots({ shots }: { shots: Shot[] }) {
 						</li>
 					))}
 				</ul>
-				{shots.length > 1 && (
+				{shots.length > 1 && !portrait && (
 					<>
 						<button type="button" className="shots__nav prev" onClick={() => go(i - 1)} aria-label={t(ui2.shots.prev)}>
 							<FiChevronLeft aria-hidden="true" />
@@ -93,7 +95,7 @@ export default function Shots({ shots }: { shots: Shot[] }) {
 					</>
 				)}
 			</div>
-			{shots.length > 1 && (
+			{shots.length > 1 && !portrait && (
 				<div className="shots__thumbs" role="tablist" aria-label={t(ui2.shots.label)}>
 					{shots.map((sh, n) => (
 						<button key={sh.src} type="button" role="tab" aria-selected={n === i} className="shots__thumb" onClick={() => go(n)} aria-label={t(sh.alt)}>
@@ -102,7 +104,7 @@ export default function Shots({ shots }: { shots: Shot[] }) {
 					))}
 				</div>
 			)}
-			<p className="shots__cap" aria-live="polite">
+			<p className="shots__cap" aria-live="polite" hidden={portrait}>
 				{t(cur.alt)} <span>· {i + 1}/{shots.length}</span>
 			</p>
 
