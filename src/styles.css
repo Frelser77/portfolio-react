@@ -4760,3 +4760,60 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .plogo-title.plate { display: inline-block; padding: 14px 24px; border-radius: 20px; background: linear-gradient(135deg, #fff8ec, #ffe7c2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
 .plogo-title.plate img { height: 72px; filter: none; }
 @media (max-width: 720px) { .plogo-title.plate { padding: 10px 16px; } .plogo-title.plate img { height: 56px; } }
+
+/* =====================================================================
+   Ottimizzazione telefono: più respiro nei testi, meno spazio sprecato,
+   contenuti mai coperti dalla barra in basso
+   ===================================================================== */
+@media (max-width: 720px) {
+	.wrap { padding: 0 12px; }
+	.sec { padding: 10px 0; }
+	.card { padding: 18px 0; }
+	.pf h1.h2, .pf h2, .dlg h2 { font-size: 27px; line-height: 1.18; margin: 6px 0 12px; letter-spacing: -0.01em; }
+	.muted { line-height: 1.6; }
+	.foot { padding: 28px 4px calc(118px + env(safe-area-inset-bottom, 0px)); }
+	.pjhead { padding: 16px; }
+	.pjhead .btn { width: 100%; }
+
+	/* elenco progetti: schede più basse */
+	.pcards { gap: 12px; }
+	.thumb { height: 92px; padding: 10px 12px; justify-content: center; align-items: center; }
+	.thumb .plogo { max-height: 62px; width: auto; }
+	.thumb .mark { font-size: 40px; }
+	.pc .pcb { padding: 12px 14px; gap: 10px; }
+	.pc .pcb b { font-size: 16px; }
+
+	/* pagina del singolo progetto */
+	.ppage.glass { padding: 14px; border-radius: 22px; }
+	.ppage .back { margin-bottom: 10px; min-height: 40px; }
+	.ppage .dlg__head { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+	.ppage .like { width: auto; min-height: 40px; padding: 0 16px; font-size: 14px; }
+	.plogo-title { margin: 4px 0 8px; }
+	.plogo-title img { height: 64px; }
+	.ppage .dlg__meta { margin: 8px 0 0 !important; }
+	.pdetail { gap: 18px; }
+	.pdetail__text p { margin: 0 0 14px; line-height: 1.62; font-size: 15.5px; }
+	.pdetail__text .pdetail__lead { font-size: 17px; line-height: 1.5; margin: 14px 0 14px; }
+	.collab { margin: 4px 0 18px; padding: 10px 12px; line-height: 1.5; }
+	.ticks { margin: 4px 0 22px !important; }
+	.ticks li { margin-bottom: 10px; line-height: 1.5; font-size: 15px; }
+	.psub { margin: 18px 0 10px !important; }
+	.tags { gap: 7px; margin: 0 0 22px !important; }
+	.plinks { margin-bottom: 18px; }
+	.pnav { gap: 10px; margin-top: 22px; }
+	.shots__cap { margin: 8px 0 14px; font-size: 13px; }
+
+	/* chat e laboratorio */
+	.chat__log { height: min(300px, 42vh); }
+	.tabs { margin-bottom: 14px; }
+}
+@media (max-width: 720px) { .thumb .plogo { max-width: 62%; max-height: 66px; object-fit: contain; } }
+@media (max-width: 720px) {
+	.pf .stats { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+	.stat { padding: 14px 8px; }
+	.stat b { font-size: 32px; }
+	.info { gap: 8px; }
+	.info li { padding: 10px 16px; font-size: 14.5px; }
+	.step { padding: 16px; background: rgba(8, 12, 38, 0.55); }
+	.step p, .step small { line-height: 1.55; }
+}
