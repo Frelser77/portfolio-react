@@ -304,7 +304,7 @@ async function github(env: Env, ctx: Ctx) {
 	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
 	const key = new Request(`https://cache.fr7.local/github-v2-${env.GITHUB_TOKEN ? "t" : "p"}`);
 	const hit = await cache?.match(key);
-	if (hit) return new Response(hit.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=300" } });
+	if (hit) return new Response(hit.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=20" } });
 	try {
 		let payload: unknown;
 		if (env.GITHUB_TOKEN) {
@@ -317,7 +317,7 @@ async function github(env: Env, ctx: Ctx) {
 		(payload as Record<string, unknown>).featured = await publicFeatured(env);
 		const res = new Response(JSON.stringify(payload), { headers: { ...JSON_HEADERS, "cache-control": "public, max-age=3600" } });
 		if (cache) ctx.waitUntil(cache.put(key, res.clone()));
-		return new Response(res.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=300" } });
+		return new Response(res.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=20" } });
 	} catch {
 		return json({ error: "github_unavailable" }, 502);
 	}

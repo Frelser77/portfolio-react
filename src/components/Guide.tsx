@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { FiArrowRight, FiRotateCcw, FiX } from "react-icons/fi";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { FiArrowRight, FiEyeOff, FiHome, FiRotateCcw, FiX } from "react-icons/fi";
 import { profile } from "../content/data";
 import { ui, withAge } from "../content/ui";
 import { navigate, usePath } from "../router";
@@ -44,6 +44,32 @@ type Mode = "auto" | "open" | "off";
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+/** Dove l'hai lasciato, come frazione dello spazio libero: così resta al suo posto anche se ridimensioni la finestra. */
+interface Pos {
+	x: number;
+	y: number;
+}
+const POS_KEY = "fr7-guide-pos";
+const HINT_KEY = "fr7-guide-hint";
+function loadPos(): Pos | null {
+	try {
+		const j = JSON.parse(localStorage.getItem(POS_KEY) ?? "null") as Pos | null;
+		if (j && typeof j.x === "number" && typeof j.y === "number") return { x: clamp(j.x, 0, 1), y: clamp(j.y, 0, 1) };
+	} catch {
+		/* senza memoria locale torna al suo posto */
+	}
+	return null;
+}
+function savePos(p: Pos | null) {
+	try {
+		if (p) localStorage.setItem(POS_KEY, JSON.stringify(p));
+		else localStorage.removeItem(POS_KEY);
+	} catch {
+		/* ok */
+	}
+}
+const pickOne = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+
 /**
  * La guida: FR7 Bot in 3D che cammina da un lato all'altro della pagina, ti guarda mentre muovi il mouse,
  * commenta ogni sezione e, se vuoi, ti accompagna passo passo.
@@ -61,6 +87,18 @@ export default function Guide() {
 	const [spin, setSpin] = useState(false);
 	const [wave, setWave] = useState(false);
 	const [said, setSaid] = useState<string | null>(null);
+	const [pos, setPos] = useState<Pos | null>(() => loadPos());
+	const [dragging, setDragging] = useState(false);
+	const [gone, setGone] = useState(false);
+	const [angry, setAngry] = useState(false);
+	const posRef = useRef(pos);
+	posRef.current = pos;
+	const angryRef = useRef(false);
+	angryRef.current = angry;
+	const incidents = useRef<number[]>([]);
+	const drag = useRef<{ id: number; dx: number; dy: number; sx: number; sy: number; moved: boolean; x: number; y: number; vx: number; vy: number; t: number; hist: { x: number; y: number; t: number }[] } | null>(null);
+	const suppress = useRef(false);
+	const lastDodge = useRef(0);
 
 	const [glOk, setGlOk] = useState(true);
 	const fail = useCallback(() => setGlOk(false), []);
@@ -93,14 +131,14 @@ export default function Guide() {
 		setSaid(null);
 		const changed = prevSide.current !== side;
 		const calm = prefersReducedMotion();
-		if (changed && !calm) {
+		if (changed && !calm && !posRef.current) {
 			setDir(side === "l" ? -1 : 1);
 			setMoving(true);
 			later(() => setMoving(false), 1500);
 		}
 		prevSide.current = side;
 		if (active === "/contatti") unlock("end");
-		const arrive = changed && !calm ? 1250 : 500;
+		const arrive = changed && !calm && !posRef.current ? 1250 : 500;
 		later(() => {
 			if (!calm) {
 				setWave(true);
@@ -200,8 +238,214 @@ export default function Guide() {
 		return () => window.removeEventListener("guide:say", onSay);
 	}, []);
 
+	const t0 = useRef(t);
+	t0.current = t;
+	/** Un messaggio breve, che sparisce da solo. */
+	const speak = useCallback((text: string, ms = 4200) => {
+		setSaid(text);
+		setShow(true);
+		clearTimeout(sayTimer.current);
+		sayTimer.current = window.setTimeout(() => {
+			setShow(false);
+			setSaid(null);
+		}, ms);
+	}, []);
+
+	const place = (p: Pos | null) => {
+		setPos(p);
+		savePos(p);
+	};
+	const fracOf = (left: number, top: number): Pos => {
+		const el = root.current;
+		const w = el?.offsetWidth ?? 150;
+		const h = el?.offsetHeight ?? 100;
+		return { x: clamp((left - 8) / Math.max(1, window.innerWidth - w - 16), 0, 1), y: clamp((top - 8) / Math.max(1, window.innerHeight - h - 16), 0, 1) };
+	};
+	const hop = () => {
+		if (!prefersReducedMotion()) pose.current.spinAt = performance.now();
+	};
+
+	/** Ogni volta che lo "butti fuori" (lo nascondi o lo lanci): alla terza, in pochi minuti, si arrabbia. */
+	const incident = () => {
+		const now = Date.now();
+		incidents.current = [...incidents.current.filter((x) => now - x < 6 * 60_000), now];
+		return incidents.current.length >= 3;
+	};
+	const dodge = () => {
+		const now = Date.now();
+		if (now - lastDodge.current < 450) return;
+		lastDodge.current = now;
+		const cur = posRef.current ?? { x: side === "r" || window.innerWidth < 720 ? 1 : 0, y: 1 };
+		let n: Pos = cur;
+		for (let i = 0; i < 6 && Math.hypot(n.x - cur.x, n.y - cur.y) < 0.4; i++) n = { x: Math.random(), y: Math.random() };
+		place(n);
+		hop();
+		if (Math.random() < 0.6) speak(t0.current(pickOne(ui2.pet.dodge)), 1800);
+	};
+	const getAngry = () => {
+		setAngry(true);
+		speak(t0.current(pickOne(ui2.pet.mad)), 4500);
+		later(dodge, 700);
+		// almeno 10 secondi in cui non si lascia prendere
+		later(() => {
+			setAngry(false);
+			incidents.current = [];
+			speak(t0.current(ui2.pet.calm), 4200);
+		}, 13_000);
+	};
+	const hide = () => {
+		if (angryRef.current) return dodge();
+		if (incident()) return getAngry();
+		setGone(true);
+		setShow(false);
+		later(() => {
+			setGone(false);
+			setWave(true);
+			later(() => setWave(false), 1500);
+			speak(t0.current(pickOne(ui2.pet.back)), 5200);
+		}, 30_000);
+	};
+	const goHome = () => {
+		place(null);
+		hop();
+	};
+
+	// dove sta: sulle variabili CSS, così segue la finestra
+	useLayoutEffect(() => {
+		const el = root.current;
+		if (!el) return;
+		const apply = () => {
+			if (!pos) {
+				el.style.removeProperty("--gx");
+				el.style.removeProperty("--gy");
+				return;
+			}
+			el.style.setProperty("--gx", `${8 + pos.x * Math.max(0, window.innerWidth - el.offsetWidth - 16)}px`);
+			el.style.setProperty("--gy", `${8 + pos.y * Math.max(0, window.innerHeight - el.offsetHeight - 16)}px`);
+		};
+		apply();
+		window.addEventListener("resize", apply);
+		return () => window.removeEventListener("resize", apply);
+	}, [pos]);
+
+	const onDown = (e: React.PointerEvent) => {
+		if (e.button !== 0 && e.pointerType === "mouse") return;
+		if (angryRef.current) {
+			e.preventDefault();
+			dodge();
+			return;
+		}
+		const el = root.current;
+		if (!el) return;
+		const r = el.getBoundingClientRect();
+		drag.current = { id: e.pointerId, dx: e.clientX - r.left, dy: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, x: r.left, y: r.top, vx: 0, vy: 0, t: performance.now(), hist: [] };
+		try {
+			(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+		} catch {
+			/* senza cattura il trascinamento funziona lo stesso */
+		}
+	};
+	const onMove = (e: React.PointerEvent) => {
+		const d = drag.current;
+		const el = root.current;
+		if (!d || !el || d.id !== e.pointerId) return;
+		if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 7) return;
+		if (!d.moved) {
+			d.moved = true;
+			setDragging(true);
+			document.documentElement.classList.add("petdrag");
+			setShow(false);
+			pose.current.walking = true; // sgambetta mentre lo tieni in braccio
+		}
+		const now = performance.now();
+		const x = clamp(e.clientX - d.dx, 8, window.innerWidth - el.offsetWidth - 8);
+		const y = clamp(e.clientY - d.dy, 8, window.innerHeight - el.offsetHeight - 8);
+		d.hist.push({ x, y, t: now });
+		d.hist = d.hist.filter((h, i, a) => now - h.t < 160 || i >= a.length - 2);
+		if (Math.abs(x - d.x) > 0.5) pose.current.dir = x > d.x ? 1 : -1;
+		d.x = x;
+		d.y = y;
+		d.t = now;
+		el.style.setProperty("--gx", `${x}px`);
+		el.style.setProperty("--gy", `${y}px`);
+	};
+	const onUp = (e: React.PointerEvent) => {
+		const d = drag.current;
+		const el = root.current;
+		drag.current = null;
+		if (!d || !el) return;
+		try {
+			(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+		} catch {
+			/* già rilasciato */
+		}
+		if (!d.moved) return;
+		suppress.current = true;
+		setDragging(false);
+		document.documentElement.classList.remove("petdrag");
+		pose.current.walking = false;
+		// velocità del rilascio: spostamento negli ultimi ~100 ms
+		const h0 = d.hist[0];
+		const h1 = d.hist[d.hist.length - 1];
+		if (h0 && h1 && h1.t > h0.t) {
+			d.vx = (h1.x - h0.x) / Math.max(16, h1.t - h0.t);
+			d.vy = (h1.y - h0.y) / Math.max(16, h1.t - h0.t);
+		}
+		const speed = Math.hypot(d.vx, d.vy);
+		if (speed > 0.8 && !prefersReducedMotion()) {
+			// lanciato: scivola e rimbalza sui bordi
+			let { x, y, vx, vy } = d;
+			let last = performance.now();
+			const W = window.innerWidth - el.offsetWidth - 8;
+			const H = window.innerHeight - el.offsetHeight - 8;
+			const step = (now: number) => {
+				const dt = Math.min(32, now - last);
+				last = now;
+				x += vx * dt;
+				y += vy * dt;
+				if (x < 8 || x > W) {
+					vx = -vx * 0.6;
+					x = clamp(x, 8, W);
+				}
+				if (y < 8 || y > H) {
+					vy = -vy * 0.6;
+					y = clamp(y, 8, H);
+				}
+				const f = Math.pow(0.992, dt);
+				vx *= f;
+				vy *= f;
+				el.style.setProperty("--gx", `${x}px`);
+				el.style.setProperty("--gy", `${y}px`);
+				if (Math.hypot(vx, vy) > 0.04) requestAnimationFrame(step);
+				else {
+					place(fracOf(x, y));
+					hop();
+				}
+			};
+			requestAnimationFrame(step);
+			if (incident()) later(getAngry, 900);
+			else speak(t0.current(ui2.pet.thrown), 2600);
+		} else place(fracOf(d.x, d.y));
+	};
+
 	const poke = () => {
+		if (suppress.current) {
+			suppress.current = false;
+			return;
+		}
+		if (angryRef.current) return dodge();
 		setSaid(null);
+		let hint = false;
+		try {
+			hint = localStorage.getItem(HINT_KEY) === "1";
+			if (!hint) localStorage.setItem(HINT_KEY, "1");
+		} catch {
+			hint = true;
+		}
+		if (!hint) {
+			speak(t0.current(ui2.pet.drag), 6500);
+			return;
+		}
 		if (mode === "open" && show) setTip((n) => n + 1);
 		else openBubble();
 		if (!prefersReducedMotion()) {
@@ -221,8 +465,25 @@ export default function Guide() {
 	const bubbleOpen = show && mode !== "off";
 	const live = mode === "open";
 
+	const pinned = pos !== null;
+	const sideNow = pinned ? (pos.x < 0.5 ? "l" : "r") : side;
+	const cls = [
+		"guide",
+		moving ? "is-moving" : "",
+		active === "/lab" || path.startsWith("/admin") ? "nogo" : "",
+		active === "/lab" || active === "/contatti" || here.key === "progetto" ? "nomob" : "",
+		pinned ? "pinned" : "",
+		pinned && pos.y < 0.28 ? "below" : "",
+		dragging ? "dragging" : "",
+		gone ? "gone" : "",
+		angry ? "angry" : "",
+		bubbleOpen ? "ctl" : "",
+	]
+		.filter(Boolean)
+		.join(" ");
+
 	return (
-		<div ref={root} className={`guide${moving ? " is-moving" : ""}${active === "/lab" || path.startsWith("/admin") ? " nogo" : ""}${active === "/lab" || active === "/contatti" || here.key === "progetto" ? " nomob" : ""}`} data-side={side}>
+		<div ref={root} className={cls} data-side={sideNow}>
 			<div
 				className={`gbubble${bubbleOpen ? " on" : ""}${live ? " live" : ""}`}
 				role={live ? "status" : undefined}
@@ -246,7 +507,27 @@ export default function Guide() {
 					</div>
 				)}
 			</div>
-			<button type="button" className="gbtn" onClick={poke} aria-label={t(ui.guide.label)}>
+			<div className="gctl">
+				<button type="button" className="gc" onClick={hide} title={t(ui2.pet.hide)} aria-label={t(ui2.pet.hide)}>
+					<FiEyeOff aria-hidden="true" />
+				</button>
+				{pinned && (
+					<button type="button" className="gc" onClick={goHome} title={t(ui2.pet.home)} aria-label={t(ui2.pet.home)}>
+						<FiHome aria-hidden="true" />
+					</button>
+				)}
+			</div>
+			<button
+				type="button"
+				className="gbtn"
+				onClick={poke}
+				onPointerDown={onDown}
+				onPointerMove={onMove}
+				onPointerUp={onUp}
+				onPointerCancel={onUp}
+				onPointerEnter={(e) => e.pointerType === "mouse" && angryRef.current && dodge()}
+				aria-label={t(ui.guide.label)}
+			>
 				{glOk ? (
 					<div className="botgl">
 						<div className="glshadow" />

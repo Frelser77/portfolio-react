@@ -42,6 +42,7 @@ export default function AdminPage() {
 	const [busy, setBusy] = useState(false);
 	const [picks, setPicks] = useState<Pick[]>([]);
 	const [saved, setSaved] = useState<"" | "ok" | "fail">("");
+	const [base, setBase] = useState("[]");
 	const [q, setQ] = useState("");
 	const [flt, setFlt] = useState<"active" | "all" | "pub" | "priv" | "mine" | "collab" | "arch">("active");
 	const [chosen, setChosen] = useState<string[]>([]);
@@ -68,7 +69,9 @@ export default function AdminPage() {
 			const f = await fetch("/api/admin/featured", { credentials: "same-origin" });
 			if (f.ok && isJson(f)) {
 				const j = (await f.json()) as { rows: { name: string; label: string | null; blurb: string | null }[] };
-				setPicks(j.rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "" })));
+				const loaded = j.rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "" }));
+				setPicks(loaded);
+				setBase(JSON.stringify(loaded));
 			}
 		} catch {
 			/* nessuna selezione */
@@ -139,6 +142,7 @@ export default function AdminPage() {
 		setBusy(false);
 	};
 
+	const dirty = JSON.stringify(picks) !== base;
 	const move = (i: number, d: number) =>
 		setPicks((p) => {
 			const j = i + d;
@@ -154,6 +158,7 @@ export default function AdminPage() {
 		try {
 			const r = await fetch("/api/admin/featured", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ items: picks }) });
 			setSaved(r.ok ? "ok" : "fail");
+			if (r.ok) setBase(JSON.stringify(picks));
 		} catch {
 			setSaved("fail");
 		}
@@ -200,6 +205,13 @@ export default function AdminPage() {
 		await loadData();
 		setBusy(false);
 	};
+
+	useEffect(() => {
+		if (!dirty) return;
+		const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+		window.addEventListener("beforeunload", warn);
+		return () => window.removeEventListener("beforeunload", warn);
+	}, [dirty]);
 
 	const checks: { id: string; icon: typeof FiDatabase; label: L; ok: boolean; optional: boolean; yes: L; no: L }[] = status
 		? [
@@ -388,10 +400,18 @@ export default function AdminPage() {
 										);
 									})}
 								</ul>
-								<div className="adm__tools">
-									<button type="button" className="btn pri sm" onClick={savePicks} disabled={busy}>
-										{t(A.save)}
-									</button>
+								<div className={`adm__save${dirty ? " dirty" : ""}`}>
+									<span>{dirty ? t(A.unsaved) : t(A.inSync)}</span>
+									<span className="adm__tools">
+										{dirty && (
+											<button type="button" className="btn glass sm" onClick={() => setPicks(JSON.parse(base) as Pick[])} disabled={busy}>
+												{t(A.cancel)}
+											</button>
+										)}
+										<button type="button" className="btn pri sm" onClick={savePicks} disabled={busy || !dirty}>
+											{t(A.save)}
+										</button>
+									</span>
 								</div>
 								{saved && (
 									<p className={`adm__note ${saved === "ok" ? "ok" : "warn"}`} role="status">

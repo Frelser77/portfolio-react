@@ -292,6 +292,8 @@ export const ui2 = {
 		publicName: { it: "Nome pubblico (facoltativo)", en: "Public name (optional)" },
 		publicBlurb: { it: "Descrizione breve (facoltativa)", en: "Short description (optional)" },
 		privWarn: { it: "Privato: scrivi un nome pubblico se il nome vero è riservato.", en: "Private: write a public name if the real one is confidential." },
+		unsaved: { it: "Hai modifiche non pubblicate: il sito mostra ancora l'ordine precedente.", en: "You have unpublished changes: the site still shows the previous order." },
+		inSync: { it: "Il sito mostra esattamente questo elenco, in questo ordine.", en: "The site shows exactly this list, in this order." },
 		save: { it: "Pubblica sul sito", en: "Publish to the site" },
 		saved: { it: "Pubblicato: la pagina Stack è già aggiornata.", en: "Published: the Stack page is already updated." },
 		saveFail: { it: "Non sono riuscito a salvare. Riprova.", en: "Couldn't save. Try again." },
@@ -325,6 +327,29 @@ export const ui2 = {
 		done: { it: "fatto", en: "done" },
 		failed: { it: "non riusciti", en: "failed" },
 		nothing: { it: "Nessun repository corrisponde.", en: "No repository matches." },
+	},
+
+	pet: {
+		hide: { it: "Nascondi il bassotto", en: "Hide the dog" },
+		home: { it: "Rimetti il bassotto al suo posto", en: "Put the dog back in its spot" },
+		drag: { it: "Puoi prendermi e portarmi dove vuoi. Se do fastidio, c'è il pulsante per mandarmi via.", en: "You can pick me up and put me anywhere. If I'm in the way, there's a button to send me off." },
+		back: [
+			{ it: "Eccomi di nuovo! Scusa se prima ti ho dato fastidio: resto buono buono.", en: "I'm back! Sorry if I was in your way earlier: I'll behave." },
+			{ it: "Scusa per prima! Ora sto in disparte, promesso.", en: "Sorry about before! I'll keep out of the way, promise." },
+			{ it: "Rieccomi. Perdonami se ero d'intralcio!", en: "Here I am again. Forgive me if I was in the way!" },
+		],
+		mad: [
+			{ it: "Basta! Mi hai sbattuto fuori troppe volte: adesso non mi prendi.", en: "Enough! You've thrown me out too many times: you can't catch me now." },
+			{ it: "Ora mi sono arrabbiato. Provaci, se ci riesci!", en: "Now I'm cross. Try to catch me if you can!" },
+		],
+		dodge: [
+			{ it: "Non mi prendi!", en: "You can't catch me!" },
+			{ it: "Lasciami stare!", en: "Leave me alone!" },
+			{ it: "Troppo lento!", en: "Too slow!" },
+			{ it: "Grr!", en: "Grr!" },
+		],
+		calm: { it: "Va bene, pace fatta. Però con delicatezza!", en: "Okay, peace. But gently!" },
+		thrown: { it: "Ahia! Un po' di delicatezza!", en: "Ouch! Gently please!" },
 	},
 
 	notFound: {
