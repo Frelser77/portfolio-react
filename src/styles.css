@@ -3010,7 +3010,7 @@ main:focus,
 	font-weight: 600;
 }
 .page {
-	animation: pagein 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+	/* l'entrata è già gestita elemento per elemento (data-rv): niente seconda dissolvenza sul contenitore */
 }
 @keyframes pagein {
 	from {

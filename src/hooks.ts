@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "./prefs";
 
 /** True se il dispositivo ha un puntatore preciso (mouse o trackpad) che può passare sopra gli elementi. */
@@ -145,7 +145,8 @@ export function usePointerFx() {
 
 /** Fa comparire gli elementi con data-rv quando entrano nello schermo. */
 export function useReveal(deps: unknown = null) {
-	useEffect(() => {
+	// layout effect: gli elementi si nascondono prima del primo disegno, così non c'è il "doppio lampo" (visibile, poi nascosto, poi di nuovo visibile)
+	useLayoutEffect(() => {
 		if (prefersReducedMotion() || !("IntersectionObserver" in window)) return;
 		const selector = [".hero > *", ".hero__side > *", ".card", ".stat", ".step", ".pc", ".tile", ".cb", ".info li", ".tour"].join(",");
 		const items = Array.from(document.querySelectorAll<HTMLElement>(selector));

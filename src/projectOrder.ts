@@ -7,14 +7,38 @@ export interface OrderInfo {
 	hidden: string[];
 }
 
-let cache: OrderInfo | null = null;
+const STORE = "fr7-order";
+const stored = (): OrderInfo | null => {
+	try {
+		const j = JSON.parse(localStorage.getItem(STORE) ?? "null") as OrderInfo | null;
+		return j && Array.isArray(j.order) && Array.isArray(j.hidden) ? j : null;
+	} catch {
+		return null;
+	}
+};
+
+// parte dall'ultimo ordine visto: niente rimescolamento visibile quando arriva la risposta
+let cache: OrderInfo | null = typeof window === "undefined" ? null : stored();
 let pending: Promise<OrderInfo | null> | null = null;
 
 const load = () =>
 	(pending ??= fetch("/api/projects")
 		.then((r) => (r.ok && (r.headers.get("content-type") ?? "").includes("application/json") ? (r.json() as Promise<OrderInfo>) : null))
-		.then((o) => (cache = o && Array.isArray(o.order) ? o : null))
+		.then((o) => {
+			if (o && Array.isArray(o.order)) {
+				cache = o;
+				try {
+					localStorage.setItem(STORE, JSON.stringify(o));
+				} catch {
+					/* ok */
+				}
+			}
+			return cache;
+		})
 		.catch(() => null));
+
+// scarica subito, prima che la pagina Progetti venga disegnata
+if (typeof window !== "undefined") void load();
 
 export function sortProjects(info: OrderInfo | null): Project[] {
 	if (!info) return projects;
