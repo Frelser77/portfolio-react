@@ -1,21 +1,16 @@
-import "../src/i18n";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { store, persistor } from "../src/redux/store/store";
-import "boxicons/css/boxicons.min.css";
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "./styles.css";
 import App from "./App";
+import { PrefsProvider } from "./prefs";
 
-import "./index.css";
-
-const container = document.getElementById("root");
-if (!container) throw new Error("Root element not found");
-
-createRoot(container).render(
-
-	<Provider store={store}>
-		<PersistGate loading={null} persistor={persistor}>
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<PrefsProvider>
 			<App />
-		</PersistGate>
-	</Provider>
+		</PrefsProvider>
+	</StrictMode>,
 );

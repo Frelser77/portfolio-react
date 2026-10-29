@@ -1,8 +1,38 @@
-# React + Vite
+# Portfolio di Salvatore D'Amico
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sito personale: una sola pagina, in italiano e in inglese, con tema chiaro e scuro. Non usa cookie né tracciamento.
 
-Currently, two official plugins are available:
+- **Stack:** React 19, TypeScript, Vite e CSS scritto a mano. I font sono serviti dal sito stesso, non da Google Fonts.
+- **Contenuti:** testi, progetti, percorso e attestati stanno tutti in `src/content/data.ts`. I testi dell'interfaccia sono in `src/content/ui.ts`.
+- **Indirizzo del sito:** si imposta in `vite.config.ts` (costante `SITE_URL`). Da lì si aggiornano canonical, Open Graph, sitemap e robots.txt.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Sviluppo
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # crea la cartella dist/
+npm run typecheck  # controllo dei tipi TypeScript
+```
+
+## Aggiungere un progetto
+
+Aggiungi un oggetto all'array `projects` in `src/content/data.ts`:
+
+- con `status: "live"` e un campo `preview`, il progetto finisce in evidenza con l'anteprima su telefono;
+- tutti gli altri compaiono nella lista filtrabile.
+
+Per collegarlo a un livello della traccia nell'hero, aggiungi il suo `id` a `layers[].projects`.
+
+## Pubblicazione su Cloudflare Pages (gratis)
+
+1. Vai su dash.cloudflare.com, poi **Workers & Pages → Create → Pages → Connect to Git**.
+2. Scegli il repository `Frelser77/portfolio-react` e il branch da pubblicare.
+3. Imposta la build:
+   - Framework preset: `Vite` (oppure `None`)
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Variabile d'ambiente: `NODE_VERSION` = `22`
+4. Chiama il progetto `salvatore-damico`: l'indirizzo sarà `https://salvatore-damico.pages.dev`. Se il nome è già preso, scegline un altro e aggiorna `SITE_URL` in `vite.config.ts`.
+
+Ogni push sul branch scelto pubblica il sito in automatico. Gli header di sicurezza e di cache sono in `public/_headers`.
