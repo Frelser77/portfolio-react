@@ -217,6 +217,7 @@ export const ui2 = {
 	project: {
 		collabShort: { it: "In coppia", en: "Pair project" },
 		back: { it: "Tutti i progetti", en: "All projects" },
+		stories: { it: "Cambia progetto", en: "Switch project" },
 		prev: { it: "Missione precedente", en: "Previous quest" },
 		next: { it: "Missione successiva", en: "Next quest" },
 		like: { it: "Mi piace", en: "Like" },

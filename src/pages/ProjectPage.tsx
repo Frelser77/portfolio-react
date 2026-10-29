@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { FiArrowLeft, FiArrowRight, FiArrowUpRight, FiHeart, FiUsers } from "react-icons/fi";
+import { FiArrowRight, FiArrowUpRight, FiHeart, FiUsers } from "react-icons/fi";
 import { projects, statusLabel } from "../content/data";
 import { ui } from "../content/ui";
 import { ui2 } from "../content/ui2";
 import { unlock } from "../achievements";
 import { usePrefs } from "../prefs";
-import { Link } from "../router";
 import { pickNeed } from "../bus";
 import { likeProject } from "../api";
 import { useStats } from "../stats";
+import ProjectStories from "../components/ProjectStories";
+import { useProjects } from "../projectOrder";
 import Shots from "../components/Shots";
 import LivePreview from "../components/LivePreview";
 import NotFound from "./NotFound";
@@ -16,8 +17,9 @@ import NotFound from "./NotFound";
 export default function ProjectPage({ id }: { id: string }) {
 	const { t } = usePrefs();
 	const stats = useStats();
-	const index = projects.findIndex((p) => p.id === id);
-	const p = projects[index];
+	const ordered = useProjects();
+	const p = projects.find((x) => x.id === id);
+	const index = Math.max(0, ordered.findIndex((x) => x.id === id));
 	const [likes, setLikes] = useState<number | null>(null);
 	const [liked, setLiked] = useState(false);
 
@@ -31,8 +33,6 @@ export default function ProjectPage({ id }: { id: string }) {
 	}, [stats, p]);
 
 	if (!p) return <NotFound />;
-	const prev = projects[(index - 1 + projects.length) % projects.length];
-	const next = projects[(index + 1) % projects.length];
 
 	const like = async () => {
 		if (liked) return;
@@ -44,11 +44,8 @@ export default function ProjectPage({ id }: { id: string }) {
 
 	return (
 		<section className="sec" aria-labelledby="project-title">
+			<ProjectStories list={ordered} current={p.id} />
 			<div className="card ppage glass" data-lg-bezel="30">
-				<Link className="back" to="/progetti">
-					<FiArrowLeft aria-hidden="true" />
-					{t(ui2.project.back)}
-				</Link>
 				<div className="dlg__head">
 					<div>
 						<p className="eyebrow">
@@ -145,16 +142,6 @@ export default function ProjectPage({ id }: { id: string }) {
 					{p.preview && <LivePreview key={p.id} url={p.preview} />}
 				</div>
 
-				<nav className="pnav" aria-label={t(ui.projects.title)}>
-					<Link className="glass pnav__a" to={`/progetti/${prev.id}`} data-lg-bezel="16">
-						<small>{t(ui2.project.prev)}</small>
-						<b>{prev.name}</b>
-					</Link>
-					<Link className="glass pnav__a r" to={`/progetti/${next.id}`} data-lg-bezel="16">
-						<small>{t(ui2.project.next)}</small>
-						<b>{next.name}</b>
-					</Link>
-				</nav>
 			</div>
 		</section>
 	);
