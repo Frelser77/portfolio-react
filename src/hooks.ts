@@ -147,9 +147,11 @@ export function usePointerFx() {
 export function useReveal(deps: unknown = null) {
 	// layout effect: gli elementi si nascondono prima del primo disegno, così non c'è il "doppio lampo" (visibile, poi nascosto, poi di nuovo visibile)
 	useLayoutEffect(() => {
-		if (prefersReducedMotion() || !("IntersectionObserver" in window)) return;
+		// su telefono (e con "meno movimento") niente comparsa animata: i pannelli di vetro con sfocatura lampeggiano mentre cambiano opacità
+		if (prefersReducedMotion() || !finePointer() || !("IntersectionObserver" in window)) return;
 		const selector = [".hero > *", ".hero__side > *", ".card", ".stat", ".step", ".pc", ".tile", ".cb", ".info li", ".tour"].join(",");
-		const items = Array.from(document.querySelectorAll<HTMLElement>(selector));
+		// quello che si vede già all'arrivo resta com'è; si anima solo ciò che sta sotto, quando ci arrivi
+		const items = Array.from(document.querySelectorAll<HTMLElement>(selector)).filter((el) => el.getBoundingClientRect().top > window.innerHeight * 0.92);
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const e of entries)

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useSyncExternalStore, type AnchorHTMLAttributes, type MouseEvent, type ReactNode } from "react";
-import { flushSync } from "react-dom";
 import { prefersReducedMotion } from "./prefs";
 
 /**
@@ -48,8 +47,9 @@ export function navigate(to: string, opts: { replace?: boolean } = {}) {
 		toTop();
 	};
 	const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
-	if (doc.startViewTransition && !prefersReducedMotion()) doc.startViewTransition(() => flushSync(go));
-	else go();
+	// cambio pagina istantaneo: la dissolvenza tra istantanee faceva lampeggiare i pannelli di vetro
+	void doc;
+	go();
 }
 
 export function usePath() {
