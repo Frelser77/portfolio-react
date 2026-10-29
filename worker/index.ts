@@ -91,6 +91,7 @@ function init(db: D1) {
 		.batch([
 			db.prepare("CREATE TABLE IF NOT EXISTS visits (day TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (day, h))"),
 			db.prepare("CREATE TABLE IF NOT EXISTS likes (project TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (project, h))"),
+			db.prepare("CREATE TABLE IF NOT EXISTS featured (name TEXT PRIMARY KEY, pos INTEGER NOT NULL, label TEXT, blurb TEXT, private INTEGER, url TEXT, language TEXT, pushed_at TEXT)"),
 			db.prepare("CREATE TABLE IF NOT EXISTS briefs (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT NOT NULL, name TEXT, reach TEXT, need TEXT, message TEXT, h TEXT)"),
 		])
 		.then(() => undefined)
@@ -313,6 +314,7 @@ async function github(env: Env, ctx: Ctx) {
 				payload = await githubPublic(); // token scaduto o limite raggiunto: si ricade sui dati pubblici
 			}
 		} else payload = await githubPublic();
+		(payload as Record<string, unknown>).featured = await publicFeatured(env);
 		const res = new Response(JSON.stringify(payload), { headers: { ...JSON_HEADERS, "cache-control": "public, max-age=3600" } });
 		if (cache) ctx.waitUntil(cache.put(key, res.clone()));
 		return new Response(res.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=300" } });
@@ -322,30 +324,108 @@ async function github(env: Env, ctx: Ctx) {
 }
 
 /** Solo per l'amministratore: tutti i repository a cui hai accesso, privati e di collaborazione compresi. */
-async function adminRepos(env: Env) {
-	if (!env.GITHUB_TOKEN) return json({ error: "no_token" }, 404);
-	try {
-		const data = await gql<{
-			viewer: { login: string; repositories: { totalCount: number; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; viewerPermission: string | null })[] } };
-		}>(
-			env.GITHUB_TOKEN,
-			`query{ viewer{ login repositories(first:100, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount nodes{ nameWithOwner isPrivate isFork isArchived url pushedAt viewerPermission primaryLanguage{ name } } } } }`,
-		);
-		const rows = data.viewer.repositories.nodes.map((r) => ({
+interface AdminRepoRow { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string }
+
+/** Tutti i repository a cui il token ha accesso: tuoi, di collaborazione e di organizzazioni. */
+async function viewerRepos(token: string): Promise<{ total: number; rows: AdminRepoRow[] }> {
+	const data = await gql<{
+		viewer: { login: string; repositories: { totalCount: number; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; viewerPermission: string | null })[] } };
+	}>(
+		token,
+		`query{ viewer{ login repositories(first:100, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount nodes{ nameWithOwner isPrivate isFork isArchived url pushedAt viewerPermission primaryLanguage{ name } } } } }`,
+	);
+	const login = data.viewer.login.toLowerCase();
+	return {
+		total: data.viewer.repositories.totalCount,
+		rows: data.viewer.repositories.nodes.map((r) => ({
 			name: r.nameWithOwner,
 			private: r.isPrivate,
 			fork: r.isFork,
 			archived: r.isArchived,
-			mine: r.nameWithOwner.toLowerCase().startsWith(`${data.viewer.login.toLowerCase()}/`),
+			mine: r.nameWithOwner.toLowerCase().startsWith(`${login}/`),
 			language: r.primaryLanguage?.name ?? "",
 			pushedAt: r.pushedAt,
 			url: r.url,
 			permission: r.viewerPermission ?? "",
-		}));
-		return json({ total: data.viewer.repositories.totalCount, rows });
+		})),
+	};
+}
+
+async function adminRepos(env: Env) {
+	if (!env.GITHUB_TOKEN) return json({ error: "no_token" }, 404);
+	try {
+		return json(await viewerRepos(env.GITHUB_TOKEN));
 	} catch {
 		return json({ error: "github_unavailable" }, 502);
 	}
+}
+
+/* ---- repository in evidenza: li scegli tu dal pannello, il sito pubblico li mostra al posto degli ultimi aggiornamenti ---- */
+
+interface FeaturedRow { name: string; pos: number; label: string | null; blurb: string | null; private: number; url: string | null; language: string | null; pushed_at: string | null }
+
+async function loadFeatured(env: Env) {
+	if (!env.DB) return [] as FeaturedRow[];
+	try {
+		await init(env.DB);
+		return ((await env.DB.prepare("SELECT name, pos, label, blurb, private, url, language, pushed_at FROM featured ORDER BY pos").all()).results ?? []) as unknown as FeaturedRow[];
+	} catch {
+		return [];
+	}
+}
+
+/** Versione pubblica: dei repository privati non c'è mai il link, e il nome vero compare solo se non hai scritto un nome pubblico. */
+async function publicFeatured(env: Env) {
+	const rows = await loadFeatured(env);
+	if (!rows.length) return [];
+	let fresh = new Map<string, AdminRepoRow>();
+	if (env.GITHUB_TOKEN) {
+		try {
+			fresh = new Map((await viewerRepos(env.GITHUB_TOKEN)).rows.map((r) => [r.name, r]));
+		} catch {
+			/* si usano i dati salvati */
+		}
+	}
+	return rows.map((r) => {
+		const f = fresh.get(r.name);
+		const priv = f ? f.private : !!r.private;
+		return {
+			name: r.label || r.name.split("/").pop() || r.name,
+			blurb: r.blurb ?? "",
+			language: f?.language ?? r.language ?? "",
+			pushedAt: f?.pushedAt ?? r.pushed_at ?? "",
+			url: priv ? "" : (f?.url ?? r.url ?? ""),
+			private: priv,
+		};
+	});
+}
+
+async function adminFeatured(req: Request, env: Env) {
+	if (!env.DB) return json({ error: "no_db" }, 404);
+	if (req.method === "GET") return json({ rows: await loadFeatured(env) });
+	if (!env.GITHUB_TOKEN) return json({ error: "no_token" }, 404);
+	const b = await body<{ items?: { name?: string; label?: string; blurb?: string }[] }>(req, 20000);
+	if (!b || !Array.isArray(b.items) || b.items.length > 8) return json({ error: "bad_request" }, 400);
+	let all: AdminRepoRow[];
+	try {
+		all = (await viewerRepos(env.GITHUB_TOKEN)).rows;
+	} catch {
+		return json({ error: "github_unavailable" }, 502);
+	}
+	const byName = new Map(all.map((r) => [r.name, r]));
+	const clean = (v: unknown, n: number) => (typeof v === "string" ? v.trim().slice(0, n) : "");
+	const items = b.items.flatMap((it, i) => {
+		const r = typeof it.name === "string" ? byName.get(it.name) : undefined;
+		return r ? [{ r, pos: i, label: clean(it.label, 60), blurb: clean(it.blurb, 160) }] : [];
+	});
+	await init(env.DB);
+	await env.DB.batch([
+		env.DB.prepare("DELETE FROM featured"),
+		...items.map((x) => env.DB!.prepare("INSERT INTO featured (name, pos, label, blurb, private, url, language, pushed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").bind(x.r.name, x.pos, x.label, x.blurb, x.r.private ? 1 : 0, x.r.url, x.r.language, x.r.pushedAt)),
+	]);
+	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
+	await Promise.all(["t", "p"].map((k) => cache?.delete(new Request(`https://cache.fr7.local/github-v2-${k}`)) ?? Promise.resolve(false)));
+	return json({ rows: await loadFeatured(env) });
 }
 
 /* ------------------------------ D1: visite, like, richieste ------------------------------ */
@@ -514,6 +594,11 @@ export default {
 				case "/api/admin/briefs":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminBriefs(req, env);
+				case "/api/admin/featured":
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
+					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+					if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+					return await adminFeatured(req, env);
 				case "/api/admin/repos":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
-import { FiStar } from "react-icons/fi";
+import { FiLock, FiStar } from "react-icons/fi";
 import { getGithub, type GithubData } from "../api";
 import { profile } from "../content/data";
 import { ui2 } from "../content/ui2";
@@ -92,25 +92,48 @@ export default function GithubLive() {
 									</li>
 								))}
 							</ul>
-							<p className="psub">{t(ui2.stack.live.recent)}</p>
-							<ul className="recent" role="list">
-								{data.recent.slice(0, 4).map((r) => (
-									<li key={r.name}>
-										<a href={r.url} target="_blank" rel="noopener noreferrer">
-											<b>{r.name}</b>
-											<small>
-												{r.language || "—"} · {ago(r.pushedAt, lang)}
-											</small>
-										</a>
-										{r.stars > 0 && (
-											<span className="stars">
-												<FiStar aria-hidden="true" />
-												{r.stars}
-											</span>
-										)}
-									</li>
-								))}
-							</ul>
+							{data.featured && data.featured.length > 0 ? (
+								<>
+									<p className="psub">{t(ui2.stack.live.featured)}</p>
+									<ul className="recent" role="list">
+										{data.featured.slice(0, 8).map((r) => {
+											const inner = (
+												<>
+													<b>
+														{r.private && <FiLock aria-label={t(ui2.stack.live.privateRepo)} />}
+														{r.name}
+													</b>
+													{r.blurb && <span className="rblurb">{r.blurb}</span>}
+													<small>{[r.language, r.pushedAt && ago(r.pushedAt, lang)].filter(Boolean).join(" · ") || "—"}</small>
+												</>
+											);
+											return <li key={r.name}>{r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer">{inner}</a> : <div className="rstatic">{inner}</div>}</li>;
+										})}
+									</ul>
+								</>
+							) : (
+								<>
+									<p className="psub">{t(ui2.stack.live.recent)}</p>
+									<ul className="recent" role="list">
+										{data.recent.slice(0, 4).map((r) => (
+											<li key={r.name}>
+												<a href={r.url} target="_blank" rel="noopener noreferrer">
+													<b>{r.name}</b>
+													<small>
+														{r.language || "—"} · {ago(r.pushedAt, lang)}
+													</small>
+												</a>
+												{r.stars > 0 && (
+													<span className="stars">
+														<FiStar aria-hidden="true" />
+														{r.stars}
+													</span>
+												)}
+											</li>
+										))}
+									</ul>
+								</>
+							)}
 						</>
 					)}
 				</div>

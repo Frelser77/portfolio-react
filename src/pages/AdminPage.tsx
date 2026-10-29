@@ -19,6 +19,11 @@ interface Status {
 	github: boolean;
 	notify: boolean;
 }
+interface Pick {
+	name: string;
+	label: string;
+	blurb: string;
+}
 type Fail = "" | "wrong" | "noToken" | "noDb" | "limited" | "bad";
 type Level = "ok" | "warn" | "info";
 
@@ -34,6 +39,8 @@ export default function AdminPage() {
 	const [rows, setRows] = useState<Row[] | null>(null);
 	const [repos, setRepos] = useState<AdminRepo[] | "none" | null>(null);
 	const [busy, setBusy] = useState(false);
+	const [picks, setPicks] = useState<Pick[]>([]);
+	const [saved, setSaved] = useState<"" | "ok" | "fail">("");
 
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
 	const failOf = async (r: Response): Promise<Fail> => {
@@ -50,6 +57,15 @@ export default function AdminPage() {
 			else setRows([]);
 		} catch {
 			setRows([]);
+		}
+		try {
+			const f = await fetch("/api/admin/featured", { credentials: "same-origin" });
+			if (f.ok && isJson(f)) {
+				const j = (await f.json()) as { rows: { name: string; label: string | null; blurb: string | null }[] };
+				setPicks(j.rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "" })));
+			}
+		} catch {
+			/* nessuna selezione */
 		}
 		try {
 			const g = await fetch("/api/admin/repos", { credentials: "same-origin" });
@@ -116,6 +132,28 @@ export default function AdminPage() {
 		await loadData();
 		setBusy(false);
 	};
+
+	const move = (i: number, d: number) =>
+		setPicks((p) => {
+			const j = i + d;
+			if (j < 0 || j >= p.length) return p;
+			const n = [...p];
+			[n[i], n[j]] = [n[j], n[i]];
+			return n;
+		});
+	const edit = (i: number, k: "label" | "blurb", v: string) => setPicks((p) => p.map((x, n) => (n === i ? { ...x, [k]: v } : x)));
+	const savePicks = async () => {
+		setBusy(true);
+		setSaved("");
+		try {
+			const r = await fetch("/api/admin/featured", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ items: picks }) });
+			setSaved(r.ok ? "ok" : "fail");
+		} catch {
+			setSaved("fail");
+		}
+		setBusy(false);
+	};
+	const repoByName = new Map(Array.isArray(repos) ? repos.map((r) => [r.name, r] as const) : []);
 
 	const checks: { id: string; icon: typeof FiDatabase; label: L; ok: boolean; optional: boolean; yes: L; no: L }[] = status
 		? [
@@ -266,21 +304,78 @@ export default function AdminPage() {
 							</p>
 						)}
 						{Array.isArray(repos) && (
-							<ul className="adm__list adm__repos" role="list">
-								{repos.map((r) => (
-									<li key={r.name}>
-										<a href={r.url} target="_blank" rel="noopener noreferrer">
-											<b>{r.name}</b>
-										</a>
-										<small>
-											<span className={`adm__tag ${r.private ? "priv" : ""}`}>{t(r.private ? A.priv : A.pub)}</span>
-											{!r.mine && <span className="adm__tag">{t(A.collab)}</span>}
-											{r.language && <span>{r.language}</span>}
-											{r.pushedAt && <time>{r.pushedAt.slice(0, 10)}</time>}
-										</small>
-									</li>
-								))}
-							</ul>
+							<>
+								<div>
+									<h3 className="h3">{t(A.featTitle)}</h3>
+									<p className="muted adm__sub">{t(A.featText)}</p>
+								</div>
+								{picks.length === 0 && <p className="muted adm__sub">{t(A.featNone)}</p>}
+								<ul className="adm__pick" role="list">
+									{picks.map((p, i) => {
+										const r = repoByName.get(p.name);
+										return (
+											<li key={p.name}>
+												<div className="adm__pickhead">
+													<b>{p.name}</b>
+													{r && <span className={`adm__tag ${r.private ? "priv" : ""}`}>{t(r.private ? A.priv : A.pub)}</span>}
+													<button type="button" className="adm__mini" onClick={() => move(i, -1)} disabled={i === 0} aria-label={t(A.up)}>
+														↑
+													</button>
+													<button type="button" className="adm__mini" onClick={() => move(i, 1)} disabled={i === picks.length - 1} aria-label={t(A.down)}>
+														↓
+													</button>
+													<button type="button" className="adm__mini" onClick={() => setPicks((x) => x.filter((_, n) => n !== i))}>
+														{t(A.remove)}
+													</button>
+												</div>
+												<input value={p.label} maxLength={60} placeholder={t(A.publicName)} onChange={(e) => edit(i, "label", e.target.value)} />
+												<input value={p.blurb} maxLength={160} placeholder={t(A.publicBlurb)} onChange={(e) => edit(i, "blurb", e.target.value)} />
+												{r?.private && <small className="muted">{t(A.privWarn)}</small>}
+											</li>
+										);
+									})}
+								</ul>
+								<div className="adm__tools">
+									<button type="button" className="btn pri sm" onClick={savePicks} disabled={busy}>
+										{t(A.save)}
+									</button>
+								</div>
+								{saved && (
+									<p className={`adm__note ${saved === "ok" ? "ok" : "warn"}`} role="status">
+										{saved === "ok" ? <FiCheckCircle aria-hidden="true" /> : <FiAlertTriangle aria-hidden="true" />}
+										<span>{t(saved === "ok" ? A.saved : A.saveFail)}</span>
+									</p>
+								)}
+
+								<h3 className="h3">{t(A.allRepos)}</h3>
+								<ul className="adm__list adm__repos" role="list">
+									{repos.map((r) => {
+										const on = picks.some((p) => p.name === r.name);
+										return (
+											<li key={r.name}>
+												<a href={r.url} target="_blank" rel="noopener noreferrer">
+													<b>{r.name}</b>
+												</a>
+												<small>
+													<span className={`adm__tag ${r.private ? "priv" : ""}`}>{t(r.private ? A.priv : A.pub)}</span>
+													{!r.mine && <span className="adm__tag">{t(A.collab)}</span>}
+													{r.language && <span>{r.language}</span>}
+													{r.pushedAt && <time>{r.pushedAt.slice(0, 10)}</time>}
+												</small>
+												<button
+													type="button"
+													className={`adm__mini${on ? " on" : ""}`}
+													disabled={on || picks.length >= 8}
+													title={picks.length >= 8 ? t(A.max) : undefined}
+													onClick={() => setPicks((x) => [...x, { name: r.name, label: "", blurb: "" }])}
+												>
+													{on ? "✓" : t(A.add)}
+												</button>
+											</li>
+										);
+									})}
+								</ul>
+							</>
 						)}
 					</div>
 				</>

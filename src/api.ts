@@ -39,6 +39,8 @@ export interface GithubData {
 	privateRepos?: number;
 	contributions?: number;
 	calendar?: number[][];
+	/** repository scelti dal pannello admin: se ci sono, sostituiscono "ultimi aggiornamenti" */
+	featured?: { name: string; blurb: string; language: string; pushedAt: string; url: string; private: boolean }[];
 	recent: { name: string; description: string; language: string; pushedAt: string; url: string; stars: number }[];
 	fetchedAt: string;
 }

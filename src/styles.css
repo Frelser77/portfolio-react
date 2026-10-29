@@ -4385,3 +4385,50 @@ html[data-refract="off"] .lens {
 	.adm__tools { width: 100%; }
 	.adm__tools .btn { flex: 1; }
 }
+
+.recent .rstatic { display: grid; min-width: 0; }
+.recent b { display: inline-flex; align-items: center; gap: 6px; }
+.recent b svg { flex: none; width: 13px; height: 13px; opacity: 0.8; }
+.rblurb { font-size: 13px; color: #d6dcff; line-height: 1.35; white-space: normal; }
+
+/* admin: repository in evidenza */
+.adm__sub { margin: 4px 0 0; font-size: 13.5px; }
+.adm__pick { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.adm__pick > li {
+	display: grid;
+	gap: 8px;
+	padding: 12px 14px;
+	border-radius: 18px;
+	background: rgba(143, 160, 255, 0.12);
+	border: 1px solid rgba(143, 160, 255, 0.35);
+}
+.adm__pick input {
+	min-height: 42px;
+	padding: 0 12px;
+	border-radius: 12px;
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	background: rgba(4, 7, 28, 0.5);
+	color: var(--ink);
+	font: inherit;
+	font-size: 14px;
+}
+.adm__pickhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.adm__pickhead b { overflow-wrap: anywhere; margin-right: auto; }
+.adm__mini {
+	min-height: 36px;
+	padding: 0 12px;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	background: rgba(255, 255, 255, 0.08);
+	color: var(--ink);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+}
+.adm__mini:disabled { opacity: 0.4; cursor: default; }
+.adm__mini.on { background: linear-gradient(135deg, #5d73ff, #8b5cf6); border-color: #c4ccff; }
+.adm__repos > li { grid-template-columns: 1fr auto; align-items: center; }
+.adm__repos > li > a { grid-column: 1; }
+.adm__repos > li > small { grid-column: 1; }
+.adm__repos > li > .adm__mini { grid-column: 2; grid-row: 1 / span 2; }

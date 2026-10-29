@@ -50,6 +50,7 @@ Il sito è multipagina (`/`, `/progetti`, `/progetti/:id`, `/stack`, `/lab`, `/c
 | `POST /api/visit`, `GET /api/stats`, `POST /api/likes` | visite anonime e "mi piace" | binding `DB` (D1) |
 | `POST /api/brief` | richieste dal modulo contatti | `DB` e/o secret `NOTIFY_WEBHOOK` |
 | `GET /api/admin/briefs` | elenco richieste (pagina `/admin`) | `DB` + secret `ADMIN_TOKEN` |
+| `GET/POST /api/admin/featured` | repository scelti dal pannello per la pagina Stack (tabella D1 `featured`) | `DB` + `ADMIN_TOKEN` + `GITHUB_TOKEN` |
 | `GET /api/admin/repos` | tutti i repo (privati e di collaborazione), solo in `/admin` | `ADMIN_TOKEN` + `GITHUB_TOKEN` |
 
 Senza uno di questi pezzi il sito continua a funzionare: la chat risponde dai dati del sito, i contatori spariscono, il modulo usa email/WhatsApp.
