@@ -13,6 +13,16 @@ const notify = () => listeners.forEach((l) => l());
 const clean = (p: string) => (p.length > 1 ? p.replace(/\/+$/, "") : p) || "/";
 const read = () => clean(window.location.pathname);
 
+/** Torna in cima subito (niente scroll animato: su iPhone si interrompeva a metà quando la pagina cambia). */
+const toTop = () => {
+	const jump = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+	jump();
+	requestAnimationFrame(() => {
+		jump();
+		setTimeout(jump, 120);
+	});
+};
+
 if (typeof window !== "undefined") {
 	try {
 		history.scrollRestoration = "manual";
@@ -21,7 +31,7 @@ if (typeof window !== "undefined") {
 	}
 	window.addEventListener("popstate", () => {
 		notify();
-		window.scrollTo(0, 0);
+		toTop();
 	});
 }
 
@@ -35,7 +45,7 @@ export function navigate(to: string, opts: { replace?: boolean } = {}) {
 		if (opts.replace) history.replaceState(null, "", target);
 		else history.pushState(null, "", target);
 		notify();
-		window.scrollTo(0, 0);
+		toTop();
 	};
 	const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
 	if (doc.startViewTransition && !prefersReducedMotion()) doc.startViewTransition(() => flushSync(go));

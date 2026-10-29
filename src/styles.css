@@ -4888,3 +4888,6 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .ppage .psub, .ppage .dlg__meta, .ppage .shots__cap { color: #d6dcff !important; }
 .ppage .like { background: rgba(255, 255, 255, 0.14); color: #fff; }
 .status { color: #fff; }
+.nav { padding-top: calc(28px + env(safe-area-inset-top, 0px)); }
+.stories { top: calc(8px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 720px) { .nav { padding-top: calc(18px + env(safe-area-inset-top, 0px)); } }
