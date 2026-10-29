@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { projects } from "./src/content/data";
 
 /**
  * Indirizzo pubblico del portfolio.
@@ -14,6 +15,7 @@ function siteUrl(): Plugin {
 		transformIndexHtml: (html) => html.replaceAll("__SITE_URL__", SITE_URL),
 		generateBundle() {
 			const today = new Date().toISOString().slice(0, 10);
+			const paths = ["/", "/progetti", "/stack", "/lab", "/chi-sono", "/contatti", ...projects.map((p) => `/progetti/${p.id}`)];
 			this.emitFile({
 				type: "asset",
 				fileName: "robots.txt",
@@ -22,7 +24,7 @@ function siteUrl(): Plugin {
 			this.emitFile({
 				type: "asset",
 				fileName: "sitemap.xml",
-				source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE_URL}/</loc><lastmod>${today}</lastmod></url>\n</urlset>\n`,
+				source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${SITE_URL}${p}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`,
 			});
 		},
 	};

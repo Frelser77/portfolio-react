@@ -1,4 +1,4 @@
-/** Il "mondo" colorato dietro al vetro: sfere lucide e anelli che scorrono con parallasse. Il vetro li rifrange. */
+/** Il "mondo" colorato dietro al vetro: sfere lucide che scorrono con parallasse. Il vetro li rifrange. */
 const orbs = [
 	{ top: "3%", left: "62%", size: 360, a: "#ff4fa3", b: "#7a2cff", par: 140 },
 	{ top: "14%", left: "-6%", size: 300, a: "#3be2ff", b: "#2b5bff", par: 90 },
@@ -31,8 +31,6 @@ export default function World() {
 					}
 				/>
 			))}
-			<i className="ring r1" />
-			<i className="ring r2" />
 		</div>
 	);
 }

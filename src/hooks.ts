@@ -100,18 +100,50 @@ export function usePointerFx() {
 			window.addEventListener("pointermove", move, { passive: true });
 			document.addEventListener("pointerout", leave);
 		}
+		// Telefono e tablet: niente cursore, quindi il dito accende la luce sul vetro e l'inclinazione del telefono muove lo sfondo
+		let touch: ((e: PointerEvent) => void) | undefined;
+		let tilt: ((e: DeviceOrientationEvent) => void) | undefined;
+		if (!fine && !calm) {
+			touch = (e: PointerEvent) => {
+				root.style.setProperty("--px", (e.clientX / window.innerWidth - 0.5).toFixed(3));
+				root.style.setProperty("--py", (e.clientY / window.innerHeight - 0.5).toFixed(3));
+				const glass = (e.target as Element | null)?.closest<HTMLElement>(".glass");
+				if (glass) {
+					const r = glass.getBoundingClientRect();
+					glass.style.setProperty("--mx", `${e.clientX - r.left}px`);
+					glass.style.setProperty("--my", `${e.clientY - r.top}px`);
+				}
+			};
+			window.addEventListener("pointerdown", touch, { passive: true });
+			const DOE = window.DeviceOrientationEvent as unknown as { requestPermission?: unknown } | undefined;
+			if (DOE && typeof DOE.requestPermission !== "function") {
+				let last = 0;
+				tilt = (e: DeviceOrientationEvent) => {
+					const now = performance.now();
+					if (now - last < 50) return;
+					last = now;
+					const g = Math.max(-1, Math.min(1, (e.gamma ?? 0) / 40)) / 2;
+					const b = Math.max(-1, Math.min(1, ((e.beta ?? 50) - 50) / 40)) / 2;
+					root.style.setProperty("--px", g.toFixed(3));
+					root.style.setProperty("--py", b.toFixed(3));
+				};
+				window.addEventListener("deviceorientation", tilt, { passive: true });
+			}
+		}
 		return () => {
 			cancelAnimationFrame(raf);
 			window.removeEventListener("scroll", onScroll);
 			window.removeEventListener("resize", onScroll);
 			if (move) window.removeEventListener("pointermove", move);
 			if (leave) document.removeEventListener("pointerout", leave);
+			if (touch) window.removeEventListener("pointerdown", touch);
+			if (tilt) window.removeEventListener("deviceorientation", tilt);
 		};
 	}, []);
 }
 
 /** Fa comparire gli elementi con data-rv quando entrano nello schermo. */
-export function useReveal() {
+export function useReveal(deps: unknown = null) {
 	useEffect(() => {
 		if (prefersReducedMotion() || !("IntersectionObserver" in window)) return;
 		const selector = [".hero > *", ".hero__side > *", ".card", ".stat", ".step", ".pc", ".tile", ".cb", ".info li", ".tour"].join(",");
@@ -134,7 +166,7 @@ export function useReveal() {
 			observer.observe(el);
 		});
 		return () => observer.disconnect();
-	}, []);
+	}, [deps]);
 }
 
 /** Conta da 0 a `to` quando l'elemento entra nello schermo. */

@@ -31,7 +31,7 @@ export default function About() {
 				<div className="about">
 					<div>
 						<p className="eyebrow">
-							<b>02.</b>
+							<b>04.</b>
 							{t(ui.about.eyebrow)}
 						</p>
 						<h2 id="about-title">{t(ui.about.title)}</h2>

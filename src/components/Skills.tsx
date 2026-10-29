@@ -25,6 +25,7 @@ import {
 import { unlock } from "../achievements";
 import { certificates, profile, projects, skillGroups } from "../content/data";
 import { openProject } from "../bus";
+import { Link } from "../router";
 import { ui } from "../content/ui";
 import { usePrefs } from "../prefs";
 
@@ -93,7 +94,7 @@ export default function Skills() {
 						</span>
 						<div>
 							<p className="eyebrow">
-								<b>03.</b>
+								<b>02.</b>
 								{t(ui.skills.eyebrow)}
 							</p>
 							<h2 id="skills-title">{t(ui.skills.title)}</h2>
@@ -196,10 +197,10 @@ export default function Skills() {
 					</aside>
 				</div>
 
-				<a className="btn glass" href="#progetti" data-lg-bezel="14">
+				<Link className="btn glass" to="/progetti" data-lg-bezel="14">
 					{t(ui.skills.cta)}
 					<FiArrowRight aria-hidden="true" />
-				</a>
+				</Link>
 			</div>
 		</section>
 	);

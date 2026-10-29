@@ -8,7 +8,7 @@ export type Lang = "it" | "en";
 export type L = Record<Lang, string>;
 
 /** Indirizzo pubblico del sito: si cambia in vite.config.ts */
-export const SITE_URL = __SITE_URL__;
+export const SITE_URL: string = typeof __SITE_URL__ !== "undefined" ? __SITE_URL__ : "";
 
 export const profile = {
 	name: "Salvatore D'Amico",

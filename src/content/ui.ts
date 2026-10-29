@@ -114,7 +114,7 @@ export const ui = {
 	guide: {
 		label: { it: "FR7 Bot, la tua guida: toccalo", en: "FR7 Bot, your guide: poke it" },
 		next: { it: "Avanti", en: "Next" },
-		top: { it: "Torna su", en: "Back to top" },
+		top: { it: "Ricomincia", en: "Start over" },
 		close: { it: "Chiudi il fumetto", en: "Close the speech bubble" },
 		home: [
 			{
@@ -293,7 +293,7 @@ export const ui = {
 	footer: {
 		rights: { it: "Tutti i diritti riservati.", en: "All rights reserved." },
 		menu: { it: "Menu footer", en: "Footer menu" },
-		top: { it: "Torna su", en: "Back to top" },
+		top: { it: "Ricomincia", en: "Start over" },
 	},
 };
 

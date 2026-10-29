@@ -12,7 +12,7 @@ export default function Method() {
 				<div className="method">
 					<div>
 						<p className="eyebrow">
-							<b>01.</b>
+							<b>00.</b>
 							{t(ui.method.eyebrow)}
 						</p>
 						<h2 id="method-title">{t(ui.method.title)}</h2>

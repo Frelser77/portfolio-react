@@ -5,6 +5,7 @@ import { profile } from "../content/data";
 import { ui } from "../content/ui";
 import { pickNeed } from "../bus";
 import { usePrefs } from "../prefs";
+import { Link } from "../router";
 import Configurator from "./Configurator";
 import Lens from "./Lens";
 
@@ -27,9 +28,9 @@ export default function Hero() {
 						{t(ui.hero.ctaBrief)}
 						<FiArrowRight aria-hidden="true" />
 					</button>
-					<a className="btn glass" href="#progetti" data-lg-bezel="14">
+					<Link className="btn glass" to="/progetti" data-lg-bezel="14">
 						{t(ui.hero.ctaWork)}
-					</a>
+					</Link>
 				</div>
 				<div className="row socials">
 					<a className="ico glass" href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">

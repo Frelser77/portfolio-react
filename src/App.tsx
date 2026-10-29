@@ -1,25 +1,75 @@
+import { useEffect } from "react";
 import Nav from "./components/Nav";
-import Hero from "./components/Hero";
-import Method from "./components/Method";
-import About from "./components/About";
-import Skills from "./components/Skills";
-import Projects from "./components/Projects";
-import Contact from "./components/Contact";
+import Dock from "./components/Dock";
 import Footer from "./components/Footer";
 import Guide from "./components/Guide";
 import World from "./components/World";
+import About from "./components/About";
+import Skills from "./components/Skills";
+import GithubLive from "./components/GithubLive";
+import Projects from "./components/Projects";
+import Contact from "./components/Contact";
 import { AchievementToasts } from "./components/Achievements";
+import Home from "./pages/Home";
+import ProjectPage from "./pages/ProjectPage";
+import LabPage from "./pages/LabPage";
+import AdminPage from "./pages/AdminPage";
+import NotFound from "./pages/NotFound";
 import { usePointerFx, useReveal } from "./hooks";
 import { initLiquidGlass } from "./liquid";
-import { useEffect } from "react";
+import { match, usePath, useRouteFocus } from "./router";
 import { usePrefs } from "./prefs";
 import { ui } from "./content/ui";
+import { ui2 } from "./content/ui2";
+import { projects } from "./content/data";
+
+function Page({ path }: { path: string }) {
+	const r = match(path);
+	switch (r.name) {
+		case "home":
+			return <Home />;
+		case "progetti":
+			return <Projects />;
+		case "progetto":
+			return <ProjectPage id={r.id!} />;
+		case "stack":
+			return (
+				<>
+					<Skills />
+					<GithubLive />
+				</>
+			);
+		case "lab":
+			return <LabPage />;
+		case "chi-sono":
+			return <About />;
+		case "contatti":
+			return <Contact />;
+		case "admin":
+			return <AdminPage />;
+		default:
+			return <NotFound />;
+	}
+}
 
 export default function App() {
-	const { t } = usePrefs();
+	const { t, lang } = usePrefs();
+	const path = usePath();
+	const r = match(path);
 	usePointerFx();
 	useEffect(() => initLiquidGlass(), []);
-	useReveal();
+	useReveal(path);
+	useRouteFocus(path);
+
+	// titolo e meta della pagina corrente
+	useEffect(() => {
+		const project = r.name === "progetto" ? projects.find((p) => p.id === r.id) : null;
+		document.title = project ? `${project.name} · Salvatore D'Amico` : t(ui2.titles[r.name] ?? ui2.titles.home);
+		const robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+		if (robots) robots.content = r.name === "admin" ? "noindex" : "index, follow";
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [path, lang]);
+
 	return (
 		<div className="pf" id="top">
 			<a className="skip-link" href="#main">
@@ -36,16 +86,12 @@ export default function App() {
 			<World />
 			<div className="wrap">
 				<Nav />
-				<main id="main" tabIndex={-1}>
-					<Hero />
-					<Method />
-					<About />
-					<Skills />
-					<Projects />
-					<Contact />
+				<main id="main" tabIndex={-1} key={path} className="page">
+					<Page path={path} />
 				</main>
 				<Footer />
 			</div>
+			<Dock />
 			<Guide />
 			<AchievementToasts />
 		</div>

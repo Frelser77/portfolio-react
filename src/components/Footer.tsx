@@ -1,6 +1,9 @@
 import { FiArrowUp } from "react-icons/fi";
 import { ui } from "../content/ui";
 import { usePrefs } from "../prefs";
+import { Link } from "../router";
+import { routes } from "./Nav";
+import Counter from "./Counter";
 
 export default function Footer() {
 	const { t } = usePrefs();
@@ -9,18 +12,18 @@ export default function Footer() {
 			<span className="brand">FR7</span>
 			<span>
 				© {new Date().getFullYear()} Salvatore D'Amico. {t(ui.footer.rights)}
+				<Counter />
 			</span>
 			<nav aria-label={t(ui.footer.menu)}>
-				<a href="#top">{t(ui.nav.home)}</a>
-				<a href="#metodo">{t(ui.nav.method)}</a>
-				<a href="#chi-sono">{t(ui.nav.about)}</a>
-				<a href="#competenze">{t(ui.nav.skills)}</a>
-				<a href="#progetti">{t(ui.nav.projects)}</a>
-				<a href="#contatti">{t(ui.nav.contact)}</a>
+				{routes.map((r) => (
+					<Link key={r.to} to={r.to}>
+						{t(r.label)}
+					</Link>
+				))}
 			</nav>
-			<a className="ico" href="#top" aria-label={t(ui.footer.top)}>
+			<button type="button" className="ico" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label={t(ui.footer.top)}>
 				<FiArrowUp aria-hidden="true" />
-			</a>
+			</button>
 		</footer>
 	);
 }

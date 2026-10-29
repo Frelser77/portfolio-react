@@ -1,18 +1,44 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FiArrowRight, FiArrowUp, FiX } from "react-icons/fi";
+import { FiArrowRight, FiRotateCcw, FiX } from "react-icons/fi";
 import { profile } from "../content/data";
 import { ui, withAge } from "../content/ui";
-import { useActiveSection } from "../hooks";
+import { navigate, usePath } from "../router";
+import { ui2 } from "../content/ui2";
+import type { L } from "../content/data";
 import { unlock } from "../achievements";
 import { prefersReducedMotion, usePrefs } from "../prefs";
 import Bot3D from "./Bot3D";
 import BotGL, { type Pose } from "./BotGL";
 
-const STOPS = ["home", "metodo", "chi-sono", "competenze", "progetti", "contatti"] as const;
+/** Le tappe del giro guidato: una per pagina. */
+const STOPS = ["/", "/progetti", "/stack", "/lab", "/chi-sono", "/contatti"] as const;
 type Stop = (typeof STOPS)[number];
 
-/** Da che lato dello schermo si ferma in ogni sezione (su telefono sta sempre a destra). */
-const SIDE: Record<Stop, "l" | "r"> = { home: "r", metodo: "l", "chi-sono": "r", competenze: "l", progetti: "r", contatti: "l" };
+/** Da che lato dello schermo si ferma in ogni pagina (su telefono sta sempre a destra). */
+const SIDE: Record<Stop, "l" | "r"> = { "/": "r", "/progetti": "l", "/stack": "r", "/lab": "l", "/chi-sono": "r", "/contatti": "l" };
+
+/** Pagina corrente → tappa del giro e messaggi da dire. */
+function where(path: string): { stop: Stop; messages: L[]; key: string } {
+	const stop = (STOPS.find((s) => s !== "/" && (path === s || path.startsWith(s + "/"))) ?? "/") as Stop;
+	if (path.startsWith("/progetti/")) return { stop, messages: ui2.guide.progetto, key: "progetto" };
+	switch (stop) {
+		case "/progetti":
+			return { stop, messages: ui.guide.progetti, key: stop };
+		case "/stack":
+			return { stop, messages: [...ui.guide.competenze, ...ui2.guide.stack], key: stop };
+		case "/lab":
+			return { stop, messages: ui2.guide.lab, key: stop };
+		case "/chi-sono":
+			return { stop, messages: ui.guide["chi-sono"], key: stop };
+		case "/contatti":
+			return { stop, messages: ui.guide.contatti, key: stop };
+		default:
+			return { stop, messages: [...ui.guide.home, ...ui.guide.metodo], key: "/" };
+	}
+}
+
+/** Su telefono il fumetto compare da solo una volta per pagina, poi sta zitto finché non lo tocchi. */
+const seen = new Set<string>();
 
 type Mode = "auto" | "open" | "off";
 
@@ -24,7 +50,9 @@ const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(mi
  */
 export default function Guide() {
 	const { t } = usePrefs();
-	const active = useActiveSection([...STOPS]) as Stop;
+	const path = usePath();
+	const here = where(path);
+	const active = here.stop;
 	const [mode, setMode] = useState<Mode>("auto");
 	const [tip, setTip] = useState(0);
 	const [show, setShow] = useState(false);
@@ -41,7 +69,7 @@ export default function Guide() {
 	const bot = useRef<HTMLDivElement>(null);
 	const quiet = useRef(false);
 	const sayTimer = useRef(0);
-	const prevSide = useRef<"l" | "r">(SIDE.home);
+	const prevSide = useRef<"l" | "r">(SIDE["/"]);
 	const timers = useRef<number[]>([]);
 	const later = (fn: () => void, ms: number) => {
 		const id = window.setTimeout(fn, ms);
@@ -54,7 +82,7 @@ export default function Guide() {
 
 	const side = SIDE[active];
 	const index = STOPS.indexOf(active);
-	const messages = ui.guide[active];
+	const messages = here.messages;
 	const text = said ?? withAge(t(messages[tip % messages.length]), profile.age);
 	const last = index === STOPS.length - 1;
 
@@ -71,14 +99,17 @@ export default function Guide() {
 			later(() => setMoving(false), 1500);
 		}
 		prevSide.current = side;
-		if (active === "contatti") unlock("end");
+		if (active === "/contatti") unlock("end");
 		const arrive = changed && !calm ? 1250 : 500;
 		later(() => {
 			if (!calm) {
 				setWave(true);
 				later(() => setWave(false), 1700);
 			}
-			if (mode === "auto" && !quiet.current && !(active === "home" && window.innerWidth < 720)) {
+			const phone = window.innerWidth < 720;
+			const skip = phone && (here.key === "/" || seen.has(here.key));
+			seen.add(here.key);
+			if (mode === "auto" && !quiet.current && !skip) {
 				setShow(true);
 				later(() => setShow(false), 7500);
 			} else if (mode === "open") setShow(true);
@@ -87,11 +118,11 @@ export default function Guide() {
 		setShow(false);
 		return clearTimers;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [active]);
+	}, [here.key]);
 
 	// Lo sguardo segue il cursore (su touch ondeggia da solo, vedi CSS)
 	useEffect(() => {
-		if (prefersReducedMotion() || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+		if (prefersReducedMotion()) return;
 		let raf = 0;
 		const onMove = (e: PointerEvent) => {
 			cancelAnimationFrame(raf);
@@ -111,8 +142,10 @@ export default function Guide() {
 			});
 		};
 		window.addEventListener("pointermove", onMove, { passive: true });
+			window.addEventListener("pointerdown", onMove, { passive: true });
 		return () => {
 			window.removeEventListener("pointermove", onMove);
+				window.removeEventListener("pointerdown", onMove);
 			cancelAnimationFrame(raf);
 		};
 	}, []);
@@ -179,13 +212,7 @@ export default function Guide() {
 		quiet.current = true;
 	};
 
-	const next = () => {
-		const calm = prefersReducedMotion();
-		const id = last ? "home" : STOPS[index + 1];
-		const el = document.getElementById(id);
-		if (last) window.scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" });
-		else el?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
-	};
+	const next = () => navigate(last ? "/" : STOPS[index + 1]);
 
 	const bubbleOpen = show && mode !== "off";
 	const live = mode === "open";
@@ -203,7 +230,7 @@ export default function Guide() {
 					<div className="gactions">
 						<button type="button" className="btn pri sm" onClick={next}>
 							{last ? t(ui.guide.top) : t(ui.guide.next)}
-							{last ? <FiArrowUp aria-hidden="true" /> : <FiArrowRight aria-hidden="true" />}
+							{last ? <FiRotateCcw aria-hidden="true" /> : <FiArrowRight aria-hidden="true" />}
 						</button>
 						<span className="gstep" aria-hidden="true">
 							{index + 1}/{STOPS.length}

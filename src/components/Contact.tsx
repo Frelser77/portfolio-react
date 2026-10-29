@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { FiArrowRight, FiCheck, FiCopy, FiMail } from "react-icons/fi";
+import { FiArrowRight, FiCheck, FiCopy, FiMail, FiSend } from "react-icons/fi";
 import { FaGithub, FaLinkedin, FaWhatsapp } from "react-icons/fa6";
 import { needs, profile, type Need } from "../content/data";
 import { ui } from "../content/ui";
 import { unlock } from "../achievements";
 import { usePrefs } from "../prefs";
+import { takePendingBrief } from "../bus";
+import { ui2 } from "../content/ui2";
+import { getHealth, sendBrief } from "../api";
+import { cleanBrief } from "../shared";
 
 export default function Contact() {
 	const { t } = usePrefs();
@@ -18,20 +22,46 @@ export default function Contact() {
 
 	useEffect(() => () => clearTimeout(timer.current), []);
 
-	// Dal configuratore: preseleziona la voce, scrivi la prima frase e porta qui
+	// Da un'altra pagina (configuratore, piano, progetto): preseleziona la voce e scrivi la prima frase
 	useEffect(() => {
-		const onNeed = (e: Event) => {
-			const id = (e as CustomEvent<Need["id"]>).detail;
-			setNeed(id);
-			const found = needs.find((n) => n.id === id);
-			if (found) setMsg((m) => (m.trim() ? m : t(found.brief) + " "));
+		const apply = () => {
+			const p = takePendingBrief();
+			if (!p) return;
+			if (p.need) {
+				setNeed(p.need as Need["id"]);
+				const found = needs.find((n) => n.id === p.need);
+				if (found && !p.text) setMsg((m) => (m.trim() ? m : t(found.brief) + " "));
+			}
+			if (p.text) setMsg((m) => (m.trim() ? m + "\n\n" + p.text : p.text!));
 			const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			document.getElementById("contatti")?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
-			window.setTimeout(() => area.current?.focus({ preventScroll: true }), calm ? 0 : 700);
+			document.getElementById("brief")?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" });
+			window.setTimeout(() => area.current?.focus({ preventScroll: true }), calm ? 0 : 600);
 		};
-		window.addEventListener("brief:need", onNeed);
-		return () => window.removeEventListener("brief:need", onNeed);
-	}, [t]);
+		apply();
+		window.addEventListener("brief:need", apply);
+		return () => window.removeEventListener("brief:need", apply);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const [state, setState] = useState<"idle" | "sending" | "sent" | "fail" | "needReach" | "needMsg">("idle");
+	const [canDirect, setCanDirect] = useState(false);
+	useEffect(() => {
+		let alive = true;
+		getHealth().then((h) => alive && setCanDirect(!!h?.brief));
+		return () => {
+			alive = false;
+		};
+	}, []);
+	const [trap, setTrap] = useState("");
+	const direct = async () => {
+		const b = cleanBrief({ name, reach, need: need ?? "", message: msg });
+		if (!msg.trim() || msg.trim().length < 10) return setState("needMsg");
+		if (!b) return setState("needReach");
+		setState("sending");
+		unlock("send");
+		const ok = await sendBrief({ ...b, website: trap });
+		setState(ok ? "sent" : "fail");
+	};
 
 	const copyEmail = async () => {
 		unlock("send");
@@ -93,7 +123,10 @@ export default function Contact() {
 					</div>
 				</div>
 
-				<form className="glass brief" onSubmit={(e) => e.preventDefault()} data-lg-bezel="26">
+				<form className="glass brief" id="brief" onSubmit={(e) => {
+						e.preventDefault();
+						if (canDirect) void direct();
+					}} data-lg-bezel="26">
 					<fieldset>
 						<legend>{t(ui.contact.needLabel)}</legend>
 						<div className="cfg__chips">
@@ -118,8 +151,26 @@ export default function Contact() {
 							<input type="text" autoComplete="email" value={reach} onChange={(e) => setReach(e.target.value)} />
 						</label>
 					</div>
+					<input className="hp" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} />
+					{canDirect && (
+						<>
 					<div className="brief__send">
-						<a className="btn pri" href={mail} onClick={() => unlock("send")}>
+						<button type="submit" className="btn pri" disabled={state === "sending"}>
+							<FiSend aria-hidden="true" />
+							{state === "sending" ? t(ui2.contact.sending) : t(ui2.contact.direct)}
+						</button>
+					</div>
+					<p className={`brief__state ${state}`} role="status">
+						{state === "sent" && t(ui2.contact.sent)}
+						{state === "fail" && t(ui2.contact.fail)}
+						{state === "needReach" && t(ui2.contact.needReach)}
+						{state === "needMsg" && t(ui2.contact.needMsg)}
+					</p>
+							<p className="brief__or">{t(ui2.contact.alt)}</p>
+						</>
+					)}
+					<div className="brief__send">
+						<a className="btn glass" href={mail} data-lg-bezel="14" onClick={() => unlock("send")}>
 							<FiMail aria-hidden="true" />
 							{t(ui.contact.sendMail)}
 							<FiArrowRight aria-hidden="true" />

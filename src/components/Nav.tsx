@@ -1,40 +1,45 @@
-import { useActiveSection } from "../hooks";
+import { Link, usePath } from "../router";
 import { usePrefs } from "../prefs";
 import { AchievementsHud } from "./Achievements";
+import { ui2 } from "../content/ui2";
 import { ui } from "../content/ui";
 
-/** id = sezione osservata per l'evidenziazione, href = dove porta il link */
-const links = [
-	{ id: "home", href: "#top", label: ui.nav.home },
-	{ id: "metodo", href: "#metodo", label: ui.nav.method },
-	{ id: "chi-sono", href: "#chi-sono", label: ui.nav.about },
-	{ id: "competenze", href: "#competenze", label: ui.nav.skills },
-	{ id: "progetti", href: "#progetti", label: ui.nav.projects },
-	{ id: "contatti", href: "#contatti", label: ui.nav.contact },
+export const routes = [
+	{ to: "/", label: ui2.nav.home },
+	{ to: "/progetti", label: ui2.nav.projects },
+	{ to: "/stack", label: ui2.nav.stack },
+	{ to: "/lab", label: ui2.nav.lab },
+	{ to: "/chi-sono", label: ui2.nav.about },
+	{ to: "/contatti", label: ui2.nav.contact },
 ];
+
+export const isOn = (path: string, to: string) => (to === "/" ? path === "/" : path === to || path.startsWith(to + "/"));
 
 export default function Nav() {
 	const { t, lang, toggleLang } = usePrefs();
-	const active = useActiveSection(links.map((l) => l.id));
+	const path = usePath();
 
 	return (
 		<header className="nav">
-			<a className="brand" href="#top" aria-label="FR7, home">
+			<Link className="brand" to="/" aria-label="FR7, home">
 				FR7
-			</a>
+			</Link>
 			<nav className="glass pill" aria-label={t(ui.nav.label)}>
-				{links.map((l) => (
-					<a key={l.id} href={l.href} className={active === l.id ? "on" : undefined} aria-current={active === l.id ? "true" : undefined}>
-						{t(l.label)}
-					</a>
-				))}
+				{routes.map((l) => {
+					const on = isOn(path, l.to);
+					return (
+						<Link key={l.to} to={l.to} className={on ? "on" : undefined} aria-current={on ? "page" : undefined}>
+							{t(l.label)}
+						</Link>
+					);
+				})}
 			</nav>
 			<div className="nav__tools">
 				<AchievementsHud />
 				<button type="button" className="ico lang glass" onClick={toggleLang} title={t(ui.nav.lang)}>
-				<span aria-hidden="true">{lang === "it" ? "EN" : "IT"}</span>
-				<span className="sr-only">{t(ui.nav.lang)}</span>
-			</button>
+					<span aria-hidden="true">{lang === "it" ? "EN" : "IT"}</span>
+					<span className="sr-only">{t(ui.nav.lang)}</span>
+				</button>
 			</div>
 		</header>
 	);

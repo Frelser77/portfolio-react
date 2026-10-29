@@ -32,17 +32,11 @@ const initialLang = (): Lang => {
 	return navigator.language?.toLowerCase().startsWith("it") ? "it" : "en";
 };
 
-const TITLES: Record<Lang, string> = {
-	it: "Salvatore D'Amico, full stack developer",
-	en: "Salvatore D'Amico, full stack developer",
-};
-
 export function PrefsProvider({ children }: { children: ReactNode }) {
 	const [lang, setLang] = useState<Lang>(initialLang);
 
 	useEffect(() => {
 		document.documentElement.lang = lang;
-		document.title = TITLES[lang];
 	}, [lang]);
 
 	const toggleLang = useCallback(() => {
