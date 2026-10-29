@@ -566,7 +566,19 @@ const sessionCookie = (value: string, maxAge: number) => `${COOKIE}=${value}; Pa
 async function adminSession(req: Request, env: Env, login: boolean) {
 	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
 	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
-	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT };
+	let ghInfo: { login: string; kind: string; scopes: string } | null = null;
+	if (env.GITHUB_TOKEN) {
+		const tk = env.GITHUB_TOKEN.trim();
+		const kind = tk.startsWith("github_pat_") ? "fine-grained" : tk.startsWith("ghp_") ? "classic" : "?";
+		try {
+			const u = await fetch("https://api.github.com/user", { headers: { authorization: `Bearer ${tk}`, "user-agent": "fr7-portfolio", accept: "application/vnd.github+json" } });
+			const j = (await u.json().catch(() => ({}))) as { login?: string };
+			ghInfo = { login: u.ok ? (j.login ?? "") : `errore ${u.status}`, kind, scopes: u.headers.get("x-oauth-scopes") ?? "" };
+		} catch {
+			ghInfo = { login: "non raggiungibile", kind, scopes: "" };
+		}
+	}
+	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, ghInfo, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT };
 	if (!login) return json({ ok: true, status });
 	const exp = Date.now() + SESSION_MS;
 	return json({ ok: true, status }, 200, { "set-cookie": sessionCookie(`${exp}.${await hmac((env.ADMIN_TOKEN ?? "").trim(), `admin.${exp}`)}`, SESSION_MS / 1000) });
@@ -584,7 +596,9 @@ async function adminBriefs(req: Request, env: Env) {
 /* ------------------------------ ingresso ------------------------------ */
 
 export default {
-	async fetch(req: Request, env: Env, ctx: Ctx): Promise<Response> {
+	async fetch(req: Request, rawEnv: Env, ctx: Ctx): Promise<Response> {
+		// spazi o a capo incollati per sbaglio nei secret non devono rompere i token
+		const env: Env = { ...rawEnv, GITHUB_TOKEN: rawEnv.GITHUB_TOKEN?.trim() || undefined, ADMIN_TOKEN: rawEnv.ADMIN_TOKEN?.trim() || undefined };
 		const url = new URL(req.url);
 		const path = url.pathname.replace(/\/+$/, "");
 		if (!path.startsWith("/api/")) return env.ASSETS ? env.ASSETS.fetch(req) : new Response("Not found", { status: 404 });

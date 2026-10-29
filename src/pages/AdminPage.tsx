@@ -14,6 +14,7 @@ interface Row {
 	message: string;
 }
 interface Status {
+	ghInfo?: { login: string; kind: string; scopes: string } | null;
 	db: boolean;
 	ai: boolean;
 	github: boolean;
@@ -282,6 +283,13 @@ export default function AdminPage() {
 											<b>{t(c.label)}</b>
 											<em>{c.ok ? t(A.ok) : c.optional ? t(A.opt) : t(A.warn)}</em>
 											<small>{t(c.ok ? c.yes : c.no)}</small>
+											{c.id === "gh" && status.ghInfo && (
+												<small>
+													Token {status.ghInfo.kind} · {status.ghInfo.login}
+													{status.ghInfo.kind === "classic" ? ` · scope: ${status.ghInfo.scopes || "nessuno"}` : ""}
+													{status.ghInfo.kind === "fine-grained" ? " · non adatto: serve un token classic con scope repo" : ""}
+												</small>
+											)}
 										</span>
 									</li>
 								);
