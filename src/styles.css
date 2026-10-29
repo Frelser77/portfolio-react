@@ -4891,3 +4891,26 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .nav { padding-top: calc(28px + env(safe-area-inset-top, 0px)); }
 .stories { top: calc(8px + env(safe-area-inset-top, 0px)); }
 @media (max-width: 720px) { .nav { padding-top: calc(18px + env(safe-area-inset-top, 0px)); } }
+
+/* bassotto: passeggiate, comportamento su telefono */
+.gbtn { translate: var(--sx, 0px) 0; transition: translate 1s ease-in-out; }
+.gbubble.on { pointer-events: auto; cursor: pointer; }
+.guide { transition-property: transform, opacity, translate; }
+@media (max-width: 720px) {
+	.guide { width: 100px; height: 118px; right: 10px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transition: transform 1.3s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.3s; }
+	.guide:not(.pinned)[data-side="l"] { transform: none; }
+	.guide.scrolling:not(.gone) { opacity: 0.28; }
+	.gbubble { width: min(240px, calc(100vw - 28px)); right: 0; }
+	.gc { width: 44px; height: 44px; }
+}
+
+/* bassotto: passeggiate, comportamento su telefono */
+.gbtn { translate: var(--sx, 0px) 0; transition: translate 1s ease-in-out; }
+.gbubble.on { pointer-events: auto; cursor: pointer; }
+@media (max-width: 720px) {
+	.guide { width: 100px; height: 118px; right: 10px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transition: transform 1.3s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.3s; }
+	.guide:not(.pinned)[data-side="l"] { transform: none; }
+	.guide.scrolling:not(.gone) { opacity: 0.28; }
+	.gbubble { width: min(240px, calc(100vw - 28px)); right: 0; }
+	.gc { width: 44px; height: 44px; }
+}

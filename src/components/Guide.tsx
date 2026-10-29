@@ -95,6 +95,10 @@ export default function Guide() {
 	posRef.current = pos;
 	const angryRef = useRef(false);
 	angryRef.current = angry;
+	const busyRef = useRef(false);
+	busyRef.current = dragging || angry || gone || moving;
+	const modeRef = useRef<Mode>("auto");
+	modeRef.current = mode;
 	const incidents = useRef<number[]>([]);
 	const drag = useRef<{ id: number; dx: number; dy: number; sx: number; sy: number; moved: boolean; x: number; y: number; vx: number; vy: number; t: number; hist: { x: number; y: number; t: number }[] } | null>(null);
 	const suppress = useRef(false);
@@ -102,7 +106,7 @@ export default function Guide() {
 
 	const [glOk, setGlOk] = useState(true);
 	const fail = useCallback(() => setGlOk(false), []);
-	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, face: -1, waving: false, spinAt: -1e9 });
+	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, face: -1, waving: false, spinAt: -1e9, hopAt: -1e9 });
 	const root = useRef<HTMLDivElement>(null);
 	const bot = useRef<HTMLDivElement>(null);
 	const quiet = useRef(false);
@@ -185,6 +189,98 @@ export default function Guide() {
 			window.removeEventListener("pointermove", onMove);
 				window.removeEventListener("pointerdown", onMove);
 			cancelAnimationFrame(raf);
+		};
+	}, []);
+
+	// Una vita sua: ogni tanto si guarda attorno, saltella, saluta, fa due passi o dice qualcosa.
+	// Niente è a ritmo fisso: tempi e gesti sono a caso, e si ferma quando lo stai prendendo o è arrabbiato.
+	useEffect(() => {
+		if (prefersReducedMotion()) return;
+		const phone = window.innerWidth < 720;
+		let id = 0;
+		let off = 0; // quanto si è spostato con le passeggiate, in px
+		const reach = phone ? 26 : 46;
+		const timers: number[] = [];
+		const after = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
+		const look = () => {
+			const P = pose.current;
+			P.lx = (Math.random() * 2 - 1) * 0.9;
+			P.ly = (Math.random() * 2 - 1) * 0.35;
+			after(() => {
+				if (Math.random() < 0.5) {
+					P.lx = (Math.random() * 2 - 1) * 0.9;
+					P.ly = 0.1;
+				}
+			}, 1100);
+			after(() => {
+				P.lx = 0;
+				P.ly = 0;
+			}, 2300);
+		};
+		const stroll = () => {
+			const btn = root.current?.querySelector<HTMLElement>(".gbtn");
+			if (!btn) return;
+			const dir = off > 0 ? -1 : off < 0 ? 1 : Math.random() < 0.5 ? -1 : 1;
+			off = off === 0 ? dir * reach : 0;
+			const P = pose.current;
+			P.dir = dir;
+			P.walking = true;
+			btn.style.setProperty("--sx", `${off}px`);
+			after(() => {
+				P.walking = false;
+				P.face = -dir;
+			}, 1000);
+		};
+		const tick = () => {
+			id = window.setTimeout(tick, 5500 + Math.random() * 7500);
+			if (document.hidden || busyRef.current || drag.current) return;
+			const r = Math.random();
+			if (r < 0.32) look();
+			else if (r < 0.52) pose.current.hopAt = performance.now();
+			else if (r < 0.66) {
+				setWave(true);
+				after(() => setWave(false), 1500);
+			} else if (r < 0.82) stroll();
+			else if (!phone && modeRef.current === "auto" && !quiet.current) speak(t0.current(pickOne(ui2.pet.idle)), 3800);
+			else look();
+		};
+		id = window.setTimeout(tick, 4000 + Math.random() * 3000);
+		return () => {
+			clearTimeout(id);
+			timers.forEach(clearTimeout);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// Scorrendo la pagina: guarda nella direzione dello scorrimento e, su telefono, si fa trasparente e zitto per non coprire il testo
+	useEffect(() => {
+		const el = root.current;
+		if (!el) return;
+		let lastY = window.scrollY;
+		let timer = 0;
+		const onScroll = () => {
+			const y = window.scrollY;
+			const dy = y - lastY;
+			lastY = y;
+			if (Math.abs(dy) < 2) return;
+			if (!prefersReducedMotion() && !busyRef.current) {
+				pose.current.ly = dy > 0 ? 0.75 : -0.6;
+				pose.current.lx *= 0.4;
+			}
+			if (window.innerWidth < 720) {
+				el.classList.add("scrolling");
+				if (modeRef.current !== "open") setShow(false);
+			}
+			clearTimeout(timer);
+			timer = window.setTimeout(() => {
+				el.classList.remove("scrolling");
+				if (!busyRef.current) pose.current.ly = 0;
+			}, 750);
+		};
+		window.addEventListener("scroll", onScroll, { passive: true });
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+			clearTimeout(timer);
 		};
 	}, []);
 
@@ -485,6 +581,7 @@ export default function Guide() {
 	return (
 		<div ref={root} className={cls} data-side={sideNow}>
 			<div
+				onClick={() => !live && setShow(false)}
 				className={`gbubble${bubbleOpen ? " on" : ""}${live ? " live" : ""}`}
 				role={live ? "status" : undefined}
 				aria-hidden={bubbleOpen ? undefined : true}

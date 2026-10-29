@@ -10,6 +10,7 @@ export interface Pose {
 	face: number; // lato verso cui guarda da fermo: 1 destra, -1 sinistra
 	waving: boolean;
 	spinAt: number; // istante (ms) dell'ultima piroetta
+	hopAt: number; // istante (ms) dell'ultimo saltello
 }
 
 const VERT = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
@@ -322,7 +323,8 @@ export default function BotGL({ pose, onFail }: { pose: React.MutableRefObject<P
 				blink = Math.sin(clamp(s.blinkT / 0.18, 0, 1) * Math.PI);
 				if (s.blinkT > 0.18) s.blinkT = -1;
 			}
-			const hop = spin >= 0 && spin < 0.6 ? Math.sin((spin / 0.6) * Math.PI) * 0.22 : 0;
+			const hp = (now - P.hopAt) / 520;
+			const hop = (spin >= 0 && spin < 0.6 ? Math.sin((spin / 0.6) * Math.PI) * 0.22 : 0) + (hp >= 0 && hp < 1 ? Math.sin(hp * Math.PI) * 0.12 : 0);
 			const bob = (calm ? 0 : Math.sin(tt * 2.1) * 0.012) + Math.abs(Math.sin(s.phase)) * 0.035 * s.walk + hop;
 
 			gl.clearColor(0, 0, 0, 0);
