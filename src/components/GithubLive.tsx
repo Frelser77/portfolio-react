@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
-import { FiLock, FiStar } from "react-icons/fi";
+import { FiLock, FiStar, FiUserPlus } from "react-icons/fi";
 import { getGithub, type GithubData } from "../api";
 import { profile } from "../content/data";
 import { ui2 } from "../content/ui2";
@@ -45,10 +45,16 @@ export default function GithubLive() {
 					<p className="eyebrow">{t(ui2.stack.live.eyebrow)}</p>
 					<h2 id="gh-title">{t(ui2.stack.live.title)}</h2>
 					<p className="muted">{t(ui2.stack.live.text)}</p>
-					<a className="btn" href={profile.github} target="_blank" rel="noopener noreferrer">
-						<FaGithub aria-hidden="true" />
-						GitHub
-					</a>
+					<div className="ghcta">
+						<a className="btn pri" href={profile.github} target="_blank" rel="noopener noreferrer">
+							<FiUserPlus aria-hidden="true" />
+							{t(ui2.stack.live.follow)}
+						</a>
+						<a className="btn" href={profile.github} target="_blank" rel="noopener noreferrer">
+							<FaGithub aria-hidden="true" />
+							{t(ui2.stack.live.profile)}
+						</a>
+					</div>
 				</div>
 				<div className="glass ghbox" data-lg-bezel="26" aria-live="polite">
 					{state === "loading" && <p className="muted">{t(ui2.stack.live.loading)}</p>}

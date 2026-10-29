@@ -41,6 +41,11 @@ export default function AdminPage() {
 	const [busy, setBusy] = useState(false);
 	const [picks, setPicks] = useState<Pick[]>([]);
 	const [saved, setSaved] = useState<"" | "ok" | "fail">("");
+	const [q, setQ] = useState("");
+	const [flt, setFlt] = useState<"all" | "pub" | "priv" | "mine" | "collab">("all");
+	const [chosen, setChosen] = useState<string[]>([]);
+	const [ask, setAsk] = useState<"" | "private" | "archive" | "public">("");
+	const [report, setReport] = useState<{ ok: number; bad: number } | null>(null);
 
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
 	const failOf = async (r: Response): Promise<Fail> => {
@@ -154,6 +159,28 @@ export default function AdminPage() {
 		setBusy(false);
 	};
 	const repoByName = new Map(Array.isArray(repos) ? repos.map((r) => [r.name, r] as const) : []);
+
+	const visible = Array.isArray(repos)
+		? repos.filter((r) => (flt === "all" ? true : flt === "pub" ? !r.private : flt === "priv" ? r.private : flt === "mine" ? r.mine : !r.mine) && r.name.toLowerCase().includes(q.trim().toLowerCase()))
+		: [];
+	const canAct = (r: AdminRepo) => r.permission === "ADMIN";
+	const toggle = (n: string) => setChosen((c) => (c.includes(n) ? c.filter((x) => x !== n) : [...c, n]));
+	const runAction = async () => {
+		if (!ask) return;
+		setBusy(true);
+		setReport(null);
+		try {
+			const r = await fetch("/api/admin/repo-action", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: ask, names: chosen }) });
+			const j = r.ok ? ((await r.json()) as { results: { ok: boolean }[] }) : null;
+			setReport(j ? { ok: j.results.filter((x) => x.ok).length, bad: j.results.filter((x) => !x.ok).length } : { ok: 0, bad: chosen.length });
+		} catch {
+			setReport({ ok: 0, bad: chosen.length });
+		}
+		setAsk("");
+		setChosen([]);
+		await loadData();
+		setBusy(false);
+	};
 
 	const checks: { id: string; icon: typeof FiDatabase; label: L; ok: boolean; optional: boolean; yes: L; no: L }[] = status
 		? [
@@ -348,20 +375,97 @@ export default function AdminPage() {
 								)}
 
 								<h3 className="h3">{t(A.allRepos)}</h3>
-								<ul className="adm__list adm__repos" role="list">
-									{repos.map((r) => {
+								<div className="adm__filters">
+									<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t(A.search)} aria-label={t(A.search)} />
+									<div className="adm__chips" role="group">
+										{(
+											[
+												["all", A.fAll],
+												["pub", A.fPub],
+												["priv", A.fPriv],
+												["mine", A.fMine],
+												["collab", A.fCollab],
+											] as const
+										).map(([k, label]) => (
+											<button key={k} type="button" className="cchip" aria-pressed={flt === k} onClick={() => setFlt(k)}>
+												{t(label)}
+											</button>
+										))}
+									</div>
+								</div>
+								<div className="adm__bar">
+									<button type="button" className="adm__mini" onClick={() => setChosen(visible.filter(canAct).map((r) => r.name))}>
+										{t(A.selVisible)}
+									</button>
+									{chosen.length > 0 && (
+										<button type="button" className="adm__mini" onClick={() => setChosen([])}>
+											{t(A.selNone)}
+										</button>
+									)}
+									<span className="muted">
+										{chosen.length} {t(A.selected)} · {visible.length}/{repos.length}
+									</span>
+								</div>
+								{chosen.length > 0 && !ask && (
+									<div className="adm__bar adm__acts">
+										<button type="button" className="adm__mini" onClick={() => setAsk("private")}>
+											{t(A.toPrivate)} ({chosen.length})
+										</button>
+										<button type="button" className="adm__mini" onClick={() => setAsk("archive")}>
+											{t(A.toArchive)} ({chosen.length})
+										</button>
+										<button type="button" className="adm__mini" onClick={() => setAsk("public")}>
+											{t(A.toPublic)} ({chosen.length})
+										</button>
+									</div>
+								)}
+								{ask && (
+									<div className="adm__note warn" role="alertdialog">
+										<FiAlertTriangle aria-hidden="true" />
+										<span>
+											<b>
+												{ask === "private" ? t(A.toPrivate) : ask === "archive" ? t(A.toArchive) : t(A.toPublic)} · {chosen.length}
+											</b>
+											<small>{t(ask === "private" ? A.confirmPrivate : ask === "archive" ? A.confirmArchive : A.confirmPublic)}</small>
+											<span className="adm__bar">
+												<button type="button" className="adm__mini on" onClick={runAction} disabled={busy}>
+													{t(A.confirm)}
+												</button>
+												<button type="button" className="adm__mini" onClick={() => setAsk("")} disabled={busy}>
+													{t(A.cancel)}
+												</button>
+											</span>
+										</span>
+									</div>
+								)}
+								{report && (
+									<p className={`adm__note ${report.bad ? "warn" : "ok"}`} role="status">
+										{report.bad ? <FiAlertTriangle aria-hidden="true" /> : <FiCheckCircle aria-hidden="true" />}
+										<span>
+											{report.ok} {t(A.done)}
+											{report.bad > 0 && ` · ${report.bad} ${t(A.failed)}`}
+										</span>
+									</p>
+								)}
+								<ul className="adm__list adm__repos adm__scroll" role="list">
+									{visible.length === 0 && <li className="muted">{t(A.nothing)}</li>}
+									{visible.map((r) => {
 										const on = picks.some((p) => p.name === r.name);
 										return (
 											<li key={r.name}>
-												<a href={r.url} target="_blank" rel="noopener noreferrer">
-													<b>{r.name}</b>
-												</a>
-												<small>
-													<span className={`adm__tag ${r.private ? "priv" : ""}`}>{t(r.private ? A.priv : A.pub)}</span>
-													{!r.mine && <span className="adm__tag">{t(A.collab)}</span>}
-													{r.language && <span>{r.language}</span>}
-													{r.pushedAt && <time>{r.pushedAt.slice(0, 10)}</time>}
-												</small>
+												<input type="checkbox" checked={chosen.includes(r.name)} disabled={!canAct(r)} title={canAct(r) ? undefined : t(A.noPerm)} onChange={() => toggle(r.name)} aria-label={r.name} />
+												<div className="adm__rinfo">
+													<a href={r.url} target="_blank" rel="noopener noreferrer">
+														<b>{r.name}</b>
+													</a>
+													<small>
+														<span className={`adm__tag ${r.private ? "priv" : ""}`}>{t(r.private ? A.priv : A.pub)}</span>
+														{!r.mine && <span className="adm__tag">{t(A.collab)}</span>}
+														{r.archived && <span className="adm__tag">archived</span>}
+														{r.language && <span>{r.language}</span>}
+														{r.pushedAt && <time>{r.pushedAt.slice(0, 10)}</time>}
+													</small>
+												</div>
 												<button
 													type="button"
 													className={`adm__mini${on ? " on" : ""}`}

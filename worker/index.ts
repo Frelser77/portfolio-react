@@ -360,6 +360,38 @@ async function adminRepos(env: Env) {
 	}
 }
 
+/** Pulizia dei repository da GitHub: solo azioni reversibili (rendere privato, archiviare) e solo dove hai i permessi di amministratore. Cancellare non è previsto. */
+async function adminRepoAction(req: Request, env: Env) {
+	if (!env.GITHUB_TOKEN) return json({ error: "no_token" }, 404);
+	const b = await body<{ action?: string; names?: string[] }>(req, 20000);
+	const actions: Record<string, Record<string, boolean>> = { private: { private: true }, public: { private: false }, archive: { archived: true }, unarchive: { archived: false } };
+	if (!b || typeof b.action !== "string" || !actions[b.action] || !Array.isArray(b.names) || b.names.length === 0 || b.names.length > 25) return json({ error: "bad_request" }, 400);
+	let all: AdminRepoRow[];
+	try {
+		all = (await viewerRepos(env.GITHUB_TOKEN)).rows;
+	} catch {
+		return json({ error: "github_unavailable" }, 502);
+	}
+	const byName = new Map(all.map((r) => [r.name, r]));
+	const results: { name: string; ok: boolean; error?: string }[] = [];
+	for (const name of b.names) {
+		const r = typeof name === "string" ? byName.get(name) : undefined;
+		if (!r) results.push({ name: String(name), ok: false, error: "not_found" });
+		else if (r.permission !== "ADMIN") results.push({ name, ok: false, error: "no_permission" });
+		else {
+			const res = await fetch(`https://api.github.com/repos/${r.name}`, {
+				method: "PATCH",
+				headers: { authorization: `Bearer ${env.GITHUB_TOKEN}`, "user-agent": "fr7-portfolio", accept: "application/vnd.github+json", "content-type": "application/json" },
+				body: JSON.stringify(actions[b.action]),
+			});
+			results.push(res.ok ? { name, ok: true } : { name, ok: false, error: `github_${res.status}` });
+		}
+	}
+	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
+	await Promise.all(["t", "p"].map((k) => cache?.delete(new Request(`https://cache.fr7.local/github-v2-${k}`)) ?? Promise.resolve(false)));
+	return json({ results });
+}
+
 /* ---- repository in evidenza: li scegli tu dal pannello, il sito pubblico li mostra al posto degli ultimi aggiornamenti ---- */
 
 interface FeaturedRow { name: string; pos: number; label: string | null; blurb: string | null; private: number; url: string | null; language: string | null; pushed_at: string | null }
@@ -599,6 +631,12 @@ export default {
 					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
 					if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
 					return await adminFeatured(req, env);
+				case "/api/admin/repo-action":
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
+					if (!post) return json({ error: "method" }, 405);
+					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+					if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+					return await adminRepoAction(req, env);
 				case "/api/admin/repos":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
