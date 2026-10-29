@@ -24,7 +24,7 @@ uniform vec2 uRes;
 uniform float uT;
 uniform vec2 uHead;   // yaw, pitch della testa
 uniform float uBody;  // yaw del corpo
-uniform float uBob;   // altezza (respiro / salto)
+uniform float uBob;   // respiro / salto
 uniform float uWalk;  // 0..1
 uniform float uPhase; // fase del passo
 uniform float uWave;  // 0..1 zampa alzata + coda veloce
@@ -33,68 +33,92 @@ uniform float uBlink; // 0..1
 mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
 float sdRB(vec3 p, vec3 b, float r){ vec3 q=abs(p)-b; return length(max(q,0.0))+min(max(q.x,max(q.y,q.z)),0.0)-r; }
 float sdCap(vec3 p, vec3 a, vec3 b, float r){ vec3 pa=p-a, ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.0,1.0); return length(pa-ba*h)-r; }
+// capsula che si assottiglia da r1 a r2
+float sdCone(vec3 p, vec3 a, vec3 b, float r1, float r2){ vec3 pa=p-a, ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.0,1.0); return length(pa-ba*h)-mix(r1,r2,h); }
+float sdEll(vec3 p, vec3 r){ float k0=length(p/r); float k1=length(p/(r*r)); return k0*(k0-1.0)/k1; }
 float sdTorusXY(vec3 p, vec2 t){ vec2 q=vec2(length(p.xy)-t.x,p.z); return length(q)-t.y; }
 float smin(float a,float b,float k){ float h=clamp(0.5+0.5*(b-a)/k,0.0,1.0); return mix(b,a,h)-k*h*(1.0-h); }
 vec2 un(vec2 a, vec2 b){ return a.x<b.x ? a : b; }
 
-// zampa: l'anca ruota avanti e indietro, il piedino è crema
-vec2 leg(vec3 q, vec3 hip, float sw){
+float hash(vec3 p){ p=fract(p*0.3183099+0.1); p*=17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
+float vnoise(vec3 x){
+  vec3 i=floor(x), f=fract(x); f=f*f*(3.0-2.0*f);
+  return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);
+}
+
+// zampa anteriore: dritta, con grande piede
+vec2 fleg(vec3 q, vec3 hip, float sw){
   vec3 a=q-hip;
   a.yz=rot(sw)*a.yz;
-  float d=sdCap(a,vec3(0.0),vec3(0.0,-0.27,0.0),0.072);
-  float f=sdRB(a-vec3(0.0,-0.335,0.03),vec3(0.03,0.018,0.06),0.04);
+  float d=sdCone(a,vec3(0.0),vec3(0.0,-0.24,0.0),0.068,0.047);
+  float f=sdEll(a-vec3(0.0,-0.285,0.04),vec3(0.052,0.036,0.09));
   return un(vec2(d,0.0),vec2(f,7.0));
+}
+// zampa posteriore: coscia piena e stinco sottile
+vec2 hleg(vec3 q, vec3 hip, float sw){
+  vec3 a=q-hip;
+  a.yz=rot(sw)*a.yz;
+  float th=sdEll(a-vec3(0.0,-0.06,0.0),vec3(0.088,0.15,0.13));
+  float lo=sdCone(a,vec3(0.0,-0.12,-0.01),vec3(0.0,-0.24,0.0),0.054,0.043);
+  float f=sdEll(a-vec3(0.0,-0.285,0.04),vec3(0.052,0.036,0.09));
+  return un(vec2(smin(th,lo,0.08),0.0),vec2(f,7.0));
 }
 
 vec2 map(vec3 p){
-  vec3 q=p; q.y-=uBob; q.xz=rot(uBody)*q.xz;
-  float wob=sin(uPhase*2.0)*0.018*uWalk;
+  vec3 q=p; q.y-=uBob-0.16; q.xz=rot(uBody)*q.xz;
+  float wob=sin(uPhase*2.0)*0.015*uWalk;
   vec3 b=q; b.y-=wob;
-  // corpo lungo da salsiccia
-  float torso=sdCap(b,vec3(0.0,0.0,-0.40),vec3(0.0,0.02,0.28),0.205);
-  float chest=length((b-vec3(0.0,-0.015,0.30))*vec3(1.0,1.0,0.92))-0.245;
-  float rump=length(b-vec3(0.0,0.0,-0.44))-0.195;
-  vec2 r=vec2(smin(smin(torso,chest,0.16),rump,0.1),1.0);
-  // dorso luminoso
-  r=un(r,vec2(sdCap(b,vec3(0.0,0.205,-0.38),vec3(0.0,0.225,0.26),0.011),5.0));
-  // zampe: andatura in diagonale; la anteriore destra può salutare
+  // corpo: petto profondo, vita sottile e rialzata, anca tonda
+  float chest=sdEll(b-vec3(0.0,0.0,0.37),vec3(0.2,0.235,0.27));
+  float waist=sdCone(b,vec3(0.0,0.035,0.28),vec3(0.0,0.03,-0.36),0.16,0.17);
+  float rump=sdEll(b-vec3(0.0,0.01,-0.52),vec3(0.19,0.2,0.23));
+  vec2 r=vec2(smin(smin(chest,waist,0.14),rump,0.12),1.0);
+  // zampe: andatura in diagonale; l'anteriore destra può salutare
   float s1=uWalk*sin(uPhase)*0.8;
   float s2=uWalk*sin(uPhase+3.14159)*0.8;
-  r=un(r,leg(b,vec3(-0.12,-0.12,0.31),s2));
-  r=un(r,leg(b,vec3(0.12,-0.12,0.31),mix(s1,-1.15+sin(uT*9.0)*0.3,uWave)));
-  r=un(r,leg(b,vec3(-0.12,-0.12,-0.40),s1));
-  r=un(r,leg(b,vec3(0.12,-0.12,-0.40),s2));
-  // collo e testa
-  r=un(r,vec2(sdCap(b,vec3(0.0,0.07,0.30),vec3(0.0,0.2,0.5),0.125),0.0));
-  r=un(r,vec2(sdTorusXY(b-vec3(0.0,0.14,0.42),vec2(0.132,0.015)),5.0));
-  r=un(r,vec2(length(b-vec3(0.0,0.0,0.45))-0.032,6.0));
-  vec3 hp=b-vec3(0.0,0.17,0.48);
+  r=un(r,fleg(b,vec3(-0.105,-0.11,0.38),s2));
+  r=un(r,fleg(b,vec3(0.105,-0.11,0.38),mix(s1,-1.15+sin(uT*9.0)*0.3,uWave)));
+  r=un(r,hleg(b,vec3(-0.12,-0.1,-0.52),s1));
+  r=un(r,hleg(b,vec3(0.12,-0.1,-0.52),s2));
+  // collo
+  r.x=smin(r.x,sdCone(b,vec3(0.0,0.06,0.4),vec3(0.0,0.2,0.6),0.14,0.1),0.1);
+  // collare luminoso con medaglietta
+  r=un(r,vec2(length(b-vec3(0.0,0.005,0.535))-0.026,6.0));
+  // testa
+  vec3 hp=b-vec3(0.0,0.17,0.56);
   hp.xz=rot(uHead.x)*hp.xz;
   hp.yz=rot(uHead.y)*hp.yz;
-  vec3 h=hp-vec3(0.0,0.07,0.1);
-  float skull=length(h*vec3(1.0,1.04,0.95))-0.185;
-  float snout=sdCap(h,vec3(0.0,-0.05,0.08),vec3(0.0,-0.075,0.34),0.082);
-  vec2 head=vec2(smin(skull,snout,0.09),0.0);
-  head=un(head,vec2(sdCap(h,vec3(0.0,-0.07,0.2),vec3(0.0,-0.075,0.34),0.085),8.0));
-  head=un(head,vec2(length(h-vec3(0.0,-0.045,0.435))-0.055,2.0));
-  float sy=mix(1.0,0.08,uBlink);
-  vec3 e1=h-vec3(-0.085,0.06,0.15); e1.y/=sy;
-  vec3 e2=h-vec3(0.085,0.06,0.15); e2.y/=sy;
-  head=un(head,vec2(length(e1)-0.032,3.0));
-  head=un(head,vec2(length(e2)-0.032,3.0));
-  // orecchie lunghe e morbide
-  float flap=sin(uPhase*2.0)*0.22*uWalk+sin(uT*1.7)*0.04+uWave*0.15;
-  vec3 e=vec3(abs(h.x),h.y,h.z)-vec3(0.15,0.08,-0.03);
-  e.xy=rot(-0.22-flap)*e.xy;
-  e.z*=1.0; head=un(head,vec2(sdCap(vec3(e.x*0.8,e.y,e.z),vec3(0.0),vec3(0.03,-0.28,-0.03),0.06)*0.85,4.0));
+  vec3 h=hp-vec3(0.0,0.07,0.09);
+  float skull=sdEll(h,vec3(0.145,0.15,0.17));
+  float snout=sdCone(h,vec3(0.0,-0.035,0.1),vec3(0.0,-0.06,0.37),0.082,0.052);
+  float jaw=sdCone(h,vec3(0.0,-0.085,0.1),vec3(0.0,-0.095,0.31),0.05,0.04);
+  vec2 head=vec2(smin(smin(skull,snout,0.1),jaw,0.04),0.0);
+  head=un(head,vec2(smin(sdCone(h,vec3(0.0,-0.05,0.2),vec3(0.0,-0.06,0.37),0.075,0.052),sdEll(h-vec3(0.0,-0.088,0.25),vec3(0.05,0.03,0.12)),0.03),8.0));
+  head=un(head,vec2(sdEll(h-vec3(0.0,-0.042,0.425),vec3(0.05,0.04,0.034)),2.0)); // tartufo
+  // occhi scuri e lucidi, con palpebra
+  float sy=mix(1.0,0.1,uBlink);
+  vec3 e1=h-vec3(-0.07,0.045,0.12); e1.y/=sy;
+  vec3 e2=h-vec3(0.07,0.045,0.12); e2.y/=sy;
+  head=un(head,vec2(length(e1)-0.03,3.0));
+  head=un(head,vec2(length(e2)-0.03,3.0));
+  // arcata sopracciliare
+  vec3 bw=vec3(abs(h.x)-0.07,h.y-0.085,h.z-0.12);
+  head.x=smin(head.x,sdEll(bw,vec3(0.04,0.018,0.04)),0.03);
+  // orecchie lunghe, lisce, che cadono lungo la testa
+  float flap=sin(uPhase*2.0)*0.2*uWalk+sin(uT*1.7)*0.03+uWave*0.12;
+  vec3 e=vec3(abs(h.x),h.y,h.z)-vec3(0.135,0.07,-0.01);
+  e.xy=rot(-0.12-flap)*e.xy;
+  e.yz=rot(0.12)*e.yz;
+  float ear=sdEll(e-vec3(0.02,-0.11,0.0),vec3(0.022,0.125,0.075));
+  head.x=smin(head.x,ear,0.03);
   r=un(r,head);
-  // coda che scodinzola, con la lucina in punta
-  float wag=sin(uT*(5.5+uWalk*5.0+uWave*8.0))*(0.07+0.13*uWave+0.05*uWalk);
-  vec3 t=b-vec3(0.0,0.04,-0.54);
-  vec3 m1=vec3(wag*0.5,0.12,-0.2);
-  vec3 m2=vec3(wag,0.34,-0.28);
-  r=un(r,vec2(smin(sdCap(t,vec3(0.0),m1,0.045),sdCap(t,m1,m2,0.034),0.05),0.0));
-  r=un(r,vec2(length(t-m2)-0.05,6.0));
+  // coda sottile che scodinzola
+  float wag=sin(uT*(5.0+uWalk*5.0+uWave*8.0))*(0.06+0.12*uWave+0.04*uWalk);
+  vec3 t=b-vec3(0.0,0.03,-0.7);
+  vec3 m1=vec3(wag*0.5,0.04,-0.2);
+  vec3 m2=vec3(wag,0.13,-0.42);
+  r=un(r,vec2(smin(sdCone(t,vec3(0.0),m1,0.05,0.034),sdCone(t,m1,m2,0.034,0.016),0.04),0.0));
   return r;
 }
 
@@ -104,29 +128,28 @@ vec3 nrm(vec3 p){
 }
 vec3 env(vec3 r){
   float y=r.y*0.5+0.5;
-  vec3 sky=mix(vec3(0.12,0.08,0.26),vec3(0.55,0.58,0.95),y);
-  float key=pow(max(dot(r,normalize(vec3(-0.4,0.7,0.6))),0.0),22.0);
+  vec3 sky=mix(vec3(0.16,0.12,0.30),vec3(0.60,0.62,0.95),y);
+  float key=pow(max(dot(r,normalize(vec3(-0.4,0.7,0.6))),0.0),18.0);
   float rim=pow(max(dot(r,normalize(vec3(0.75,0.25,-0.5))),0.0),8.0);
-  return sky+vec3(1.0,0.97,0.9)*key*2.4+vec3(0.55,0.5,1.0)*rim*1.4;
+  return sky+vec3(1.0,0.95,0.88)*key*1.6+vec3(0.5,0.6,1.0)*rim*1.2;
 }
 float ao(vec3 p, vec3 n){
   float o=0.0, s=1.0;
-  for(int i=1;i<=4;i++){ float h=0.035*float(i); o+=(h-map(p+n*h).x)*s; s*=0.7; }
-  return clamp(1.0-2.4*o,0.0,1.0);
+  for(int i=1;i<=4;i++){ float h=0.04*float(i); o+=(h-map(p+n*h).x)*s; s*=0.7; }
+  return clamp(1.0-2.2*o,0.0,1.0);
 }
 float shadow(vec3 p, vec3 l){
   float res=1.0, t=0.04;
-  for(int i=0;i<16;i++){ float h=map(p+l*t).x; res=min(res,9.0*h/t); t+=clamp(h,0.03,0.2); if(res<0.02||t>2.0) break; }
+  for(int i=0;i<16;i++){ float h=map(p+l*t).x; res=min(res,8.0*h/t); t+=clamp(h,0.03,0.2); if(res<0.02||t>2.0) break; }
   return clamp(res,0.0,1.0);
 }
 
 void main(){
   vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y*2.0;
   vec3 ro=vec3(0.0,0.5,5.0);
-  vec3 rd=normalize(vec3(uv*0.145,-1.0));
+  vec3 rd=normalize(vec3(uv*0.16,-1.0));
   rd.yz=rot(0.1)*rd.yz;
-  vec3 oc=ro-vec3(0.0,0.0,0.0);
-  float b=dot(oc,rd), c=dot(oc,oc)-1.5*1.5, disc=b*b-c;
+  float b=dot(ro,rd), c=dot(ro,ro)-1.5*1.5, disc=b*b-c;
   if(disc<0.0){ gl_FragColor=vec4(0.0); return; }
   float t=-b-sqrt(disc), tmax=-b+sqrt(disc);
   float md=1e9, tm=t; bool hit=false;
@@ -134,10 +157,10 @@ void main(){
     vec3 p=ro+rd*t; float h=map(p).x;
     float ang=h/t; if(ang<md){ md=ang; tm=t; }
     if(h<0.0006*t){ hit=true; tm=t; break; }
-    t+=h*0.92;
+    t+=h*0.9;
     if(t>tmax) break;
   }
-  float pa=0.29/uRes.y;
+  float pa=0.32/uRes.y;
   float alpha=hit?1.0:clamp(1.0-md/(pa*1.3),0.0,1.0);
   if(alpha<0.01){ gl_FragColor=vec4(0.0); return; }
   vec3 p=ro+rd*tm;
@@ -145,45 +168,48 @@ void main(){
   vec3 n=nrm(p);
   vec3 v=-rd;
   vec3 key=normalize(vec3(-0.45,0.8,0.7));
-  float dif=max(dot(n,key),0.0);
+  float ndl=dot(n,key);
+  float dif=max(ndl*0.75+0.25,0.0);       // luce morbida avvolgente, come il pelo
   float sh=shadow(p+n*0.01,key);
   float occ=ao(p,n);
   float fr=pow(1.0-max(dot(n,v),0.0),3.0);
   vec3 refl=reflect(rd,n);
-  vec3 q=p; q.y-=uBob; q.xz=rot(uBody)*q.xz;
+  vec3 q=p; q.y-=uBob-0.16; q.xz=rot(uBody)*q.xz;
   vec3 col;
   float id=m.y;
-  if(id<1.5){ // guscio ceramico color nocciola
-    vec3 alb=vec3(0.40,0.15,0.07);
-    col=alb*(env(n)*0.42*occ+dif*sh*vec3(1.0,0.94,0.88)*0.95);
-    col+=env(refl)*(0.1+0.5*fr)*occ;
-    col+=pow(max(dot(refl,key),0.0),60.0)*sh*0.9;
-    if(id>0.5){ // anelli di luce che scorrono lungo il corpo
-      float g=abs(fract(q.z*5.0)-0.5);
-      float ln=smoothstep(0.455,0.49,g)*smoothstep(-0.12,0.08,q.y+0.1);
-      col+=vec3(0.1,0.6,1.0)*ln*(0.5+0.5*sin(uT*2.4-q.z*7.0));
-    }
-  } else if(id<2.5){ // naso: vetro nero lucido
-    col=vec3(0.02,0.025,0.06)+env(refl)*(0.3+0.6*fr)*occ;
-    col+=pow(max(dot(refl,key),0.0),90.0)*1.6*sh;
-  } else if(id<3.5){ // occhi: luce
-    col=vec3(0.15,0.75,1.0)*1.05;
-  } else if(id<4.5){ // orecchie viola
-    vec3 alb=vec3(0.46,0.30,0.92);
-    col=alb*(env(n)*0.4*occ+dif*sh*0.85)+env(refl)*(0.1+0.5*fr)*occ+pow(max(dot(refl,key),0.0),40.0)*sh*0.6;
-  } else if(id<5.5){ // collare e dorso
-    col=mix(vec3(0.45,0.95,1.2),vec3(0.8,0.55,1.3),0.5+0.5*sin(uT*2.0+q.z*4.0))*1.7;
-  } else if(id<6.5){ // lucina della coda e medaglietta
-    col=mix(vec3(0.3,1.1,0.7),vec3(1.1,0.9,0.4),0.5+0.5*sin(uT*3.0))*1.9;
-  } else if(id<7.5){ // piedini crema
-    vec3 alb=vec3(0.97,0.90,0.80);
-    col=alb*(env(n)*0.38*occ+dif*sh*0.9)+env(refl)*(0.08+0.4*fr)*occ+pow(max(dot(refl,key),0.0),40.0)*sh*0.5;
-  } else { // muso color sabbia
-    vec3 alb=vec3(0.93,0.66,0.45);
-    col=alb*(env(n)*0.4*occ+dif*sh*0.9)+env(refl)*(0.08+0.4*fr)*occ+pow(max(dot(refl,key),0.0),50.0)*sh*0.6;
+  float fur=0.88+0.24*vnoise(q*vec3(46.0,46.0,16.0));
+  float fur2=0.9+0.2*vnoise(q*vec3(110.0,110.0,38.0));
+  if(id<1.5){ // mantello rosso fulvo, più scuro sul dorso, sfumato sul petto
+    vec3 red=vec3(0.34,0.095,0.03);
+    vec3 dark=vec3(0.18,0.05,0.02);
+    vec3 tan=vec3(0.55,0.27,0.11);
+    vec3 alb=mix(red,dark,smoothstep(0.0,0.9,n.y)*0.8);
+    float chestTan=smoothstep(0.05,-0.12,q.y)*smoothstep(0.0,0.26,q.z)*smoothstep(0.17,0.04,abs(q.x));
+    alb=mix(alb,tan,clamp(chestTan,0.0,1.0)*0.85);
+    alb*=fur*fur2;
+    col=alb*(env(n)*0.42*occ+dif*sh*vec3(1.0,0.93,0.85)*1.0);
+    col+=vec3(0.9,0.6,0.45)*pow(max(dot(refl,key),0.0),14.0)*sh*0.12*fur; // riflesso largo e morbido
+    col+=vec3(0.5,0.6,1.0)*fr*0.22*occ;
+  } else if(id<2.5){ // tartufo nero lucido
+    col=vec3(0.015,0.015,0.02)+env(refl)*(0.04+0.22*fr)*occ;
+    col+=pow(max(dot(refl,key),0.0),70.0)*1.4*sh;
+  } else if(id<3.5){ // occhi scuri con un punto di luce
+    col=vec3(0.05,0.025,0.015)+env(refl)*(0.25+0.4*fr);
+    col+=pow(max(dot(refl,key),0.0),120.0)*3.0;
+  } else if(id<4.5){
+    col=vec3(0.3,0.1,0.04);
+  } else if(id<5.5){ // collare: striscia di luce
+    col=mix(vec3(0.3,0.85,1.1),vec3(0.75,0.5,1.2),0.5+0.5*sin(uT*2.0+q.z*5.0))*1.35;
+  } else if(id<6.5){ // medaglietta
+    col=mix(vec3(0.5,1.0,0.8),vec3(1.1,0.9,0.5),0.5+0.5*sin(uT*3.0))*1.5;
+  } else if(id<7.5){ // zampe e piedi: pelo più chiaro
+    vec3 alb=vec3(0.46,0.22,0.1)*fur*fur2;
+    col=alb*(env(n)*0.4*occ+dif*sh*0.95)+vec3(0.5,0.6,1.0)*fr*0.18*occ;
+  } else { // muso
+    vec3 alb=vec3(0.42,0.19,0.08)*(0.9+0.2*vnoise(q*80.0));
+    col=alb*(env(n)*0.4*occ+dif*sh*0.95)+vec3(0.9,0.6,0.45)*pow(max(dot(refl,key),0.0),20.0)*sh*0.1+vec3(0.5,0.6,1.0)*fr*0.2*occ;
   }
-  col+=vec3(0.45,0.5,1.0)*fr*0.35*step(id,2.5);
-  col=1.0-exp(-col*1.25);
+  col=1.0-exp(-col*1.35);
   col=pow(col,vec3(0.4545));
   gl_FragColor=vec4(col*alpha,alpha);
 }
