@@ -3293,7 +3293,7 @@ main:focus {
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
 }
-.msg.bot p {
+.msg.ai p {
 	border-top-left-radius: 6px;
 	background: rgba(255, 255, 255, 0.1);
 	border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3736,4 +3736,42 @@ html[data-refract="off"] .lens {
 .making,
 .brief {
 	grid-template-columns: minmax(0, 1fr);
+}
+
+/* Chat su telefono: campo e pulsante affiancati, suggerimenti scorrevoli, robot fuori dai piedi */
+.chat__form {
+	align-items: stretch;
+}
+.chat__form input {
+	flex: 1 1 auto;
+	width: auto;
+}
+.chat__form .btn {
+	flex: 0 0 auto;
+	width: auto;
+	white-space: nowrap;
+}
+@media (max-width: 720px) {
+	.guide.nomob {
+		display: none;
+	}
+	.chat__log {
+		height: min(340px, 48vh);
+	}
+	.chat .chips {
+		flex-wrap: nowrap;
+		margin-inline: -14px;
+		padding: 2px 14px 6px;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.chat .chips::-webkit-scrollbar {
+		display: none;
+	}
+	.chat .chips .cchip {
+		white-space: nowrap;
+	}
+	.chat__form input {
+		min-height: 48px;
+	}
 }

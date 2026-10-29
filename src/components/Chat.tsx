@@ -74,12 +74,12 @@ export default function Chat() {
 	return (
 		<div className="chat glass" data-lg-bezel="26">
 			<div className="chat__log" ref={log} role="log" aria-live="polite" aria-label={t(ui2.lab.chat.bot)}>
-				<div className="msg bot">
+				<div className="msg ai">
 					<span className="who">{t(ui2.lab.chat.bot)}</span>
 					<p>{t(ui2.lab.chat.hello)}</p>
 				</div>
 				{msgs.map((m, i) => (
-					<div key={i} className={`msg ${m.role === "user" ? "me" : "bot"}`}>
+					<div key={i} className={`msg ${m.role === "user" ? "me" : "ai"}`}>
 						<span className="who">{m.role === "user" ? t(ui2.lab.chat.you) : t(ui2.lab.chat.bot)}</span>
 						<p>{m.content || (busy && i === msgs.length - 1 ? <span className="dots" aria-hidden="true" /> : "")}</p>
 					</div>

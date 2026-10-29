@@ -218,7 +218,7 @@ export default function Guide() {
 	const live = mode === "open";
 
 	return (
-		<div ref={root} className={`guide${moving ? " is-moving" : ""}`} data-side={side}>
+		<div ref={root} className={`guide${moving ? " is-moving" : ""}${active === "/lab" || active === "/contatti" ? " nomob" : ""}`} data-side={side}>
 			<div
 				className={`gbubble${bubbleOpen ? " on" : ""}${live ? " live" : ""}`}
 				role={live ? "status" : undefined}
