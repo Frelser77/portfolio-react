@@ -4433,6 +4433,7 @@ html[data-refract="off"] .lens {
 .adm__rinfo { display: grid; gap: 4px; min-width: 0; }
 .adm__rinfo a { color: inherit; overflow-wrap: anywhere; }
 .adm__scroll {
+	padding-top: 2px;
 	max-height: min(460px, 62vh);
 	overflow-y: auto;
 	padding-right: 6px;

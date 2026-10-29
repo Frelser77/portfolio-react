@@ -45,7 +45,7 @@ export default function AdminPage() {
 	const [flt, setFlt] = useState<"all" | "pub" | "priv" | "mine" | "collab">("all");
 	const [chosen, setChosen] = useState<string[]>([]);
 	const [ask, setAsk] = useState<"" | "private" | "archive" | "public">("");
-	const [report, setReport] = useState<{ ok: number; bad: number } | null>(null);
+	const [report, setReport] = useState<{ ok: number; bad: number; errors: string[] } | null>(null);
 
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
 	const failOf = async (r: Response): Promise<Fail> => {
@@ -171,10 +171,14 @@ export default function AdminPage() {
 		setReport(null);
 		try {
 			const r = await fetch("/api/admin/repo-action", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: ask, names: chosen }) });
-			const j = r.ok ? ((await r.json()) as { results: { ok: boolean }[] }) : null;
-			setReport(j ? { ok: j.results.filter((x) => x.ok).length, bad: j.results.filter((x) => !x.ok).length } : { ok: 0, bad: chosen.length });
+			const j = r.ok ? ((await r.json()) as { results: { name: string; ok: boolean; error?: string }[] }) : null;
+			setReport(
+				j
+					? { ok: j.results.filter((x) => x.ok).length, bad: j.results.filter((x) => !x.ok).length, errors: j.results.filter((x) => !x.ok).map((x) => `${x.name} → ${x.error}`) }
+					: { ok: 0, bad: chosen.length, errors: [`HTTP ${r.status}`] },
+			);
 		} catch {
-			setReport({ ok: 0, bad: chosen.length });
+			setReport({ ok: 0, bad: chosen.length, errors: ["rete"] });
 		}
 		setAsk("");
 		setChosen([]);
@@ -444,6 +448,9 @@ export default function AdminPage() {
 										<span>
 											{report.ok} {t(A.done)}
 											{report.bad > 0 && ` · ${report.bad} ${t(A.failed)}`}
+											{report.errors.map((e) => (
+												<small key={e}>{e}</small>
+											))}
 										</span>
 									</p>
 								)}

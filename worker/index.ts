@@ -384,7 +384,8 @@ async function adminRepoAction(req: Request, env: Env) {
 				headers: { authorization: `Bearer ${env.GITHUB_TOKEN}`, "user-agent": "fr7-portfolio", accept: "application/vnd.github+json", "content-type": "application/json" },
 				body: JSON.stringify(actions[b.action]),
 			});
-			results.push(res.ok ? { name, ok: true } : { name, ok: false, error: `github_${res.status}` });
+			const msg = res.ok ? "" : String(((await res.json().catch(() => ({}))) as { message?: string }).message ?? "").slice(0, 160);
+			results.push(res.ok ? { name, ok: true } : { name, ok: false, error: `${res.status}${msg ? `: ${msg}` : ""}` });
 		}
 	}
 	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
