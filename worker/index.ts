@@ -32,6 +32,8 @@ export interface Env {
 	AI?: { run(model: string, input: unknown): Promise<unknown> };
 	DB?: D1;
 	ADMIN_TOKEN?: string;
+	/** segreto TOTP (base32) del 2FA dell'amministratore: se c'è, il login chiede anche il codice a 6 cifre */
+	ADMIN_TOTP?: string;
 	NOTIFY_WEBHOOK?: string;
 	GITHUB_TOKEN?: string;
 	SALT?: string;
@@ -93,6 +95,8 @@ function init(db: D1) {
 			db.prepare("CREATE TABLE IF NOT EXISTS visits (day TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (day, h))"),
 			db.prepare("CREATE TABLE IF NOT EXISTS likes (project TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (project, h))"),
 			db.prepare("CREATE TABLE IF NOT EXISTS featured (name TEXT PRIMARY KEY, pos INTEGER NOT NULL, label TEXT, blurb TEXT, private INTEGER, url TEXT, language TEXT, pushed_at TEXT, link TEXT)"),
+			db.prepare("CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT)"),
+			db.prepare("CREATE TABLE IF NOT EXISTS admin_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, ok INTEGER NOT NULL, ip TEXT, country TEXT, ua TEXT)"),
 			db.prepare("CREATE TABLE IF NOT EXISTS briefs (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT NOT NULL, name TEXT, reach TEXT, need TEXT, message TEXT, h TEXT)"),
 		])
 		// la colonna `link` è nata dopo: sulle tabelle già create si aggiunge una volta sola (se c'è già l'errore è innocuo)
@@ -639,27 +643,179 @@ async function hmac(key: string, msg: string) {
 	return Array.from(new Uint8Array(sig), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** Accesso: la chiave nell'intestazione Authorization oppure il cookie di sessione (firmato, HttpOnly) rilasciato dopo il login. */
+/* ---- 2FA: codici a tempo (TOTP, RFC 6238) compatibili con Google Authenticator, Authy, 1Password, Aegis… ---- */
+
+const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+function b32decode(v: string) {
+	let bits = 0;
+	let val = 0;
+	const out: number[] = [];
+	for (const c of v.toUpperCase().replace(/[^A-Z2-7]/g, "")) {
+		val = (val << 5) | B32.indexOf(c);
+		bits += 5;
+		if (bits >= 8) {
+			out.push((val >>> (bits - 8)) & 255);
+			bits -= 8;
+		}
+	}
+	return new Uint8Array(out);
+}
+function b32encode(b: Uint8Array) {
+	let bits = 0;
+	let val = 0;
+	let out = "";
+	for (const x of b) {
+		val = (val << 8) | x;
+		bits += 8;
+		while (bits >= 5) {
+			out += B32[(val >>> (bits - 5)) & 31];
+			bits -= 5;
+		}
+	}
+	return bits ? out + B32[(val << (5 - bits)) & 31] : out;
+}
+async function hotp(secret: Uint8Array, counter: number) {
+	const key = await crypto.subtle.importKey("raw", secret, { name: "HMAC", hash: "SHA-1" }, false, ["sign"]);
+	const msg = new Uint8Array(8);
+	new DataView(msg.buffer).setUint32(4, counter >>> 0);
+	new DataView(msg.buffer).setUint32(0, Math.floor(counter / 2 ** 32));
+	const h = new Uint8Array(await crypto.subtle.sign("HMAC", key, msg));
+	const o = h[19] & 15;
+	const n = ((h[o] & 0x7f) << 24) | (h[o + 1] << 16) | (h[o + 2] << 8) | h[o + 3];
+	return String(n % 1_000_000).padStart(6, "0");
+}
+/** Il codice è giusto se coincide con quello di questo istante, del precedente o del successivo (orologi che differiscono di poco). Restituisce il passo da ricordare. */
+async function totpMatch(secretB32: string, code: string, now = Date.now()): Promise<number | null> {
+	if (!/^\d{6}$/.test(code)) return null;
+	const secret = b32decode(secretB32);
+	if (secret.length < 10) return null;
+	const c = Math.floor(now / 30000);
+	let hit: number | null = null;
+	for (const d of [0, -1, 1]) if ((await hotp(secret, c + d)) === code && hit === null) hit = c + d;
+	return hit;
+}
+
+async function kvGet(env: Env, k: string) {
+	if (!env.DB) return null;
+	try {
+		await init(env.DB);
+		return ((await env.DB.prepare("SELECT v FROM kv WHERE k = ?").bind(k).first()) as { v: string } | null)?.v ?? null;
+	} catch {
+		return null;
+	}
+}
+async function kvSet(env: Env, k: string, v: string) {
+	if (!env.DB) return;
+	await init(env.DB);
+	await env.DB.prepare("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v").bind(k, v).run();
+}
+
+/* ---- sessione: cookie firmato con token + segreto 2FA + "epoca" (cambiandola si esce da tutti i dispositivi) ---- */
+
+const sessionKey = (env: Env) => `${(env.ADMIN_TOKEN ?? "").trim()}|${env.ADMIN_TOTP ?? ""}`;
+const epochOf = async (env: Env) => (await kvGet(env, "epoch")) ?? "0";
+
+/**
+ * Accesso: cookie di sessione (firmato, HttpOnly) rilasciato dopo il login.
+ * La chiave sola nell'intestazione Authorization vale solo finché il 2FA non è attivo: con il 2FA, senza codice non si entra.
+ */
 async function isAdmin(req: Request, env: Env) {
 	const token = (env.ADMIN_TOKEN ?? "").trim();
 	if (!token) return false;
 	const given = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
 	if (given) {
+		if (env.ADMIN_TOTP) return false;
 		const [x, y] = await Promise.all([sha(given), sha(token)]);
 		return x === y;
 	}
 	const raw = (req.headers.get("cookie") ?? "").split(/;\s*/).find((c) => c.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1) ?? "";
-	const [exp, sig] = raw.split(".");
-	if (!exp || !sig || !(Number(exp) > Date.now())) return false;
-	const [x, y] = await Promise.all([sha(await hmac(token, `admin.${exp}`)), sha(sig)]);
-	return x === y;
+	const [exp, epoch, sig] = raw.split(".");
+	if (!exp || !epoch || !sig || !(Number(exp) > Date.now())) return false;
+	const [x, y] = await Promise.all([sha(await hmac(sessionKey(env), `admin.${exp}.${epoch}`)), sha(sig)]);
+	return x === y && epoch === (await epochOf(env));
 }
 
 const sessionCookie = (value: string, maxAge: number) => `${COOKIE}=${value}; Path=/api/admin; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Strict`;
 
-async function adminSession(req: Request, env: Env, login: boolean) {
+/* ---- tentativi: dopo 5 errori da uno stesso indirizzo (o 20 in tutto) il login si blocca per 15 minuti ---- */
+
+const LOCK_MS = 15 * 60_000;
+const failMem = new Map<string, number[]>();
+
+async function lockedFor(env: Env, who: string): Promise<number> {
+	const now = Date.now();
+	const since = now - LOCK_MS;
+	if (env.DB) {
+		try {
+			await init(env.DB);
+			const lastOk = ((await env.DB.prepare("SELECT MAX(ts) AS t FROM admin_log WHERE ok = 1 AND ip = ?").bind(who.slice(0, 16)).first()) as { t: number | null } | null)?.t ?? 0;
+			const mine = (await env.DB.prepare("SELECT COUNT(*) AS c, MIN(ts) AS m FROM admin_log WHERE ok = 0 AND ip = ? AND ts > ?").bind(who.slice(0, 16), Math.max(since, lastOk)).first()) as { c: number; m: number | null } | null;
+			if (mine && mine.c >= 5 && mine.m) return Math.max(1, Math.ceil((mine.m + LOCK_MS - now) / 1000));
+			const all = (await env.DB.prepare("SELECT COUNT(*) AS c, MIN(ts) AS m FROM admin_log WHERE ok = 0 AND ts > ?").bind(since).first()) as { c: number; m: number | null } | null;
+			if (all && all.c >= 20 && all.m) return Math.max(1, Math.ceil((all.m + LOCK_MS - now) / 1000));
+			return 0;
+		} catch {
+			/* si ricade sulla memoria */
+		}
+	}
+	const recent = (failMem.get(who) ?? []).filter((t) => now - t < LOCK_MS);
+	failMem.set(who, recent);
+	return recent.length >= 5 ? Math.max(1, Math.ceil((recent[0] + LOCK_MS - now) / 1000)) : 0;
+}
+
+function shortUa(ua: string) {
+	const b = /Edg\//.test(ua) ? "Edge" : /Firefox\//.test(ua) ? "Firefox" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : "Browser";
+	const o = /iPhone|iPad/.test(ua) ? "iOS" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Mac OS/.test(ua) ? "macOS" : /Linux/.test(ua) ? "Linux" : "";
+	return o ? `${b} · ${o}` : b;
+}
+
+async function logAttempt(env: Env, req: Request, who: string, ok: boolean) {
+	const now = Date.now();
+	if (!ok) failMem.set(who, [...(failMem.get(who) ?? []), now]);
+	else failMem.delete(who);
+	if (!env.DB) return;
+	try {
+		await init(env.DB);
+		await env.DB.prepare("INSERT INTO admin_log (ts, ok, ip, country, ua) VALUES (?, ?, ?, ?, ?)").bind(now, ok ? 1 : 0, who.slice(0, 16), req.headers.get("cf-ipcountry") ?? "", shortUa(req.headers.get("user-agent") ?? "")).run();
+		await env.DB.prepare("DELETE FROM admin_log WHERE ts < ?").bind(now - 90 * 86_400_000).run();
+	} catch {
+		/* il registro è un di più: non deve bloccare il login */
+	}
+}
+
+async function recentLog(env: Env) {
+	if (!env.DB) return [];
+	try {
+		await init(env.DB);
+		return ((await env.DB.prepare("SELECT ts, ok, country, ua FROM admin_log ORDER BY id DESC LIMIT 8").all()).results ?? []) as unknown as { ts: number; ok: number; country: string; ua: string }[];
+	} catch {
+		return [];
+	}
+}
+
+async function adminSession(req: Request, env: Env, login: boolean, who: string) {
 	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
-	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	const totp = !!env.ADMIN_TOTP;
+	let epoch = "0";
+	if (login) {
+		const wait = await lockedFor(env, who);
+		if (wait) return json({ error: "locked", retry: wait, totp }, 429, { "retry-after": String(wait) });
+		const token = env.ADMIN_TOKEN;
+		const given = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
+		const [x, y] = await Promise.all([sha(given), sha(token)]);
+		let ok = x === y;
+		let step: number | null = null;
+		if (totp) {
+			step = await totpMatch(env.ADMIN_TOTP ?? "", (req.headers.get("x-admin-code") ?? "").replace(/\s/g, ""));
+			// un codice già usato non vale una seconda volta
+			if (step !== null && step <= Number((await kvGet(env, "totp_last")) ?? 0)) step = null;
+			ok = ok && step !== null;
+		}
+		await logAttempt(env, req, who, ok);
+		if (!ok) return json({ error: "unauthorized", totp }, 401);
+		if (step !== null) await kvSet(env, "totp_last", String(step)).catch(() => undefined);
+		epoch = await epochOf(env);
+	} else if (!(await isAdmin(req, env))) return json({ error: "unauthorized", totp }, 401);
 	let ghInfo: { login: string; kind: string; scopes: string } | null = null;
 	if (env.GITHUB_TOKEN) {
 		const tk = env.GITHUB_TOKEN.trim();
@@ -672,10 +828,25 @@ async function adminSession(req: Request, env: Env, login: boolean) {
 			ghInfo = { login: "non raggiungibile", kind, scopes: "" };
 		}
 	}
-	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, ghInfo, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT };
+	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, ghInfo, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT, totp, log: await recentLog(env) };
 	if (!login) return json({ ok: true, status });
 	const exp = Date.now() + SESSION_MS;
-	return json({ ok: true, status }, 200, { "set-cookie": sessionCookie(`${exp}.${await hmac((env.ADMIN_TOKEN ?? "").trim(), `admin.${exp}`)}`, SESSION_MS / 1000) });
+	return json({ ok: true, status }, 200, { "set-cookie": sessionCookie(`${exp}.${epoch}.${await hmac(sessionKey(env), `admin.${exp}.${epoch}`)}`, SESSION_MS / 1000) });
+}
+
+/** Esce da tutti i dispositivi (cambia l'epoca) oppure prepara il segreto del 2FA da mettere in Cloudflare. */
+async function adminSecurity(req: Request, env: Env, what: "logout-all" | "totp-setup") {
+	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	if (what === "logout-all") {
+		if (!env.DB) return json({ error: "no_db" }, 404);
+		await kvSet(env, "epoch", String(Number(await epochOf(env)) + 1));
+		return json({ ok: true }, 200, { "set-cookie": sessionCookie("", 0) });
+	}
+	const secret = b32encode(crypto.getRandomValues(new Uint8Array(20)));
+	const label = encodeURIComponent("Portfolio admin");
+	const uri = `otpauth://totp/${label}:${encodeURIComponent(new URL(req.url).host)}?secret=${secret}&issuer=${label}&algorithm=SHA1&digits=6&period=30`;
+	return json({ secret, uri, on: !!env.ADMIN_TOTP });
 }
 
 async function adminBriefs(req: Request, env: Env) {
@@ -692,7 +863,7 @@ async function adminBriefs(req: Request, env: Env) {
 export default {
 	async fetch(req: Request, rawEnv: Env, ctx: Ctx): Promise<Response> {
 		// spazi o a capo incollati per sbaglio nei secret non devono rompere i token
-		const env: Env = { ...rawEnv, GITHUB_TOKEN: rawEnv.GITHUB_TOKEN?.trim() || undefined, ADMIN_TOKEN: rawEnv.ADMIN_TOKEN?.trim() || undefined };
+		const env: Env = { ...rawEnv, GITHUB_TOKEN: rawEnv.GITHUB_TOKEN?.trim() || undefined, ADMIN_TOKEN: rawEnv.ADMIN_TOKEN?.trim() || undefined, ADMIN_TOTP: rawEnv.ADMIN_TOTP?.replace(/[\s-]/g, "").toUpperCase() || undefined };
 		const url = new URL(req.url);
 		const path = url.pathname.replace(/\/+$/, "");
 		if (!path.startsWith("/api/")) {
@@ -732,7 +903,12 @@ export default {
 					return await brief(req, env, ctx);
 				case "/api/admin/session":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
-					return await adminSession(req, env, post);
+					return await adminSession(req, env, post, who);
+				case "/api/admin/logout-all":
+				case "/api/admin/totp-setup":
+					if (!post) return json({ error: "method" }, 405);
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
+					return await adminSecurity(req, env, path.endsWith("logout-all") ? "logout-all" : "totp-setup");
 				case "/api/admin/logout":
 					return post ? json({ ok: true }, 200, { "set-cookie": sessionCookie("", 0) }) : json({ error: "method" }, 405);
 				case "/api/admin/briefs":

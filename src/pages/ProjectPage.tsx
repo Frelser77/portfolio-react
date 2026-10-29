@@ -54,9 +54,15 @@ export default function ProjectPage({ id }: { id: string }) {
 							<b>{String(index + 1).padStart(2, "0")}.</b>
 							{t(ui.projects.quest)}
 						</p>
-						<h1 id="project-title" className="h2">
-							{p.name}
-						</h1>
+						{p.logo ? (
+							<h1 id="project-title" className="plogo-title">
+								<img src={p.logo.src} width={p.logo.w} height={p.logo.h} alt={p.name} decoding="async" />
+							</h1>
+						) : (
+							<h1 id="project-title" className="h2">
+								{p.name}
+							</h1>
+						)}
 						<p className="dlg__meta">
 							<span className={`status status--${p.status}`}>{t(statusLabel[p.status])}</span>
 							{p.years && <span>{p.years}</span>}

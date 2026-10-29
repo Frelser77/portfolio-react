@@ -52,11 +52,12 @@ Il sito è multipagina (`/`, `/progetti`, `/progetti/:id`, `/stack`, `/lab`, `/c
 | `GET /api/admin/briefs` | elenco richieste (pagina `/admin`) | `DB` + secret `ADMIN_TOKEN` |
 | `GET/POST /api/admin/featured` | repository scelti dal pannello per la pagina Stack (tabella D1 `featured`) | `DB` + `ADMIN_TOKEN` + `GITHUB_TOKEN` |
 | `POST /api/admin/repo-action` | rende privati/pubblici o archivia repo dal pannello (mai cancella; serve essere admin del repo) | `ADMIN_TOKEN` + `GITHUB_TOKEN` (classic, scope `repo`) |
+| `POST /api/admin/totp-setup`, `POST /api/admin/logout-all` | genera il segreto del 2FA da mettere in Cloudflare; esce da tutti i dispositivi | `ADMIN_TOKEN` (+ `DB` per l'uscita globale) |
 | `GET /api/admin/repos` | tutti i repo (privati e di collaborazione), solo in `/admin` | `ADMIN_TOKEN` + `GITHUB_TOKEN` |
 
 Senza uno di questi pezzi il sito continua a funzionare: la chat risponde dai dati del sito, i contatori spariscono, il modulo usa email/WhatsApp.
 
 ### Attivare database e notifiche
 1. **D1**: in `wrangler.jsonc` aggiungi `"d1_databases": [{ "binding": "DB" }]` (provisioning automatico) oppure crea il database dalla dashboard e inserisci `database_name` e `database_id`. Le tabelle si creano da sole alla prima richiesta.
-2. **Secret** (dashboard → Worker → Settings → Variables and Secrets): `ADMIN_TOKEN` (una password lunga per `/admin`), facoltativo `GITHUB_TOKEN` (token GitHub in sola lettura: la pagina Stack mostra lingue e contributi anche dei repo privati, ma solo come numeri; i nomi compaiono solo in `/admin`), facoltativo `NOTIFY_WEBHOOK` (URL webhook Slack/Discord per ricevere le richieste), facoltativo `SALT` (stringa casuale per gli hash anonimi).
+2. **Secret** (dashboard → Worker → Settings → Variables and Secrets): `ADMIN_TOKEN` (una password lunga per `/admin`), facoltativo `GITHUB_TOKEN` (token GitHub in sola lettura: la pagina Stack mostra lingue e contributi anche dei repo privati, ma solo come numeri; i nomi compaiono solo in `/admin`), facoltativo `NOTIFY_WEBHOOK` (URL webhook Slack/Discord per ricevere le richieste), consigliato `ADMIN_TOTP` (segreto del 2FA: si genera da `/admin` › Sicurezza › Attiva il 2FA; con questo, per entrare servono chiave **e** codice a 6 cifre dell'app, e dopo 5 errori il login si blocca 15 minuti), facoltativo `SALT` (stringa casuale per gli hash anonimi).
 3. Workers AI ha una quota gratuita giornaliera; se finisce, il sito ricade sulle risposte locali.

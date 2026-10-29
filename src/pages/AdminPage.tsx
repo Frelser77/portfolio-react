@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw } from "react-icons/fi";
+import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone } from "react-icons/fi";
 import type { AdminRepo } from "../api";
 import { ui2 } from "../content/ui2";
 import type { L } from "../content/data";
@@ -19,6 +19,8 @@ interface Status {
 	ai: boolean;
 	github: boolean;
 	notify: boolean;
+	totp?: boolean;
+	log?: { ts: number; ok: number; country: string; ua: string }[];
 }
 interface Pick {
 	name: string;
@@ -26,7 +28,7 @@ interface Pick {
 	blurb: string;
 	link: string;
 }
-type Fail = "" | "wrong" | "noToken" | "noDb" | "limited" | "bad";
+type Fail = "" | "locked" | "wrong" | "noToken" | "noDb" | "limited" | "bad";
 type Level = "ok" | "warn" | "info";
 
 const A = ui2.admin;
@@ -37,6 +39,11 @@ export default function AdminPage() {
 	const [key, setKey] = useState("");
 	const [phase, setPhase] = useState<"check" | "out" | "in">("check");
 	const [fail, setFail] = useState<Fail>("");
+	const [needCode, setNeedCode] = useState(false);
+	const [code, setCode] = useState("");
+	const [wait, setWait] = useState(0);
+	const [setup, setSetup] = useState<{ secret: string; uri: string } | null>(null);
+	const [copied, setCopied] = useState(false);
 	const [status, setStatus] = useState<Status | null>(null);
 	const [rows, setRows] = useState<Row[] | null>(null);
 	const [repos, setRepos] = useState<AdminRepo[] | "none" | null>(null);
@@ -52,8 +59,16 @@ export default function AdminPage() {
 
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
 	const failOf = async (r: Response): Promise<Fail> => {
-		const e = isJson(r) ? ((await r.json().catch(() => ({}))) as { error?: string }).error : "";
-		if (r.status === 429) return "limited";
+		const body = isJson(r) ? ((await r.json().catch(() => ({}))) as { error?: string; totp?: boolean; retry?: number }) : {};
+		const e = body.error;
+		if (typeof body.totp === "boolean") setNeedCode(body.totp);
+		if (r.status === 429) {
+			if (e === "locked") {
+				setWait(Math.max(1, Math.ceil((body.retry ?? 60) / 60)));
+				return "locked";
+			}
+			return "limited";
+		}
 		if (r.status === 401) return "wrong";
 		return e === "no_admin_token" ? "noToken" : e === "no_db" ? "noDb" : "bad";
 	};
@@ -118,15 +133,48 @@ export default function AdminPage() {
 		setBusy(true);
 		setFail("");
 		try {
-			const r = await fetch("/api/admin/session", { method: "POST", credentials: "same-origin", headers: { authorization: `Bearer ${key.trim()}` } });
+			const r = await fetch("/api/admin/session", { method: "POST", credentials: "same-origin", headers: { authorization: `Bearer ${key.trim()}`, ...(needCode ? { "x-admin-code": code.replace(/\s/g, "") } : {}) } });
 			if (r.ok && isJson(r)) {
 				setKey("");
+				setCode("");
 				await enter(((await r.json()) as { status: Status }).status);
-			} else setFail(await failOf(r));
+			} else {
+				setCode("");
+				setFail(await failOf(r));
+			}
 		} catch {
 			setFail("bad");
 		}
 		setBusy(false);
+	};
+
+	const startSetup = async () => {
+		setBusy(true);
+		try {
+			const r = await fetch("/api/admin/totp-setup", { method: "POST", credentials: "same-origin" });
+			if (r.ok) setSetup((await r.json()) as { secret: string; uri: string });
+		} catch {
+			/* riprova */
+		}
+		setBusy(false);
+	};
+	const copySecret = async () => {
+		if (!setup) return;
+		try {
+			await navigator.clipboard.writeText(setup.secret);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			/* si copia a mano */
+		}
+	};
+	const logoutAll = async () => {
+		if (!window.confirm(t(A.logoutAllAsk))) return;
+		await fetch("/api/admin/logout-all", { method: "POST", credentials: "same-origin" }).catch(() => undefined);
+		setPhase("out");
+		setStatus(null);
+		setRows(null);
+		setRepos(null);
 	};
 
 	const logout = async () => {
@@ -269,13 +317,19 @@ export default function AdminPage() {
 						<span>{t(A.token)}</span>
 						<input type="password" autoComplete="current-password" value={key} onChange={(e) => setKey(e.target.value)} />
 					</label>
-					<button className="btn pri" type="submit" disabled={busy || !key.trim()}>
+					{needCode && (
+						<label>
+							<span>{t(A.code)}</span>
+							<input className="adm__code" type="text" inputMode="numeric" pattern="[0-9 ]*" autoComplete="one-time-code" maxLength={7} placeholder="000000" value={code} onChange={(e) => setCode(e.target.value.replace(/[^0-9 ]/g, ""))} />
+						</label>
+					)}
+					<button className="btn pri" type="submit" disabled={busy || !key.trim() || (needCode && code.replace(/\s/g, "").length !== 6)}>
 						{t(A.load)}
 					</button>
 					{fail && (
 						<p className="adm__note warn" role="alert">
 							<FiAlertTriangle aria-hidden="true" />
-							<span>{t(A[fail])}</span>
+							<span>{t(A[fail])}{fail === "locked" ? ` ${wait} min.` : ""}</span>
 						</p>
 					)}
 				</form>
@@ -323,6 +377,61 @@ export default function AdminPage() {
 								);
 							})}
 						</ul>
+					</div>
+
+					<div className="glass adm__card" data-lg-bezel="26">
+						<div className="adm__top">
+							<h2 className="h3">{t(A.secTitle)}</h2>
+							<span className={`adm__badge ${status.totp ? "ok" : "info"}`}>
+								{status.totp ? <FiCheckCircle aria-hidden="true" /> : <FiInfo aria-hidden="true" />}
+								{status.totp ? t(A.secOn) : t(A.secOff)}
+							</span>
+						</div>
+						<p className="muted adm__sub">{t(status.totp ? A.secOnText : A.secOffText)}</p>
+						{!status.totp && !setup && (
+							<button type="button" className="btn pri sm" onClick={startSetup} disabled={busy}>
+								<FiShield aria-hidden="true" />
+								{t(A.secEnable)}
+							</button>
+						)}
+						{setup && (
+							<div className="adm__setup">
+								<ol>
+									<li>{t(A.step1)}</li>
+									<li>{t(A.step2)}</li>
+									<li>{t(A.step3)}</li>
+								</ol>
+								<p className="adm__secret" aria-label={t(A.secretLabel)}>
+									<code>{setup.secret.replace(/(.{4})/g, "$1 ").trim()}</code>
+									<button type="button" className="adm__mini" onClick={copySecret}>
+										<FiCopy aria-hidden="true" /> {copied ? t(A.copied) : t(A.copy)}
+									</button>
+								</p>
+								<a className="btn glass sm" href={setup.uri}>
+									<FiSmartphone aria-hidden="true" />
+									{t(A.openApp)}
+								</a>
+								<small className="muted">{t(A.secretHint)}</small>
+							</div>
+						)}
+						{status.log && status.log.length > 0 && (
+							<>
+								<p className="psub">{t(A.recentAccess)}</p>
+								<ul className="adm__log" role="list">
+									{status.log.map((l) => (
+										<li key={l.ts} className={l.ok ? "ok" : "bad"}>
+											<b>{l.ok ? t(A.accessOk) : t(A.accessFail)}</b>
+											<span>{[l.ua, l.country].filter(Boolean).join(" · ")}</span>
+											<small>{new Date(l.ts).toLocaleString()}</small>
+										</li>
+									))}
+								</ul>
+							</>
+						)}
+						<button type="button" className="btn glass sm" onClick={logoutAll}>
+							<FiLogOut aria-hidden="true" />
+							{t(A.logoutAll)}
+						</button>
 					</div>
 
 					<div className="glass adm__card" data-lg-bezel="26">

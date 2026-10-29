@@ -4628,3 +4628,23 @@ html[data-refract="off"] .lens {
 .pshots li { scroll-snap-align: start; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.04); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); }
 .pshots img { display: block; width: 100%; height: auto; }
 @media (min-width: 1000px) { .pshots { grid-auto-columns: calc((100% - 28px) / 3); } }
+
+/* admin: sicurezza, 2FA e registro accessi */
+.adm__code { letter-spacing: 0.4em; font-variant-numeric: tabular-nums; text-align: center; font-size: 1.25rem; }
+.adm__setup { display: grid; gap: 12px; margin: 12px 0; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); }
+.adm__setup ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; line-height: 1.45; }
+.adm__secret { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0; }
+.adm__secret code { font-size: 1.05rem; letter-spacing: 0.08em; word-break: break-all; padding: 8px 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.35); }
+.adm__log { display: grid; gap: 6px; margin: 8px 0 14px; padding: 0; list-style: none; }
+.adm__log li { display: grid; grid-template-columns: 76px 1fr auto; gap: 10px; align-items: baseline; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); font-size: 13px; }
+.adm__log li.ok b { color: #7ee2a8; }
+.adm__log li.bad b { color: #ffb4a8; }
+.adm__log small { color: var(--ink-3); }
+@media (max-width: 560px) { .adm__log li { grid-template-columns: 1fr auto; } .adm__log li span { grid-column: 1 / -1; order: 3; } }
+
+/* pagina progetto: il logo prende il posto del titolo scritto */
+.plogo-title { margin: 6px 0 10px; line-height: 0; }
+.plogo-title img { display: block; height: 104px; width: auto; max-width: 100%; object-fit: contain; filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.4)); }
+@media (max-width: 720px) { .plogo-title img { height: 84px; } }
+.adm__setup ol { list-style: decimal; }
+.adm__setup .btn { justify-self: start; }
