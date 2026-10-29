@@ -3,6 +3,7 @@ import { usePrefs } from "../prefs";
 import { AchievementsHud } from "./Achievements";
 import { ui2 } from "../content/ui2";
 import { ui } from "../content/ui";
+import Logo from "./Logo";
 
 export const routes = [
 	{ to: "/", label: ui2.nav.home },
@@ -22,7 +23,7 @@ export default function Nav() {
 	return (
 		<header className="nav">
 			<Link className="brand" to="/" aria-label="FR7, home">
-				FR7
+				<Logo />
 			</Link>
 			<nav className="glass pill" aria-label={t(ui.nav.label)}>
 				{routes.map((l) => {

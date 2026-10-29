@@ -64,7 +64,7 @@ export default function Guide() {
 
 	const [glOk, setGlOk] = useState(true);
 	const fail = useCallback(() => setGlOk(false), []);
-	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, waving: false, spinAt: -1e9 });
+	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, face: -1, waving: false, spinAt: -1e9 });
 	const root = useRef<HTMLDivElement>(null);
 	const bot = useRef<HTMLDivElement>(null);
 	const quiet = useRef(false);
@@ -111,7 +111,7 @@ export default function Guide() {
 			seen.add(here.key);
 			if (mode === "auto" && !quiet.current && !skip) {
 				setShow(true);
-				later(() => setShow(false), 7500);
+				later(() => setShow(false), phone ? 3800 : 6000);
 			} else if (mode === "open") setShow(true);
 		}, arrive);
 		// il fumetto sparisce mentre cammina e ricompare all'arrivo
@@ -156,6 +156,10 @@ export default function Guide() {
 		pose.current.dir = dir;
 	}, [moving, dir]);
 	useEffect(() => {
+		// da fermo guarda verso il centro della pagina
+		pose.current.face = window.innerWidth < 720 || side === "r" ? -1 : 1;
+	}, [side]);
+	useEffect(() => {
 		pose.current.waving = wave;
 	}, [wave]);
 	useEffect(() => {
@@ -186,7 +190,7 @@ export default function Guide() {
 			sayTimer.current = window.setTimeout(() => {
 				setShow(false);
 				setSaid(null);
-			}, 4500);
+			}, window.innerWidth < 720 ? 3000 : 4500);
 			if (!prefersReducedMotion()) {
 				setWave(true);
 				window.setTimeout(() => setWave(false), 1400);
@@ -218,7 +222,7 @@ export default function Guide() {
 	const live = mode === "open";
 
 	return (
-		<div ref={root} className={`guide${moving ? " is-moving" : ""}${active === "/lab" ? " nogo" : ""}${active === "/lab" || active === "/contatti" || here.key === "progetto" ? " nomob" : ""}`} data-side={side}>
+		<div ref={root} className={`guide${moving ? " is-moving" : ""}${active === "/lab" || path.startsWith("/admin") ? " nogo" : ""}${active === "/lab" || active === "/contatti" || here.key === "progetto" ? " nomob" : ""}`} data-side={side}>
 			<div
 				className={`gbubble${bubbleOpen ? " on" : ""}${live ? " live" : ""}`}
 				role={live ? "status" : undefined}

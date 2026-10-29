@@ -4,12 +4,15 @@ import { usePrefs } from "../prefs";
 import { Link } from "../router";
 import { routes } from "./Nav";
 import Counter from "./Counter";
+import Logo from "./Logo";
 
 export default function Footer() {
 	const { t } = usePrefs();
 	return (
 		<footer className="foot">
-			<span className="brand">FR7</span>
+			<span className="brand">
+				<Logo small />
+			</span>
 			<span>
 				© {new Date().getFullYear()} Salvatore D'Amico. {t(ui.footer.rights)}
 				<Counter />

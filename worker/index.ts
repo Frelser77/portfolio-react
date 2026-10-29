@@ -423,10 +423,40 @@ async function brief(req: Request, env: Env, ctx: Ctx) {
 	return saved || notified ? json({ ok: true }) : json({ ok: false, error: "not_delivered" }, 502);
 }
 
+const COOKIE = "fr7_admin";
+const SESSION_MS = 7 * 24 * 3600 * 1000;
+
+async function hmac(key: string, msg: string) {
+	const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(key), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+	const sig = await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(msg));
+	return Array.from(new Uint8Array(sig), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Accesso: la chiave nell'intestazione Authorization oppure il cookie di sessione (firmato, HttpOnly) rilasciato dopo il login. */
 async function isAdmin(req: Request, env: Env) {
+	const token = (env.ADMIN_TOKEN ?? "").trim();
+	if (!token) return false;
 	const given = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
-	const [x, y] = await Promise.all([sha(given), sha((env.ADMIN_TOKEN ?? "").trim())]);
+	if (given) {
+		const [x, y] = await Promise.all([sha(given), sha(token)]);
+		return x === y;
+	}
+	const raw = (req.headers.get("cookie") ?? "").split(/;\s*/).find((c) => c.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1) ?? "";
+	const [exp, sig] = raw.split(".");
+	if (!exp || !sig || !(Number(exp) > Date.now())) return false;
+	const [x, y] = await Promise.all([sha(await hmac(token, `admin.${exp}`)), sha(sig)]);
 	return x === y;
+}
+
+const sessionCookie = (value: string, maxAge: number) => `${COOKIE}=${value}; Path=/api/admin; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Strict`;
+
+async function adminSession(req: Request, env: Env, login: boolean) {
+	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT };
+	if (!login) return json({ ok: true, status });
+	const exp = Date.now() + SESSION_MS;
+	return json({ ok: true, status }, 200, { "set-cookie": sessionCookie(`${exp}.${await hmac((env.ADMIN_TOKEN ?? "").trim(), `admin.${exp}`)}`, SESSION_MS / 1000) });
 }
 
 async function adminBriefs(req: Request, env: Env) {
@@ -476,11 +506,16 @@ export default {
 					if (!post) return json({ error: "method" }, 405);
 					if (limited(`brief:${who}`, 4, 600_000)) return json({ error: "rate_limited" }, 429);
 					return await brief(req, env, ctx);
+				case "/api/admin/session":
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
+					return await adminSession(req, env, post);
+				case "/api/admin/logout":
+					return post ? json({ ok: true }, 200, { "set-cookie": sessionCookie("", 0) }) : json({ error: "method" }, 405);
 				case "/api/admin/briefs":
-					if (limited(`admin:${who}`, 10, 60_000)) return json({ error: "rate_limited" }, 429);
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminBriefs(req, env);
 				case "/api/admin/repos":
-					if (limited(`admin:${who}`, 10, 60_000)) return json({ error: "rate_limited" }, 429);
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
 					if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
 					return await adminRepos(env);
