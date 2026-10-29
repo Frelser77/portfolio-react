@@ -4897,7 +4897,7 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .gbubble.on { pointer-events: auto; cursor: pointer; }
 .guide { transition-property: transform, opacity, translate; }
 @media (max-width: 720px) {
-	.guide { width: 100px; height: 118px; right: 10px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transition: transform 1.3s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.3s; }
+	.guide { width: 138px; height: 90px; right: 8px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transition: transform 1.3s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.3s; }
 	.guide:not(.pinned)[data-side="l"] { transform: none; }
 	.guide.scrolling:not(.gone) { opacity: 0.28; }
 	.gbubble { width: min(240px, calc(100vw - 28px)); right: 0; }
@@ -4908,7 +4908,7 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .gbtn { translate: var(--sx, 0px) 0; transition: translate 1s ease-in-out; }
 .gbubble.on { pointer-events: auto; cursor: pointer; }
 @media (max-width: 720px) {
-	.guide { width: 100px; height: 118px; right: 10px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transition: transform 1.3s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.3s; }
+	.guide { width: 138px; height: 90px; right: 8px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transition: transform 1.3s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.3s; }
 	.guide:not(.pinned)[data-side="l"] { transform: none; }
 	.guide.scrolling:not(.gone) { opacity: 0.28; }
 	.gbubble { width: min(240px, calc(100vw - 28px)); right: 0; }
@@ -4918,11 +4918,11 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 /* CV in due lingue e invito "Disponibile" */
 .cvrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .cvother { color: var(--ink-2); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
-.avail { position: fixed; z-index: 48; left: 18px; bottom: 18px; display: flex; align-items: center; border-radius: 999px; padding: 4px 4px 4px 4px; background: rgba(8, 12, 38, 0.78); transition: opacity 0.3s, translate 0.3s; }
-.avail.away { opacity: 0; translate: 0 10px; pointer-events: none; }
-.avail__go { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 8px 0 16px; color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
-.avail__go i { width: 9px; height: 9px; border-radius: 50%; background: #6fe3a0; box-shadow: 0 0 0 0 rgba(111, 227, 160, 0.6); animation: availping 2.4s infinite; }
-@keyframes availping { 70% { box-shadow: 0 0 0 9px rgba(111, 227, 160, 0); } 100% { box-shadow: 0 0 0 0 rgba(111, 227, 160, 0); } }
-.avail__x { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-2); cursor: pointer; }
-@media (max-width: 720px) { .avail { left: 12px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); } }
-@media (prefers-reduced-motion: reduce) { .avail__go i { animation: none; } }
+.hire { position: fixed; z-index: 48; left: 18px; bottom: 18px; display: flex; align-items: center; border-radius: 999px; padding: 4px 4px 4px 4px; background: rgba(8, 12, 38, 0.78); transition: opacity 0.3s, translate 0.3s; }
+.hire.away { opacity: 0; translate: 0 10px; pointer-events: none; }
+.hire__go { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 8px 0 16px; color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.hire__go i { width: 9px; height: 9px; border-radius: 50%; background: #6fe3a0; box-shadow: 0 0 0 0 rgba(111, 227, 160, 0.6); animation: hireping 2.4s infinite; }
+@keyframes hireping { 70% { box-shadow: 0 0 0 9px rgba(111, 227, 160, 0); } 100% { box-shadow: 0 0 0 0 rgba(111, 227, 160, 0); } }
+.hire__x { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--ink-2); cursor: pointer; }
+@media (max-width: 720px) { .hire { left: 12px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); } }
+@media (prefers-reduced-motion: reduce) { .hire__go i { animation: none; } }

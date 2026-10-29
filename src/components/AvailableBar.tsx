@@ -37,16 +37,16 @@ export default function AvailableBar() {
 		};
 	}, []);
 
-	if (closed || path.startsWith("/contatti") || path.startsWith("/admin")) return null;
+	if (closed || path === "/" || path.startsWith("/contatti") || path.startsWith("/admin")) return null;
 	return (
-		<div className={`avail glass${moving ? " away" : ""}`} data-lg-bezel="18">
-			<Link to="/contatti" className="avail__go">
+		<div className={`hire glass${moving ? " away" : ""}`} data-lg-bezel="18">
+			<Link to="/contatti" className="hire__go">
 				<i aria-hidden="true" />
 				<span>{t(ui2.avail.cta)}</span>
 			</Link>
 			<button
 				type="button"
-				className="avail__x"
+				className="hire__x"
 				onClick={() => {
 					setClosed(true);
 					try {
