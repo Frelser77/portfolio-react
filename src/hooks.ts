@@ -70,6 +70,13 @@ export function usePointerFx() {
 						const r = glass.getBoundingClientRect();
 						glass.style.setProperty("--mx", `${e.clientX - r.left}px`);
 						glass.style.setProperty("--my", `${e.clientY - r.top}px`);
+						const a = (Math.atan2(e.clientX - (r.left + r.width / 2), -(e.clientY - (r.top + r.height / 2))) * 180) / Math.PI;
+						glass.style.setProperty("--ang", `${a.toFixed(0)}deg`);
+					}
+					const mag = target?.closest<HTMLElement>(".mag");
+					if (mag) {
+						const r = mag.getBoundingClientRect();
+						mag.style.transform = `translate(${((e.clientX - r.left) / r.width - 0.5) * 12}px, ${((e.clientY - r.top) / r.height - 0.5) * 10}px)`;
 					}
 					const tilt = target?.closest<HTMLElement>(".tilt");
 					if (tilt) {
@@ -82,6 +89,8 @@ export function usePointerFx() {
 				});
 			};
 			leave = (e: PointerEvent) => {
+				const mg = (e.target as Element | null)?.closest<HTMLElement>(".mag");
+				if (mg && !mg.contains(e.relatedTarget as Node | null)) mg.style.transform = "";
 				const tilt = (e.target as Element | null)?.closest<HTMLElement>(".tilt");
 				if (tilt && !tilt.contains(e.relatedTarget as Node | null)) {
 					tilt.style.setProperty("--tx", "0deg");

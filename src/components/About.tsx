@@ -9,7 +9,7 @@ import Certificates, { type CertificatesHandle } from "./Certificates";
 function Stat({ value, plus, label }: { value: number; plus?: boolean; label: string }) {
 	const { ref, value: v } = useCountUp(value);
 	return (
-		<li className="stat">
+		<li className="stat glass tilt" data-lg-bezel="16">
 			<b ref={ref}>
 				{v}
 				{plus ? "+" : ""}
@@ -27,22 +27,22 @@ export default function About() {
 
 	return (
 		<section className="sec" id="chi-sono" aria-labelledby="about-title">
-			<div className="glass card">
+			<div className="card">
 				<div className="about">
 					<div>
 						<p className="eyebrow">
-							<b>01.</b>
+							<b>02.</b>
 							{t(ui.about.eyebrow)}
 						</p>
 						<h2 id="about-title">{t(ui.about.title)}</h2>
 						<p className="muted">{withAge(t(ui.about.text), profile.age)}</p>
-						<a className="btn" href={profile.cv} download>
+						<a className="btn glass" href={profile.cv} download data-lg-bezel="14">
 							{t(ui.about.cv)}
 							<FiDownload aria-hidden="true" />
 						</a>
 					</div>
 					<div className="about__side">
-						<div className="tour glass tilt">
+						<div className="tour glass tilt" data-lg-bezel="26">
 							<div>
 								<h3>{t(ui.tour.title)}</h3>
 								<p>{t(ui.tour.text)}</p>
@@ -53,15 +53,15 @@ export default function About() {
 							</button>
 						</div>
 						<ul className="info" role="list">
-							<li>
+							<li className="glass" data-lg-bezel="14">
 								<FiMapPin aria-hidden="true" />
 								{profile.town}
 							</li>
-							<li>
+							<li className="glass" data-lg-bezel="14">
 								<FiCalendar aria-hidden="true" />
 								{withAge(t(ui.about.years), profile.age)}
 							</li>
-							<li>
+							<li className="glass" data-lg-bezel="14">
 								<FiTrendingUp aria-hidden="true" />
 								{t(ui.about.remote)}
 							</li>
@@ -79,14 +79,19 @@ export default function About() {
 				<div className="path">
 					<h3>{t(ui.about.path)}</h3>
 					<ol className="steps">
-						{journey.map((step) => (
-							<li key={step.place.it} className="step">
-								<p className="step__years">{t(step.years)}</p>
+						{journey.map((step, n) => (
+							<li key={step.place.it} className="step glass tilt">
+								<p className="step__years">
+									<span className="lvl">
+										{t(ui.lvl)} {journey.length - n}
+									</span>
+									{t(step.years)}
+								</p>
 								<h4>{t(step.role)}</h4>
 								<p className="step__place">{t(step.place)}</p>
 								<p className="step__text">{t(step.text)}</p>
 								{step.certificates && (
-									<button type="button" className="btn sm" onClick={() => certs.current?.open()}>
+									<button type="button" className="btn sm glass" data-lg-bezel="12" onClick={() => certs.current?.open()}>
 										<FiAward aria-hidden="true" />
 										{t(ui.about.certs)}
 									</button>

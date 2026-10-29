@@ -365,3 +365,105 @@ export const certificates: { file: string; label: L }[] = [
 	{ file: "modulo-14", label: { it: "Validazione, autenticazione e API REST", en: "Validation, authentication and REST APIs" } },
 	{ file: "modulo-16", label: { it: "Entity Framework e LINQ", en: "Entity Framework and LINQ" } },
 ];
+
+/** Le esigenze del configuratore: ogni voce rimanda a un lavoro vero. */
+export interface Need {
+	id: "gestionale" | "sito" | "integrazioni" | "legacy" | "online" | "altro";
+	title: L;
+	pitch: L;
+	steps: [L, L, L];
+	example?: { projectId?: string; label: L };
+	brief: L;
+}
+
+export const needs: Need[] = [
+	{
+		id: "gestionale",
+		title: { it: "Un gestionale su misura", en: "Custom management software" },
+		pitch: {
+			it: "Un unico posto per prenotazioni, conti e amministrazione, fatto sul tuo modo di lavorare.",
+			en: "One place for bookings, accounts and admin, built around the way you work.",
+		},
+		steps: [
+			{ it: "Capisco come lavori oggi e cosa ti fa perdere tempo", en: "I learn how you work today and what wastes your time" },
+			{ it: "Porto i dati in un solo gestionale chiaro", en: "I bring the data into one clear system" },
+			{ it: "Lo collego agli strumenti che usi già (es. Lodgify)", en: "I connect it to the tools you already use (e.g. Lodgify)" },
+		],
+		example: { projectId: "casaurea", label: { it: "Domus per Casaurea", en: "Domus for Casaurea" } },
+		brief: { it: "Mi serve un gestionale su misura.", en: "I need custom management software." },
+	},
+	{
+		id: "sito",
+		title: { it: "Un sito o un menu digitale", en: "A website or digital menu" },
+		pitch: {
+			it: "Pagine veloci da telefono, semplici da aggiornare, online con dominio ed email.",
+			en: "Pages that are fast on a phone, easy to update, online with domain and email.",
+		},
+		steps: [
+			{ it: "Progetto poche pagine chiare, pensate per lo smartphone", en: "I design a few clear pages, made for the smartphone" },
+			{ it: "Le costruisco in React, veloci e curate", en: "I build them in React, fast and polished" },
+			{ it: "Le pubblico con dominio, DNS ed email e le mantengo", en: "I publish them with domain, DNS and email, and maintain them" },
+		],
+		example: { projectId: "bite-the-trouble", label: { it: "Il menu di Bite the Trouble", en: "The Bite the Trouble menu" } },
+		brief: { it: "Mi serve un sito o un menu digitale.", en: "I need a website or a digital menu." },
+	},
+	{
+		id: "integrazioni",
+		title: { it: "Far parlare i tuoi strumenti", en: "Make your tools talk" },
+		pitch: {
+			it: "Telefonia, chat, CRM e pagamenti collegati tra loro, senza copia e incolla.",
+			en: "Telephony, chat, CRM and payments connected, with no copy and paste.",
+		},
+		steps: [
+			{ it: "Mappo gli strumenti che usi e dove i dati si perdono", en: "I map your tools and where data gets lost" },
+			{ it: "Costruisco i collegamenti tra un servizio e l'altro", en: "I build the connections between services" },
+			{ it: "Controllo che i dati arrivino giusti dove servono", en: "I check the data lands correctly where it's needed" },
+		],
+		example: { projectId: "primed", label: { it: "In Primed: 3CX, Slack, CreditSafe, Salesforce", en: "At Primed: 3CX, Slack, CreditSafe, Salesforce" } },
+		brief: { it: "Vorrei collegare tra loro i miei strumenti.", en: "I'd like to connect my tools together." },
+	},
+	{
+		id: "legacy",
+		title: { it: "Rinnovare un software vecchio", en: "Renew an old piece of software" },
+		pitch: {
+			it: "Un programma datato che funziona ma fa paura toccare? Lo riscrivo con tecnologie moderne.",
+			en: "An old program that works but scares everyone to touch? I rewrite it with modern technology.",
+		},
+		steps: [
+			{ it: "Studio come funziona oggi, anche dove manca documentazione", en: "I study how it works today, even where docs are missing" },
+			{ it: "Lo riscrivo modulo per modulo con tecnologie attuali", en: "I rewrite it module by module with current technology" },
+			{ it: "Ottimizzo dove serve: diventa anche più veloce", en: "I optimise where it counts: it gets faster too" },
+		],
+		example: { projectId: "primed", label: { it: "Primed: da Classic ASP a NestJS", en: "Primed: from Classic ASP to NestJS" } },
+		brief: { it: "Ho un software vecchio da rinnovare.", en: "I have an old piece of software to renew." },
+	},
+	{
+		id: "online",
+		title: { it: "Metterti online, bene", en: "Getting you online, properly" },
+		pitch: {
+			it: "Dominio, DNS, email e server: tutto quello che serve perché il progetto stia in piedi.",
+			en: "Domain, DNS, email and servers: everything the project needs to stand up.",
+		},
+		steps: [
+			{ it: "Configuro dominio e DNS", en: "I set up domain and DNS" },
+			{ it: "Attivo email professionali", en: "I set up professional email" },
+			{ it: "Pubblico su Cloudflare o su server Linux", en: "I publish on Cloudflare or on a Linux server" },
+		],
+		example: { label: { it: "Questo stesso sito, online su Cloudflare", en: "This very site, online on Cloudflare" } },
+		brief: { it: "Mi serve aiuto per mettere online il mio progetto.", en: "I need help putting my project online." },
+	},
+	{
+		id: "altro",
+		title: { it: "Non lo so ancora", en: "I'm not sure yet" },
+		pitch: {
+			it: "Nessun problema: raccontami la situazione e la trasformiamo insieme in un piano.",
+			en: "No problem: tell me the situation and we'll turn it into a plan together.",
+		},
+		steps: [
+			{ it: "Mi racconti il problema con parole tue", en: "You tell me the problem in your own words" },
+			{ it: "Ti dico cosa serve davvero e cosa no", en: "I tell you what's really needed and what isn't" },
+			{ it: "Decidiamo insieme da dove partire", en: "We decide together where to start" },
+		],
+		brief: { it: "Ho un'idea ma non so ancora da dove partire.", en: "I have an idea but I'm not sure where to start." },
+	},
+];

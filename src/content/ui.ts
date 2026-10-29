@@ -5,6 +5,7 @@ export const ui = {
 	nav: {
 		label: { it: "Menu principale", en: "Main menu" },
 		home: { it: "Home", en: "Home" },
+		method: { it: "Su misura", en: "Tailor-made" },
 		about: { it: "Chi sono", en: "About" },
 		skills: { it: "Competenze", en: "Skills" },
 		projects: { it: "Progetti", en: "Work" },
@@ -14,17 +15,81 @@ export const ui = {
 	},
 
 	hero: {
-		hello: { it: "Ciao, sono", en: "Hi, I'm" },
-		role: { it: "Full Stack Developer", en: "Full Stack Developer" },
+		eyebrow: { it: "Salvatore D'Amico · Full Stack Developer", en: "Salvatore D'Amico · Full Stack Developer" },
+		l1: { it: "Soluzioni digitali", en: "Digital solutions" },
+		l2: { it: "su misura", en: "made to measure" },
+		l3: { it: "per le tue esigenze.", en: "for what you need." },
 		lead: {
-			it: "Progetto e sviluppo software dal database all'interfaccia: React e Next.js davanti, NestJS e ASP.NET dietro. Metto tutto online, con dominio, DNS ed email. Da tre anni trasformo esigenze reali in software che funziona.",
-			en: "I design and build software from database to interface: React and Next.js on the front, NestJS and ASP.NET behind. I put it all online, domain, DNS and email included. For three years I've been turning real needs into software that works.",
+			it: "Gestionali, siti e menu digitali, integrazioni tra i tuoi strumenti: dall'idea alla messa online, con dominio, DNS ed email. Raccontami il tuo problema: al resto penso io.",
+			en: "Management software, websites and digital menus, integrations between your tools: from idea to launch, domain, DNS and email included. Tell me your problem and I'll handle the rest.",
 		},
-		ctaWork: { it: "Scopri i miei progetti", en: "See my work" },
-		ctaContact: { it: "Contattami", en: "Get in touch" },
-		quote: { it: "Dal DNS all'ultimo pixel.", en: "From DNS to the last pixel." },
-		quoteGo: { it: "Vedi le competenze", en: "See the skills" },
+		avail: { it: "Disponibile per nuovi progetti e ruoli", en: "Open to new projects and roles" },
+		ctaBrief: { it: "Raccontami la tua idea", en: "Tell me your idea" },
+		ctaWork: { it: "Guarda cosa ho fatto", en: "See what I've built" },
+		lens: { it: "Trascina la lente", en: "Drag the lens" },
+		lensLabel: { it: "Lente di vetro trascinabile: decorazione", en: "Draggable glass lens: decoration" },
 		email: { it: "Email", en: "Email" },
+	},
+
+	config: {
+		title: { it: "Di cosa hai bisogno?", en: "What do you need?" },
+		hint: { it: "Tocca una voce: ti mostro come la affronto.", en: "Tap one: I'll show you how I'd tackle it." },
+		how: { it: "Come la affronto", en: "How I'd do it" },
+		done: { it: "Già fatto", en: "Already done" },
+		open: { it: "Guarda il progetto", en: "See the project" },
+		cta: { it: "Parliamone", en: "Let's talk" },
+		saidPrefix: { it: "Bella scelta!", en: "Nice pick!" },
+	},
+
+	method: {
+		eyebrow: { it: "Su misura", en: "Tailor-made" },
+		title: { it: "Il software giusto per come lavori tu", en: "The right software for how you work" },
+		text: {
+			it: "Non vendo pacchetti già pronti: parto da te, dalle tue esigenze e dal tuo modo di lavorare, e costruisco la soluzione che ti serve davvero.",
+			en: "I don't sell off-the-shelf packages: I start from you, your needs and the way you work, and build the solution you actually need.",
+		},
+		values: [
+			{
+				title: { it: "Parto da te, non da un modello", en: "I start from you, not a template" },
+				text: {
+					it: "Ogni progetto nasce dalle tue esigenze. Niente funzioni che non userai mai.",
+					en: "Every project starts from your needs. No features you'll never use.",
+				},
+			},
+			{
+				title: { it: "Dall'idea alla messa online", en: "From idea to launch" },
+				text: {
+					it: "Progetto, sviluppo e pubblicazione: dominio, DNS ed email compresi. Un solo interlocutore per tutto.",
+					en: "Design, development and launch: domain, DNS and email included. One person for everything.",
+				},
+			},
+			{
+				title: { it: "Parli con chi scrive il codice", en: "You talk to whoever writes the code" },
+				text: {
+					it: "Niente passaggi tra commerciali e programmatori: ti rispondo io, in modo chiaro.",
+					en: "No hand-offs between sales and developers: I answer you myself, in plain words.",
+				},
+			},
+		],
+		stepsTitle: { it: "Come lavoriamo insieme", en: "How we work together" },
+		steps: [
+			{
+				title: { it: "Ascolto", en: "Listen" },
+				text: { it: "Mi racconti cosa ti serve e come lavori oggi.", en: "You tell me what you need and how you work today." },
+			},
+			{
+				title: { it: "Progetto", en: "Plan" },
+				text: { it: "Ti propongo una soluzione chiara, prima di scrivere codice.", en: "I propose a clear solution before writing any code." },
+			},
+			{
+				title: { it: "Costruisco", en: "Build" },
+				text: { it: "Sviluppo a passi, te lo mostro e correggiamo insieme.", en: "I build in steps, show you, and we adjust together." },
+			},
+			{
+				title: { it: "Metto online", en: "Launch" },
+				text: { it: "Pubblico tutto, dominio ed email compresi, e resto a disposizione.", en: "I publish everything, domain and email included, and stay available." },
+			},
+		],
 	},
 
 	about: {
@@ -39,6 +104,7 @@ export const ui = {
 		remote: { it: "Remoto o in Puglia", en: "Remote or in Apulia" },
 		path: { it: "Il mio percorso", en: "My path" },
 		certs: { it: "Vedi gli attestati", en: "View certificates" },
+		certsShort: { it: "attestati", en: "certificates" },
 		certsTitle: { it: "Attestati Epicode", en: "Epicode certificates" },
 		prev: { it: "Precedente", en: "Previous" },
 		next: { it: "Successivo", en: "Next" },
@@ -52,12 +118,22 @@ export const ui = {
 		close: { it: "Chiudi il fumetto", en: "Close the speech bubble" },
 		home: [
 			{
-				it: "Ciao! Sono FR7 Bot, la tua guida. Ti porto a conoscere Salvatore: tocca il mio fumetto o scorri la pagina.",
-				en: "Hi! I'm FR7 Bot, your guide. I'll walk you through Salvatore's work: poke me or just scroll.",
+				it: "Ciao! Sono FR7 Bot. Salvatore costruisce soluzioni su misura: scegli di cosa hai bisogno qui accanto e ti mostro come la affronta.",
+				en: "Hi! I'm FR7 Bot. Salvatore builds tailor-made solutions: pick what you need next to me and I'll show you how he'd handle it.",
 			},
 			{
-				it: "Salvatore costruisce software dal database all'interfaccia e lo mette anche online.",
-				en: "Salvatore builds software from the database to the interface, and puts it online too.",
+				it: "Prova a trascinare la lente di vetro: piega davvero quello che ha dietro!",
+				en: "Try dragging the glass lens: it really bends whatever is behind it!",
+			},
+		],
+		metodo: [
+			{
+				it: "Qui spiega come lavora: parte da te e dalle tue esigenze, mica da un modello già pronto.",
+				en: "This is how he works: he starts from you and your needs, not from a ready-made template.",
+			},
+			{
+				it: "Quattro passi, dall'ascolto alla messa online. E parli sempre con lui.",
+				en: "Four steps, from listening to launch. And you always talk to him.",
 			},
 		],
 		"chi-sono": [
@@ -92,13 +168,29 @@ export const ui = {
 		],
 		contatti: [
 			{
-				it: "Eccoci! Scrivi a Salvatore: ti risponde volentieri.",
-				en: "Here we are! Write to Salvatore: he'll gladly answer.",
+				it: "Eccoci! Racconta la tua idea nel modulo: si apre la tua email con il messaggio già pronto.",
+				en: "Here we are! Tell your idea in the form: your email opens with the message ready to send.",
 			},
 			{
-				it: "Puoi anche copiare l'email con il bottone e mandargli due righe.",
-				en: "You can also copy the email with the button and send him a few lines.",
+				it: "Se preferisci, scrivigli subito su WhatsApp.",
+				en: "If you prefer, message him right away on WhatsApp.",
 			},
+		],
+	},
+
+	ach: {
+		hud: { it: "Obiettivi", en: "Achievements" },
+		title: { it: "Obiettivi sbloccati", en: "Unlocked achievements" },
+		unlocked: { it: "Obiettivo sbloccato", en: "Achievement unlocked" },
+		max: { it: "Livello massimo! Ora scrivi a Salvatore.", en: "Max level! Now write to Salvatore." },
+		items: [
+			{ id: "lens", title: { it: "Lente liquida", en: "Liquid lens" }, text: { it: "Hai trascinato la lente di vetro.", en: "You dragged the glass lens." } },
+			{ id: "need", title: { it: "Esploratore", en: "Explorer" }, text: { it: "Hai scelto di cosa hai bisogno.", en: "You picked what you need." } },
+			{ id: "party", title: { it: "Compagno di viaggio", en: "Travel companion" }, text: { it: "Hai toccato FR7 Bot.", en: "You poked FR7 Bot." } },
+			{ id: "bag", title: { it: "Zaino completo", en: "Full backpack" }, text: { it: "Hai aperto tutti gli zaini dell'inventario.", en: "You opened every bag in the inventory." } },
+			{ id: "quest", title: { it: "Cacciatore di missioni", en: "Quest hunter" }, text: { it: "Hai aperto una missione.", en: "You opened a quest." } },
+			{ id: "end", title: { it: "Fino in fondo", en: "All the way" }, text: { it: "Sei arrivato ai contatti.", en: "You reached the contacts." } },
+			{ id: "send", title: { it: "Prima mossa", en: "First move" }, text: { it: "Hai preparato un messaggio per Salvatore.", en: "You prepared a message for Salvatore." } },
 		],
 	},
 
@@ -110,6 +202,8 @@ export const ui = {
 		},
 		cta: { it: "Parti con FR7 Bot", en: "Start with FR7 Bot" },
 	},
+
+	lvl: { it: "LV", en: "LV" },
 
 	stats: {
 		years: { it: "anni di lavoro", en: "years of work" },
@@ -123,18 +217,28 @@ export const ui = {
 	},
 
 	skills: {
-		eyebrow: { it: "Le mie competenze", en: "My skills" },
-		title: { it: "Tecnologie e strumenti", en: "Technologies and tools" },
+		eyebrow: { it: "Scheda personaggio", en: "Character sheet" },
+		title: { it: "Il mio inventario", en: "My inventory" },
 		text: {
-			it: "Dal frontend al server: gli strumenti che uso ogni giorno nei progetti e nel lavoro.",
-			en: "From frontend to server: the tools I use every day in projects and at work.",
+			it: "Gli strumenti che uso ogni giorno, divisi per zaino. Tocca un oggetto per vedere dove l'ho usato davvero.",
+			en: "The tools I use every day, sorted by bag. Tap an item to see where I've really used it.",
 		},
-		cta: { it: "Vedi i progetti", en: "See the projects" },
+		cta: { it: "Vedi le missioni", en: "See the quests" },
+		level: { it: "Liv.", en: "Lv." },
+		class: { it: "Full Stack Developer", en: "Full Stack Developer" },
+		exp: { it: "esperienza sul campo", en: "field experience" },
+		quests: { it: "missioni", en: "quests" },
+		type: { it: "Zaino", en: "Bag" },
+		usedIn: { it: "Usato in", en: "Used in" },
+		daily: { it: "Nel mio kit di tutti i giorni.", en: "Part of my everyday kit." },
+		missions: { it: "missioni", en: "quests" },
+		open: { it: "Apri la missione", en: "Open the quest" },
 	},
 
 	projects: {
-		eyebrow: { it: "I miei progetti", en: "My projects" },
+		eyebrow: { it: "Registro missioni", en: "Quest log" },
 		title: { it: "Cosa ho realizzato", en: "What I've built" },
+		quest: { it: "Missione", en: "Quest" },
 		text: {
 			it: "Lavori per clienti, software aziendale e prodotti miei. Alcuni non sono più online: per quelli trovi comunque cosa ho fatto.",
 			en: "Client work, in-house software and products of my own. Some are no longer online, but you can still see what I built.",
@@ -155,15 +259,31 @@ export const ui = {
 
 	contact: {
 		eyebrow: { it: "Contatti", en: "Contact" },
-		title: { it: "Parliamo del tuo progetto", en: "Let's talk about your project" },
+		title: { it: "Raccontami la tua idea", en: "Tell me your idea" },
 		text: {
-			it: "Cerco un ruolo da sviluppatore full stack, da remoto o in Puglia. Hai una posizione aperta o un progetto da realizzare? Scrivimi e ti rispondo al più presto.",
-			en: "I'm looking for a full stack developer role, remote or in Apulia. Have an open position or a project to build? Write to me and I'll get back to you soon.",
+			it: "Cerchi uno sviluppatore per il tuo team o per un progetto su misura? Scrivimi due righe: ti rispondo io, di persona.",
+			en: "Looking for a developer for your team or a tailor-made project? Write me a few lines: I'll answer you personally.",
 		},
-		cta: { it: "Scrivimi ora", en: "Write to me" },
+		needLabel: { it: "Di cosa hai bisogno?", en: "What do you need?" },
+		msgLabel: { it: "Cosa vorresti ottenere?", en: "What would you like to achieve?" },
+		msgPlaceholder: {
+			it: "Es. Vorrei gestire prenotazioni e pagamenti in un solo posto, invece che su tre fogli diversi.",
+			en: "E.g. I'd like to manage bookings and payments in one place instead of three different sheets.",
+		},
+		nameLabel: { it: "Il tuo nome (facoltativo)", en: "Your name (optional)" },
+		reachLabel: { it: "Email o telefono, per risponderti", en: "Email or phone, so I can reply" },
+		sendMail: { it: "Invia per email", en: "Send by email" },
+		sendWa: { it: "Scrivimi su WhatsApp", en: "Message me on WhatsApp" },
+		note: {
+			it: "Si apre la tua app di posta o WhatsApp con il messaggio già scritto: non salvo nulla su nessun server.",
+			en: "Your mail app or WhatsApp opens with the message already written: nothing is stored on any server.",
+		},
 		copy: { it: "Copia indirizzo", en: "Copy address" },
 		copied: { it: "Indirizzo copiato", en: "Address copied" },
 		copyFail: { it: "Copia non riuscita: seleziona l'indirizzo a mano", en: "Couldn't copy: select the address manually" },
+		subject: { it: "Progetto su misura", en: "Tailor-made project" },
+		hello: { it: "Ciao Salvatore,", en: "Hi Salvatore," },
+		reach: { it: "Mi trovi qui:", en: "You can reach me at:" },
 		waText: {
 			it: "Ciao Salvatore, ti scrivo dal tuo portfolio.",
 			en: "Hi Salvatore, I'm writing from your portfolio.",

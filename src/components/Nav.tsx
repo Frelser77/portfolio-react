@@ -1,10 +1,12 @@
 import { useActiveSection } from "../hooks";
 import { usePrefs } from "../prefs";
+import { AchievementsHud } from "./Achievements";
 import { ui } from "../content/ui";
 
 /** id = sezione osservata per l'evidenziazione, href = dove porta il link */
 const links = [
 	{ id: "home", href: "#top", label: ui.nav.home },
+	{ id: "metodo", href: "#metodo", label: ui.nav.method },
 	{ id: "chi-sono", href: "#chi-sono", label: ui.nav.about },
 	{ id: "competenze", href: "#competenze", label: ui.nav.skills },
 	{ id: "progetti", href: "#progetti", label: ui.nav.projects },
@@ -27,10 +29,13 @@ export default function Nav() {
 					</a>
 				))}
 			</nav>
-			<button type="button" className="ico lang" onClick={toggleLang} title={t(ui.nav.lang)}>
+			<div className="nav__tools">
+				<AchievementsHud />
+				<button type="button" className="ico lang glass" onClick={toggleLang} title={t(ui.nav.lang)}>
 				<span aria-hidden="true">{lang === "it" ? "EN" : "IT"}</span>
 				<span className="sr-only">{t(ui.nav.lang)}</span>
 			</button>
+			</div>
 		</header>
 	);
 }

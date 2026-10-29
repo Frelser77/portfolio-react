@@ -3,6 +3,7 @@ import { FiArrowRight, FiArrowUpRight, FiX } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa6";
 import { profile, projects, statusLabel, type Project } from "../content/data";
 import { ui } from "../content/ui";
+import { unlock } from "../achievements";
 import { usePrefs } from "../prefs";
 import LivePreview from "./LivePreview";
 
@@ -15,16 +16,26 @@ export default function Projects() {
 	const current = projects.find((p) => p.id === openId) ?? null;
 
 	useEffect(() => {
+		const onOpen = (e: Event) => setOpenId((e as CustomEvent<string>).detail);
+			// (l'obiettivo si sblocca qui sotto quando la finestra si apre)
+		window.addEventListener("project:open", onOpen);
+		return () => window.removeEventListener("project:open", onOpen);
+	}, []);
+
+	useEffect(() => {
 		const d = dialog.current;
-		if (openId && d && !d.open) d.showModal();
+		if (openId && d && !d.open) {
+			d.showModal();
+			unlock("quest");
+		}
 	}, [openId]);
 
 	return (
 		<section className="sec" id="progetti" aria-labelledby="projects-title">
-			<div className="glass card proj">
+			<div className="card proj">
 				<div>
 					<p className="eyebrow">
-						<b>03.</b>
+						<b>04.</b>
 						{t(ui.projects.eyebrow)}
 					</p>
 					<h2 id="projects-title">{t(ui.projects.title)}</h2>
@@ -37,13 +48,16 @@ export default function Projects() {
 				</div>
 
 				<ul className="pcards" role="list">
-					{projects.map((p) => {
+					{projects.map((p, n) => {
 						const live = p.status === "live" ? p.links?.[0] : undefined;
 						return (
-							<li key={p.id} className="pc tilt">
+							<li key={p.id} className="pc glass tilt" data-lg-bezel="22">
 								<button type="button" className="pc__open" aria-haspopup="dialog" onClick={() => setOpenId(p.id)}>
 									<span className="thumb" style={{ background: gradient(p) }}>
 										<span className={`status status--${p.status}`}>{t(statusLabel[p.status])}</span>
+										<span className="qn" aria-hidden="true">
+											{t(ui.projects.quest)} {String(n + 1).padStart(2, "0")}
+										</span>
 										<span className="mark" aria-hidden="true">
 											{p.mark}
 										</span>

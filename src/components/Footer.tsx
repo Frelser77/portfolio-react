@@ -12,6 +12,7 @@ export default function Footer() {
 			</span>
 			<nav aria-label={t(ui.footer.menu)}>
 				<a href="#top">{t(ui.nav.home)}</a>
+				<a href="#metodo">{t(ui.nav.method)}</a>
 				<a href="#chi-sono">{t(ui.nav.about)}</a>
 				<a href="#competenze">{t(ui.nav.skills)}</a>
 				<a href="#progetti">{t(ui.nav.projects)}</a>
