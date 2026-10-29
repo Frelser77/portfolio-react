@@ -40,11 +40,11 @@ export interface GithubData {
 	contributions?: number;
 	calendar?: number[][];
 	/** repository scelti dal pannello admin: se ci sono, sostituiscono "ultimi aggiornamenti" */
-	featured?: { name: string; blurb: string; language: string; pushedAt: string; url: string; private: boolean }[];
+	featured?: { name: string; blurb: string; language: string; pushedAt: string; url: string; private: boolean; link?: string }[];
 	recent: { name: string; description: string; language: string; pushedAt: string; url: string; stars: number }[];
 	fetchedAt: string;
 }
-export interface AdminRepo { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string }
+export interface AdminRepo { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string; homepage?: string }
 export const getGithub = () => json<GithubData>("/api/github");
 
 export const likeProject = (id: string) => json<{ likes: number; liked: boolean }>("/api/likes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) });

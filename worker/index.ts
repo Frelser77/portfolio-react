@@ -91,10 +91,11 @@ function init(db: D1) {
 		.batch([
 			db.prepare("CREATE TABLE IF NOT EXISTS visits (day TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (day, h))"),
 			db.prepare("CREATE TABLE IF NOT EXISTS likes (project TEXT NOT NULL, h TEXT NOT NULL, PRIMARY KEY (project, h))"),
-			db.prepare("CREATE TABLE IF NOT EXISTS featured (name TEXT PRIMARY KEY, pos INTEGER NOT NULL, label TEXT, blurb TEXT, private INTEGER, url TEXT, language TEXT, pushed_at TEXT)"),
+			db.prepare("CREATE TABLE IF NOT EXISTS featured (name TEXT PRIMARY KEY, pos INTEGER NOT NULL, label TEXT, blurb TEXT, private INTEGER, url TEXT, language TEXT, pushed_at TEXT, link TEXT)"),
 			db.prepare("CREATE TABLE IF NOT EXISTS briefs (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT NOT NULL, name TEXT, reach TEXT, need TEXT, message TEXT, h TEXT)"),
 		])
-		.then(() => undefined)
+		// la colonna `link` è nata dopo: sulle tabelle già create si aggiunge una volta sola (se c'è già l'errore è innocuo)
+		.then(() => db.prepare("ALTER TABLE featured ADD COLUMN link TEXT").run().then(() => undefined, () => undefined))
 		.catch((e) => {
 			ready = null;
 			throw e;
@@ -324,18 +325,18 @@ async function github(env: Env, ctx: Ctx) {
 }
 
 /** Solo per l'amministratore: tutti i repository a cui hai accesso, privati e di collaborazione compresi. */
-interface AdminRepoRow { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string }
+interface AdminRepoRow { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string; homepage: string }
 
 /** Tutti i repository a cui il token ha accesso: tuoi, di collaborazione e di organizzazioni (fino a 300, in pagine da 100). */
 async function viewerRepos(token: string): Promise<{ total: number; rows: AdminRepoRow[] }> {
-	type Page = { viewer: { login: string; repositories: { totalCount: number; pageInfo: { hasNextPage: boolean; endCursor: string | null }; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; viewerPermission: string | null })[] } } };
+	type Page = { viewer: { login: string; repositories: { totalCount: number; pageInfo: { hasNextPage: boolean; endCursor: string | null }; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; homepageUrl: string | null; viewerPermission: string | null })[] } } };
 	const rows: AdminRepoRow[] = [];
 	let after: string | null = null;
 	let total = 0;
 	for (let page = 0; page < 3; page++) {
 		const data: Page = await gql<Page>(
 			token,
-			`query($after:String){ viewer{ login repositories(first:100, after:$after, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount pageInfo{ hasNextPage endCursor } nodes{ nameWithOwner isPrivate isFork isArchived url pushedAt viewerPermission primaryLanguage{ name } } } } }`,
+			`query($after:String){ viewer{ login repositories(first:100, after:$after, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount pageInfo{ hasNextPage endCursor } nodes{ nameWithOwner isPrivate isFork isArchived url homepageUrl pushedAt viewerPermission primaryLanguage{ name } } } } }`,
 			{ after },
 		);
 		const login = data.viewer.login.toLowerCase();
@@ -351,6 +352,7 @@ async function viewerRepos(token: string): Promise<{ total: number; rows: AdminR
 				pushedAt: r.pushedAt,
 				url: r.url,
 				permission: r.viewerPermission ?? "",
+				homepage: safeUrl(r.homepageUrl),
 			});
 		if (!data.viewer.repositories.pageInfo?.hasNextPage) break;
 		after = data.viewer.repositories.pageInfo.endCursor;
@@ -403,13 +405,24 @@ async function adminRepoAction(req: Request, env: Env) {
 
 /* ---- repository in evidenza: li scegli tu dal pannello, il sito pubblico li mostra al posto degli ultimi aggiornamenti ---- */
 
-interface FeaturedRow { name: string; pos: number; label: string | null; blurb: string | null; private: number; url: string | null; language: string | null; pushed_at: string | null }
+/** Solo indirizzi http(s) validi: il link di produzione che scegli tu viene mostrato sul sito pubblico. */
+function safeUrl(v: unknown): string {
+	if (typeof v !== "string") return "";
+	try {
+		const u = new URL(v.trim());
+		return u.protocol === "https:" || u.protocol === "http:" ? u.toString().slice(0, 200) : "";
+	} catch {
+		return "";
+	}
+}
+
+interface FeaturedRow { name: string; pos: number; label: string | null; blurb: string | null; private: number; url: string | null; language: string | null; pushed_at: string | null; link: string | null }
 
 async function loadFeatured(env: Env) {
 	if (!env.DB) return [] as FeaturedRow[];
 	try {
 		await init(env.DB);
-		return ((await env.DB.prepare("SELECT name, pos, label, blurb, private, url, language, pushed_at FROM featured ORDER BY pos").all()).results ?? []) as unknown as FeaturedRow[];
+		return ((await env.DB.prepare("SELECT name, pos, label, blurb, private, url, language, pushed_at, link FROM featured ORDER BY pos").all()).results ?? []) as unknown as FeaturedRow[];
 	} catch {
 		return [];
 	}
@@ -437,6 +450,7 @@ async function publicFeatured(env: Env) {
 			pushedAt: f?.pushedAt ?? r.pushed_at ?? "",
 			url: priv ? "" : (f?.url ?? r.url ?? ""),
 			private: priv,
+			link: safeUrl(r.link),
 		};
 	});
 }
@@ -445,7 +459,7 @@ async function adminFeatured(req: Request, env: Env) {
 	if (!env.DB) return json({ error: "no_db" }, 404);
 	if (req.method === "GET") return json({ rows: await loadFeatured(env) });
 	if (!env.GITHUB_TOKEN) return json({ error: "no_token" }, 404);
-	const b = await body<{ items?: { name?: string; label?: string; blurb?: string }[] }>(req, 20000);
+	const b = await body<{ items?: { name?: string; label?: string; blurb?: string; link?: string }[] }>(req, 20000);
 	if (!b || !Array.isArray(b.items) || b.items.length > 8) return json({ error: "bad_request" }, 400);
 	let all: AdminRepoRow[];
 	try {
@@ -457,12 +471,12 @@ async function adminFeatured(req: Request, env: Env) {
 	const clean = (v: unknown, n: number) => (typeof v === "string" ? v.trim().slice(0, n) : "");
 	const items = b.items.flatMap((it, i) => {
 		const r = typeof it.name === "string" ? byName.get(it.name) : undefined;
-		return r ? [{ r, pos: i, label: clean(it.label, 60), blurb: clean(it.blurb, 160) }] : [];
+		return r ? [{ r, pos: i, label: clean(it.label, 60), blurb: clean(it.blurb, 160), link: safeUrl(it.link) }] : [];
 	});
 	await init(env.DB);
 	await env.DB.batch([
 		env.DB.prepare("DELETE FROM featured"),
-		...items.map((x) => env.DB!.prepare("INSERT INTO featured (name, pos, label, blurb, private, url, language, pushed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").bind(x.r.name, x.pos, x.label, x.blurb, x.r.private ? 1 : 0, x.r.url, x.r.language, x.r.pushedAt)),
+		...items.map((x) => env.DB!.prepare("INSERT INTO featured (name, pos, label, blurb, private, url, language, pushed_at, link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(x.r.name, x.pos, x.label, x.blurb, x.r.private ? 1 : 0, x.r.url, x.r.language, x.r.pushedAt, x.link)),
 	]);
 	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
 	await Promise.all(["t", "p"].map((k) => cache?.delete(new Request(`https://cache.fr7.local/github-v2-${k}`)) ?? Promise.resolve(false)));

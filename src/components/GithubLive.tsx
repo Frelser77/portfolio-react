@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
-import { FiLock, FiStar, FiUserPlus } from "react-icons/fi";
+import { FiExternalLink, FiLock, FiStar, FiUserPlus } from "react-icons/fi";
 import { getGithub, type GithubData } from "../api";
 import { profile } from "../content/data";
 import { ui2 } from "../content/ui2";
@@ -113,7 +113,17 @@ export default function GithubLive() {
 													<small>{[r.language, r.pushedAt && ago(r.pushedAt, lang)].filter(Boolean).join(" · ") || "—"}</small>
 												</>
 											);
-											return <li key={r.name}>{r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer">{inner}</a> : <div className="rstatic">{inner}</div>}</li>;
+											return (
+												<li key={r.name} className={r.link ? "hasgo" : undefined}>
+													{r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer">{inner}</a> : <div className="rstatic">{inner}</div>}
+													{r.link && (
+														<a className="rgo" href={r.link} target="_blank" rel="noopener noreferrer" title={t(ui2.stack.live.openSite)}>
+															<FiExternalLink aria-hidden="true" />
+															<span className="sr-only">{t(ui2.stack.live.openSite)}</span>
+														</a>
+													)}
+												</li>
+											);
 										})}
 									</ul>
 								</>

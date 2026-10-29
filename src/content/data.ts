@@ -93,6 +93,10 @@ export interface Project {
 	name: string;
 	/** sigla grande sulla copertina della scheda */
 	mark: string;
+	/** logo del progetto (in /img/progetti), mostrato sulla copertina al posto della sigla */
+	logo?: { src: string; w: number; h: number };
+	/** schermate ottimizzate per il web, mostrate nella pagina del progetto */
+	shots?: { src: string; w: number; h: number; alt: L }[];
 	/** tre colori del gradiente della copertina, dal più scuro al più chiaro */
 	tint: [string, string, string];
 	/** riga sotto il nome, nella scheda */
@@ -122,6 +126,7 @@ export const projects: Project[] = [
 		id: "bite-the-trouble",
 		name: "Bite the Trouble",
 		mark: "BT",
+		logo: { src: "/img/progetti/bt-scritta.webp", w: 400, h: 357 },
 		tint: ["#2b1238", "#9b3d2e", "#e0902f"],
 		tag: { it: "Menu digitale | React", en: "Digital menu | React" },
 		status: "live",
@@ -145,6 +150,7 @@ export const projects: Project[] = [
 		id: "casaurea",
 		name: "Casaurea",
 		mark: "Ca",
+		logo: { src: "/img/progetti/casaurea-mark.webp", w: 360, h: 357 },
 		tint: ["#0a2748", "#1a6aa6", "#4cc3d9"],
 		tag: { it: "Gestionale | Lodgify", en: "Management tool | Lodgify" },
 		status: "dev",
@@ -168,6 +174,7 @@ export const projects: Project[] = [
 		id: "san-antonio",
 		name: "Campionato San Antonio",
 		mark: "SA",
+		logo: { src: "/img/progetti/sa.webp", w: 420, h: 420 },
 		tint: ["#0c2a22", "#1f7a4f", "#c8c462"],
 		tag: { it: "Piattaforma web | React + TS", en: "Web platform | React + TS" },
 		status: "offline",
@@ -184,6 +191,36 @@ export const projects: Project[] = [
 			{ it: "Back-office offline, pacchettizzato con Electron", en: "Offline back office, packaged with Electron" },
 		],
 		stack: ["React", "TypeScript", "Context API", "Electron"],
+	},
+	{
+		id: "cable",
+		name: "Cable",
+		mark: "Cb",
+		logo: { src: "/img/progetti/cable-icon.webp", w: 320, h: 320 },
+		tint: ["#071a3d", "#1456c8", "#2fd3c4"],
+		tag: { it: "App desktop | Rust + Tauri", en: "Desktop app | Rust + Tauri" },
+		status: "desktop",
+		summary: {
+			it: "Condivisione di file e testi fra Linux e smartphone (Android o iPhone) sulla rete locale, senza account né cloud.",
+			en: "File and text sharing between Linux and phones (Android or iPhone) on the local network, with no account or cloud.",
+		},
+		details: {
+			it: "Cable parla il protocollo LocalSend v2: il PC compare fra i dispositivi vicini e si inviano file, cartelle e appunti in entrambe le direzioni, con cifratura HTTPS e verifica dell'identità del telefono. Il motore è in Rust, l'interfaccia è un guscio Tauri 2 con un design in vetro che segue il tema del sistema. Ci sono anche la ricezione in background, l'avvio con il PC e, facoltativo, lo schermo dell'iPhone sul PC via AirPlay.",
+			en: "Cable speaks the LocalSend v2 protocol: the PC shows up among nearby devices and you send files, folders and clipboard text both ways, over HTTPS with phone identity verification. The engine is written in Rust, the interface is a Tauri 2 shell with a glass design that follows the system theme. It also receives in the background, starts with the PC and, optionally, mirrors an iPhone screen to the PC over AirPlay.",
+		},
+		highlights: [
+			{ it: "Motore in Rust (tokio, hyper, rustls), un solo binario", en: "Rust engine (tokio, hyper, rustls), a single binary" },
+			{ it: "Compatibile con LocalSend: nessun account, nessun cloud", en: "LocalSend-compatible: no account, no cloud" },
+			{ it: "Identità verificabile dei dispositivi e PIN di ricezione", en: "Verifiable device identity and a receive PIN" },
+			{ it: "Test automatici: unitari, end-to-end e sulla ricezione", en: "Automated tests: unit, end-to-end and receiving" },
+		],
+		stack: ["Rust", "Tauri 2", "tokio", "LocalSend v2"],
+		links: [{ label: { it: "Codice su GitHub", en: "Code on GitHub" }, href: "https://github.com/lonelyfrank/cable" }],
+		shots: [
+			{ src: "/img/progetti/cable-home.webp", w: 1000, h: 790, alt: { it: "Cable: schermata Home con destinatario, invio file e appunti condivisi", en: "Cable: Home screen with recipient, file sending and shared clipboard" } },
+			{ src: "/img/progetti/cable-condividi.webp", w: 1000, h: 748, alt: { it: "Cable: elenco dei dispositivi vicini e trasferimenti", en: "Cable: nearby devices and transfers" } },
+			{ src: "/img/progetti/cable-schermo.webp", w: 1000, h: 626, alt: { it: "Cable: schermo dell'iPhone sul PC", en: "Cable: iPhone screen on the PC" } },
+		],
 	},
 	{
 		id: "primed",

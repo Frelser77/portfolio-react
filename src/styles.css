@@ -4610,3 +4610,21 @@ html[data-refract="off"] .lens {
 	color: var(--ink-2);
 }
 .adm__save.dirty { border-color: #ffbf5a; color: #ffe3b0; }
+
+/* repository in evidenza: link al sito online */
+.recent li.hasgo { position: relative; }
+.recent li.hasgo > a:first-child, .recent li.hasgo > .rstatic { padding-right: 52px; }
+.recent a.rgo { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: rgba(120, 150, 255, 0.16); color: #cfd9ff; border: 1px solid rgba(160, 180, 255, 0.28); padding: 0; transition: background 0.2s, transform 0.2s; }
+.recent a.rgo:hover, .recent a.rgo:focus-visible { background: rgba(120, 150, 255, 0.32); transform: translateY(-50%) scale(1.06); }
+.recent a.rgo svg { width: 15px; height: 15px; }
+.adm__linkrow { display: flex; gap: 8px; align-items: center; }
+.adm__linkrow input { flex: 1; min-width: 0; }
+.adm__err { color: #ffb4a8; }
+
+/* loghi dei progetti sulle copertine e schermate nella pagina del progetto */
+.thumb .plogo { position: absolute; left: 50%; top: 56%; height: 84px; width: auto; max-width: 62%; object-fit: contain; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45)); transition: transform 0.3s; }
+.pc:hover .plogo { transform: translate(-50%, -50%) scale(1.1) rotate(-2deg); }
+.pshots { display: grid; grid-auto-flow: column; grid-auto-columns: min(86%, 560px); gap: 14px; margin: 18px 0 8px; padding: 4px 2px 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.pshots li { scroll-snap-align: start; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.04); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); }
+.pshots img { display: block; width: 100%; height: auto; }
+@media (min-width: 1000px) { .pshots { grid-auto-columns: calc((100% - 28px) / 3); } }

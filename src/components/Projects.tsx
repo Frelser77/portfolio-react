@@ -37,9 +37,13 @@ export default function Projects() {
 										<span className="qn" aria-hidden="true">
 											{t(ui.projects.quest)} {String(n + 1).padStart(2, "0")}
 										</span>
-										<span className="mark" aria-hidden="true">
-											{p.mark}
-										</span>
+										{p.logo ? (
+											<img className="plogo" src={p.logo.src} width={p.logo.w} height={p.logo.h} alt="" loading="lazy" decoding="async" />
+										) : (
+											<span className="mark" aria-hidden="true">
+												{p.mark}
+											</span>
+										)}
 									</span>
 									<span className="pcb">
 										<span>

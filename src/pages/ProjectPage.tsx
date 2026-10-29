@@ -70,6 +70,16 @@ export default function ProjectPage({ id }: { id: string }) {
 					)}
 				</div>
 
+				{p.shots && (
+					<ul className="pshots" role="list">
+						{p.shots.map((sh, n) => (
+							<li key={sh.src}>
+								<img src={sh.src} width={sh.w} height={sh.h} alt={t(sh.alt)} loading={n === 0 ? "eager" : "lazy"} decoding="async" />
+							</li>
+						))}
+					</ul>
+				)}
+
 				<div className={`pdetail${p.preview ? " has-preview" : ""}`}>
 					<div className="pdetail__text">
 						<p className="pdetail__lead">{t(p.summary)}</p>

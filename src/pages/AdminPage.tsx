@@ -24,6 +24,7 @@ interface Pick {
 	name: string;
 	label: string;
 	blurb: string;
+	link: string;
 }
 type Fail = "" | "wrong" | "noToken" | "noDb" | "limited" | "bad";
 type Level = "ok" | "warn" | "info";
@@ -68,8 +69,8 @@ export default function AdminPage() {
 		try {
 			const f = await fetch("/api/admin/featured", { credentials: "same-origin" });
 			if (f.ok && isJson(f)) {
-				const j = (await f.json()) as { rows: { name: string; label: string | null; blurb: string | null }[] };
-				const loaded = j.rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "" }));
+				const j = (await f.json()) as { rows: { name: string; label: string | null; blurb: string | null; link: string | null }[] };
+				const loaded = j.rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "", link: r.link ?? "" }));
 				setPicks(loaded);
 				setBase(JSON.stringify(loaded));
 			}
@@ -151,7 +152,7 @@ export default function AdminPage() {
 			[n[i], n[j]] = [n[j], n[i]];
 			return n;
 		});
-	const edit = (i: number, k: "label" | "blurb", v: string) => setPicks((p) => p.map((x, n) => (n === i ? { ...x, [k]: v } : x)));
+	const edit = (i: number, k: "label" | "blurb" | "link", v: string) => setPicks((p) => p.map((x, n) => (n === i ? { ...x, [k]: v } : x)));
 	const savePicks = async () => {
 		setBusy(true);
 		setSaved("");
@@ -396,6 +397,15 @@ export default function AdminPage() {
 												</div>
 												<input value={p.label} maxLength={60} placeholder={t(A.publicName)} onChange={(e) => edit(i, "label", e.target.value)} />
 												<input value={p.blurb} maxLength={160} placeholder={t(A.publicBlurb)} onChange={(e) => edit(i, "blurb", e.target.value)} />
+												<div className="adm__linkrow">
+													<input type="url" inputMode="url" value={p.link} maxLength={200} placeholder={t(A.publicLink)} onChange={(e) => edit(i, "link", e.target.value.trim())} aria-label={t(A.publicLink)} />
+													{r?.homepage && p.link !== r.homepage && (
+														<button type="button" className="adm__mini" onClick={() => edit(i, "link", r.homepage ?? "")}>
+															{t(A.useHomepage)}
+														</button>
+													)}
+												</div>
+												{p.link && !/^https?:\/\//i.test(p.link) && <small className="adm__err">{t(A.linkBad)}</small>}
 												{r?.private && <small className="muted">{t(A.privWarn)}</small>}
 											</li>
 										);
@@ -527,7 +537,7 @@ export default function AdminPage() {
 													className={`adm__mini${on ? " on" : ""}`}
 													disabled={on || picks.length >= 8}
 													title={picks.length >= 8 ? t(A.max) : undefined}
-													onClick={() => setPicks((x) => [...x, { name: r.name, label: "", blurb: "" }])}
+													onClick={() => setPicks((x) => [...x, { name: r.name, label: "", blurb: "", link: r.homepage ?? "" }])}
 												>
 													{on ? "✓" : t(A.add)}
 												</button>
