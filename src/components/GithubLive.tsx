@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
 import { FiExternalLink, FiLock, FiStar, FiUserPlus } from "react-icons/fi";
-import { getGithub, type GithubData } from "../api";
+import type { GithubData } from "../api";
+import { swr } from "../swr";
 import { profile } from "../content/data";
 import { ui2 } from "../content/ui2";
 import { usePrefs } from "../prefs";
@@ -22,13 +23,18 @@ export default function GithubLive() {
 
 	useEffect(() => {
 		let alive = true;
-		getGithub().then((d) => {
-			if (!alive) return;
-			if (d && Array.isArray(d.recent)) {
+		// dati già visti subito, rete solo ogni 10 minuti e solo per sapere se è cambiato qualcosa
+		void swr<GithubData>(
+			"fr7-gh",
+			"/api/github",
+			10 * 60_000,
+			(d) => {
+				if (!alive) return;
 				setData(d);
 				setState("ok");
-			} else setState("off");
-		});
+			},
+			(d) => !!d && Array.isArray((d as GithubData).recent),
+		).then((ok) => alive && !ok && setState("off"));
 		return () => {
 			alive = false;
 		};

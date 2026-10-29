@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { projects, type Project } from "./content/data";
+import { swr } from "./swr";
 
 /** Ordine e visibilità delle schede, scelti dal pannello admin. Senza risposta resta l'ordine di data.ts. */
 export interface OrderInfo {
@@ -7,38 +8,21 @@ export interface OrderInfo {
 	hidden: string[];
 }
 
-const STORE = "fr7-order";
-const stored = (): OrderInfo | null => {
-	try {
-		const j = JSON.parse(localStorage.getItem(STORE) ?? "null") as OrderInfo | null;
-		return j && Array.isArray(j.order) && Array.isArray(j.hidden) ? j : null;
-	} catch {
-		return null;
-	}
+const listeners = new Set<(o: OrderInfo) => void>();
+let cache: OrderInfo | null = null;
+let started = false;
+const valid = (o: unknown): o is OrderInfo => !!o && Array.isArray((o as OrderInfo).order) && Array.isArray((o as OrderInfo).hidden);
+
+// parte dall'ultimo ordine visto (niente rimescolamento) e controlla la rete al massimo ogni 3 minuti
+const start = () => {
+	if (started || typeof window === "undefined") return;
+	started = true;
+	void swr<OrderInfo>("fr7-order", "/api/projects", 3 * 60_000, (o) => {
+		cache = o;
+		listeners.forEach((l) => l(o));
+	}, valid);
 };
-
-// parte dall'ultimo ordine visto: niente rimescolamento visibile quando arriva la risposta
-let cache: OrderInfo | null = typeof window === "undefined" ? null : stored();
-let pending: Promise<OrderInfo | null> | null = null;
-
-const load = () =>
-	(pending ??= fetch("/api/projects")
-		.then((r) => (r.ok && (r.headers.get("content-type") ?? "").includes("application/json") ? (r.json() as Promise<OrderInfo>) : null))
-		.then((o) => {
-			if (o && Array.isArray(o.order)) {
-				cache = o;
-				try {
-					localStorage.setItem(STORE, JSON.stringify(o));
-				} catch {
-					/* ok */
-				}
-			}
-			return cache;
-		})
-		.catch(() => null));
-
-// scarica subito, prima che la pagina Progetti venga disegnata
-if (typeof window !== "undefined") void load();
+start();
 
 export function sortProjects(info: OrderInfo | null): Project[] {
 	if (!info) return projects;
@@ -54,10 +38,10 @@ export function sortProjects(info: OrderInfo | null): Project[] {
 export function useProjects(): Project[] {
 	const [info, setInfo] = useState<OrderInfo | null>(cache);
 	useEffect(() => {
-		let alive = true;
-		load().then((o) => alive && o && setInfo(o));
+		setInfo(cache);
+		listeners.add(setInfo);
 		return () => {
-			alive = false;
+			listeners.delete(setInfo);
 		};
 	}, []);
 	return sortProjects(info);

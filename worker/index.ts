@@ -50,6 +50,22 @@ const json = (data: unknown, status = 200, extra: Record<string, string> = {}) =
 
 /* ------------------------------ utilità ------------------------------ */
 
+const edgeCache = () => (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
+
+/** Impronta breve del contenuto, per l'ETag: serve a rispondere "304, non è cambiato" senza rimandare i dati. */
+function etagOf(text: string) {
+	let h = 2166136261;
+	for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+	return `"${(h >>> 0).toString(36)}-${text.length.toString(36)}"`;
+}
+
+/** Risposta pubblica cacheable: il browser la riusa 5 minuti, poi chiede solo se è cambiata (304). */
+function cacheable(req: Request, text: string, etag: string) {
+	const headers = { ...JSON_HEADERS, etag, "cache-control": "public, max-age=300, stale-while-revalidate=86400" };
+	if (req.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers });
+	return new Response(text, { status: 200, headers });
+}
+
 async function sha(text: string) {
 	const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
 	return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
@@ -308,11 +324,14 @@ async function githubPublic() {
 	};
 }
 
-async function github(env: Env, ctx: Ctx) {
-	const cache = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default;
+async function github(req: Request, env: Env, ctx: Ctx) {
+	const cache = edgeCache();
 	const key = new Request(`https://cache.fr7.local/github-v2-${env.GITHUB_TOKEN ? "t" : "p"}`);
 	const hit = await cache?.match(key);
-	if (hit) return new Response(hit.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=20" } });
+	if (hit) {
+		const text = await hit.text();
+		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text));
+	}
 	try {
 		let payload: unknown;
 		if (env.GITHUB_TOKEN) {
@@ -323,9 +342,12 @@ async function github(env: Env, ctx: Ctx) {
 			}
 		} else payload = await githubPublic();
 		(payload as Record<string, unknown>).featured = await publicFeatured(env);
-		const res = new Response(JSON.stringify(payload), { headers: { ...JSON_HEADERS, "cache-control": "public, max-age=3600" } });
-		if (cache) ctx.waitUntil(cache.put(key, res.clone()));
-		return new Response(res.body, { status: 200, headers: { ...JSON_HEADERS, "cache-control": "public, max-age=20" } });
+		// l'ETag non conta l'orario di lettura: se i dati sono gli stessi, per chi li ha già resta "non cambiato"
+		const stable = { ...(payload as Record<string, unknown>), fetchedAt: "" };
+		const etag = etagOf(JSON.stringify(stable));
+		const text = JSON.stringify(payload);
+		if (cache) ctx.waitUntil(cache.put(key, new Response(text, { headers: { ...JSON_HEADERS, etag, "cache-control": "public, max-age=3600" } })));
+		return cacheable(req, text, etag);
 	} catch {
 		return json({ error: "github_unavailable" }, 502);
 	}
@@ -872,9 +894,19 @@ async function loadProjectOrder(env: Env) {
 	}
 }
 
-async function publicProjects(env: Env) {
+const PROJECTS_KEY = () => new Request("https://cache.fr7.local/projects-order-v1");
+async function publicProjects(req: Request, env: Env, ctx: Ctx) {
+	const cache = edgeCache();
+	const hit = await cache?.match(PROJECTS_KEY());
+	if (hit) {
+		const text = await hit.text();
+		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text));
+	}
 	const rows = await loadProjectOrder(env);
-	return json({ order: rows.map((r) => r.id), hidden: rows.filter((r) => r.hidden).map((r) => r.id) }, 200, { "cache-control": "public, max-age=30" });
+	const text = JSON.stringify({ order: rows.map((r) => r.id), hidden: rows.filter((r) => r.hidden).map((r) => r.id) });
+	const etag = etagOf(text);
+	if (cache) ctx.waitUntil(cache.put(PROJECTS_KEY(), new Response(text, { headers: { ...JSON_HEADERS, etag, "cache-control": "public, max-age=3600" } })));
+	return cacheable(req, text, etag);
 }
 
 async function adminProjects(req: Request, env: Env) {
@@ -889,6 +921,7 @@ async function adminProjects(req: Request, env: Env) {
 	const items = b.items.flatMap((it) => (typeof it.id === "string" && known.has(it.id) && !seen.has(it.id) && seen.add(it.id) ? [{ id: it.id, hidden: it.hidden ? 1 : 0 }] : []));
 	await init(env.DB);
 	await env.DB.batch([env.DB.prepare("DELETE FROM project_order"), ...items.map((x, pos) => env.DB!.prepare("INSERT INTO project_order (id, pos, hidden) VALUES (?, ?, ?)").bind(x.id, pos, x.hidden))]);
+	await edgeCache()?.delete(PROJECTS_KEY());
 	return json({ rows: await loadProjectOrder(env) });
 }
 
@@ -928,7 +961,7 @@ export default {
 				case "/api/health":
 					return json({ ai: !!env.AI, db: !!env.DB, brief: !!(env.DB || env.NOTIFY_WEBHOOK) }, 200, { "cache-control": "public, max-age=60" });
 				case "/api/github":
-					return req.method === "GET" ? await github(env, ctx) : json({ error: "method" }, 405);
+					return req.method === "GET" ? await github(req, env, ctx) : json({ error: "method" }, 405);
 				case "/api/stats":
 					return req.method === "GET" ? await stats(req, env) : json({ error: "method" }, 405);
 				case "/api/visit":
@@ -963,7 +996,7 @@ export default {
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminBriefs(req, env);
 				case "/api/projects":
-					return req.method === "GET" ? await publicProjects(env) : json({ error: "method" }, 405);
+					return req.method === "GET" ? await publicProjects(req, env, ctx) : json({ error: "method" }, 405);
 				case "/api/admin/projects":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminProjects(req, env);

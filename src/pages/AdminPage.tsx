@@ -34,6 +34,15 @@ type Level = "ok" | "warn" | "info";
 
 const A = ui2.admin;
 
+/** Dopo un salvataggio si scarta la copia locale, così il sito mostra subito il nuovo contenuto. */
+const forget = (k: string) => {
+	try {
+		localStorage.removeItem(k);
+	} catch {
+		/* ok */
+	}
+};
+
 /** Pannello riservato: richieste, stato del sistema e repository. La chiave vale una volta sola: poi resta una sessione di 7 giorni (cookie HttpOnly). */
 export default function AdminPage() {
 	const { t } = usePrefs();
@@ -267,7 +276,10 @@ export default function AdminPage() {
 		try {
 			const r = await fetch("/api/admin/projects", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ items: ord }) });
 			setOrdSaved(r.ok ? "ok" : "fail");
-			if (r.ok) setOrdBase(JSON.stringify(ord));
+			if (r.ok) {
+				setOrdBase(JSON.stringify(ord));
+				forget("fr7-order");
+			}
 		} catch {
 			setOrdSaved("fail");
 		}
@@ -279,7 +291,10 @@ export default function AdminPage() {
 		try {
 			const r = await fetch("/api/admin/featured", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ items: picks }) });
 			setSaved(r.ok ? "ok" : "fail");
-			if (r.ok) setBase(JSON.stringify(picks));
+			if (r.ok) {
+				setBase(JSON.stringify(picks));
+				forget("fr7-gh");
+			}
 		} catch {
 			setSaved("fail");
 		}
