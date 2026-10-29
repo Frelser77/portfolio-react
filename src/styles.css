@@ -4460,3 +4460,4 @@ html[data-refract="off"] .lens {
 	.adm__chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding: 0 16px 6px; scrollbar-width: none; }
 	.adm__chips .cchip { flex: none; white-space: nowrap; }
 }
+.adm__tag.on { background: rgba(111, 227, 160, 0.2); color: #9af0c0; }

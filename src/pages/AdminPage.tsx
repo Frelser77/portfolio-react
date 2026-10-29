@@ -43,9 +43,9 @@ export default function AdminPage() {
 	const [picks, setPicks] = useState<Pick[]>([]);
 	const [saved, setSaved] = useState<"" | "ok" | "fail">("");
 	const [q, setQ] = useState("");
-	const [flt, setFlt] = useState<"all" | "pub" | "priv" | "mine" | "collab">("all");
+	const [flt, setFlt] = useState<"active" | "all" | "pub" | "priv" | "mine" | "collab" | "arch">("active");
 	const [chosen, setChosen] = useState<string[]>([]);
-	const [ask, setAsk] = useState<"" | "private" | "archive" | "public">("");
+	const [ask, setAsk] = useState<"" | "private" | "archive" | "unarchive" | "public">("");
 	const [report, setReport] = useState<{ ok: number; bad: number; errors: string[] } | null>(null);
 
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
@@ -161,8 +161,19 @@ export default function AdminPage() {
 	};
 	const repoByName = new Map(Array.isArray(repos) ? repos.map((r) => [r.name, r] as const) : []);
 
+	// di default: repository non archiviati, pubblici e privati, con prima quelli che il sito mostra già
+	const rank = (r: AdminRepo) => {
+		const i = picks.findIndex((p) => p.name === r.name);
+		return i === -1 ? 1000 : i;
+	};
 	const visible = Array.isArray(repos)
-		? repos.filter((r) => (flt === "all" ? true : flt === "pub" ? !r.private : flt === "priv" ? r.private : flt === "mine" ? r.mine : !r.mine) && r.name.toLowerCase().includes(q.trim().toLowerCase()))
+		? repos
+				.filter((r) => {
+					const f =
+						flt === "active" ? !r.archived : flt === "all" ? true : flt === "arch" ? r.archived : flt === "pub" ? !r.private && !r.archived : flt === "priv" ? r.private && !r.archived : flt === "mine" ? r.mine && !r.archived : !r.mine && !r.archived;
+					return f && r.name.toLowerCase().includes(q.trim().toLowerCase());
+				})
+				.sort((a, b) => rank(a) - rank(b))
 		: [];
 	const canAct = (r: AdminRepo) => r.permission === "ADMIN";
 	const toggle = (n: string) => setChosen((c) => (c.includes(n) ? c.filter((x) => x !== n) : [...c, n]));
@@ -170,17 +181,20 @@ export default function AdminPage() {
 		if (!ask) return;
 		setBusy(true);
 		setReport(null);
+		const all: { name: string; ok: boolean; error?: string }[] = [];
 		try {
-			const r = await fetch("/api/admin/repo-action", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: ask, names: chosen }) });
-			const j = r.ok ? ((await r.json()) as { results: { name: string; ok: boolean; error?: string }[] }) : null;
-			setReport(
-				j
-					? { ok: j.results.filter((x) => x.ok).length, bad: j.results.filter((x) => !x.ok).length, errors: j.results.filter((x) => !x.ok).map((x) => `${x.name} → ${x.error}`) }
-					: { ok: 0, bad: chosen.length, errors: [`HTTP ${r.status}`] },
-			);
+			// a gruppi da 20, così ogni richiesta resta dentro i limiti del Worker
+			for (let i = 0; i < chosen.length; i += 20) {
+				const names = chosen.slice(i, i + 20);
+				const r = await fetch("/api/admin/repo-action", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: ask, names }) });
+				const j = r.ok ? ((await r.json()) as { results: { name: string; ok: boolean; error?: string }[] }) : null;
+				if (j) all.push(...j.results);
+				else all.push(...names.map((name) => ({ name, ok: false, error: `HTTP ${r.status}` })));
+			}
 		} catch {
-			setReport({ ok: 0, bad: chosen.length, errors: ["rete"] });
+			all.push(...chosen.filter((n) => !all.some((x) => x.name === n)).map((name) => ({ name, ok: false, error: "rete" })));
 		}
+		setReport({ ok: all.filter((x) => x.ok).length, bad: all.filter((x) => !x.ok).length, errors: all.filter((x) => !x.ok).map((x) => `${x.name} → ${x.error}`) });
 		setAsk("");
 		setChosen([]);
 		await loadData();
@@ -392,7 +406,9 @@ export default function AdminPage() {
 									<div className="adm__chips" role="group">
 										{(
 											[
+												["active", A.fActive],
 												["all", A.fAll],
+												["arch", A.fArch],
 												["pub", A.fPub],
 												["priv", A.fPriv],
 												["mine", A.fMine],
@@ -426,6 +442,9 @@ export default function AdminPage() {
 										<button type="button" className="adm__mini" onClick={() => setAsk("archive")}>
 											{t(A.toArchive)} ({chosen.length})
 										</button>
+										<button type="button" className="adm__mini" onClick={() => setAsk("unarchive")}>
+											{t(A.toUnarchive)} ({chosen.length})
+										</button>
 										<button type="button" className="adm__mini" onClick={() => setAsk("public")}>
 											{t(A.toPublic)} ({chosen.length})
 										</button>
@@ -436,9 +455,9 @@ export default function AdminPage() {
 										<FiAlertTriangle aria-hidden="true" />
 										<span>
 											<b>
-												{ask === "private" ? t(A.toPrivate) : ask === "archive" ? t(A.toArchive) : t(A.toPublic)} · {chosen.length}
+												{ask === "private" ? t(A.toPrivate) : ask === "archive" ? t(A.toArchive) : ask === "unarchive" ? t(A.toUnarchive) : t(A.toPublic)} · {chosen.length}
 											</b>
-											<small>{t(ask === "private" ? A.confirmPrivate : ask === "archive" ? A.confirmArchive : A.confirmPublic)}</small>
+											<small>{t(ask === "private" ? A.confirmPrivate : ask === "archive" ? A.confirmArchive : ask === "unarchive" ? A.confirmUnarchive : A.confirmPublic)}</small>
 											<span className="adm__bar">
 												<button type="button" className="adm__mini on" onClick={runAction} disabled={busy}>
 													{t(A.confirm)}
@@ -476,7 +495,8 @@ export default function AdminPage() {
 													<small>
 														<span className={`adm__tag ${r.private ? "priv" : ""}`}>{t(r.private ? A.priv : A.pub)}</span>
 														{!r.mine && <span className="adm__tag">{t(A.collab)}</span>}
-														{r.archived && <span className="adm__tag">archived</span>}
+														{on && <span className="adm__tag on">{t(A.onSite)}</span>}
+														{r.archived && <span className="adm__tag">{t(A.archived)}</span>}
 														{r.language && <span>{r.language}</span>}
 														{r.pushedAt && <time>{r.pushedAt.slice(0, 10)}</time>}
 													</small>

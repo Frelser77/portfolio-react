@@ -326,29 +326,36 @@ async function github(env: Env, ctx: Ctx) {
 /** Solo per l'amministratore: tutti i repository a cui hai accesso, privati e di collaborazione compresi. */
 interface AdminRepoRow { name: string; private: boolean; fork: boolean; archived: boolean; mine: boolean; language: string; pushedAt: string; url: string; permission: string }
 
-/** Tutti i repository a cui il token ha accesso: tuoi, di collaborazione e di organizzazioni. */
+/** Tutti i repository a cui il token ha accesso: tuoi, di collaborazione e di organizzazioni (fino a 300, in pagine da 100). */
 async function viewerRepos(token: string): Promise<{ total: number; rows: AdminRepoRow[] }> {
-	const data = await gql<{
-		viewer: { login: string; repositories: { totalCount: number; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; viewerPermission: string | null })[] } };
-	}>(
-		token,
-		`query{ viewer{ login repositories(first:100, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount nodes{ nameWithOwner isPrivate isFork isArchived url pushedAt viewerPermission primaryLanguage{ name } } } } }`,
-	);
-	const login = data.viewer.login.toLowerCase();
-	return {
-		total: data.viewer.repositories.totalCount,
-		rows: data.viewer.repositories.nodes.map((r) => ({
-			name: r.nameWithOwner,
-			private: r.isPrivate,
-			fork: r.isFork,
-			archived: r.isArchived,
-			mine: r.nameWithOwner.toLowerCase().startsWith(`${login}/`),
-			language: r.primaryLanguage?.name ?? "",
-			pushedAt: r.pushedAt,
-			url: r.url,
-			permission: r.viewerPermission ?? "",
-		})),
-	};
+	type Page = { viewer: { login: string; repositories: { totalCount: number; pageInfo: { hasNextPage: boolean; endCursor: string | null }; nodes: (GqlRepo & { nameWithOwner: string; isArchived: boolean; viewerPermission: string | null })[] } } };
+	const rows: AdminRepoRow[] = [];
+	let after: string | null = null;
+	let total = 0;
+	for (let page = 0; page < 3; page++) {
+		const data: Page = await gql<Page>(
+			token,
+			`query($after:String){ viewer{ login repositories(first:100, after:$after, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ totalCount pageInfo{ hasNextPage endCursor } nodes{ nameWithOwner isPrivate isFork isArchived url pushedAt viewerPermission primaryLanguage{ name } } } } }`,
+			{ after },
+		);
+		const login = data.viewer.login.toLowerCase();
+		total = data.viewer.repositories.totalCount;
+		for (const r of data.viewer.repositories.nodes)
+			rows.push({
+				name: r.nameWithOwner,
+				private: r.isPrivate,
+				fork: r.isFork,
+				archived: r.isArchived,
+				mine: r.nameWithOwner.toLowerCase().startsWith(`${login}/`),
+				language: r.primaryLanguage?.name ?? "",
+				pushedAt: r.pushedAt,
+				url: r.url,
+				permission: r.viewerPermission ?? "",
+			});
+		if (!data.viewer.repositories.pageInfo?.hasNextPage) break;
+		after = data.viewer.repositories.pageInfo.endCursor;
+	}
+	return { total, rows };
 }
 
 async function adminRepos(env: Env) {
