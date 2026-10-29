@@ -3775,3 +3775,6 @@ html[data-refract="off"] .lens {
 		min-height: 48px;
 	}
 }
+.guide.nogo {
+	display: none;
+}
