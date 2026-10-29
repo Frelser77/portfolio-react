@@ -1,6 +1,6 @@
 # Portfolio di Salvatore D'Amico
 
-Sito personale: una sola pagina, in italiano e in inglese, con tema chiaro e scuro. Non usa cookie né tracciamento.
+Sito personale: una sola pagina, in italiano e in inglese, con un design a vetro scuro e la mascotte FR7 Bot. Non usa cookie né tracciamento.
 
 - **Stack:** React 19, TypeScript, Vite e CSS scritto a mano. I font sono serviti dal sito stesso, non da Google Fonts.
 - **Contenuti:** testi, progetti, percorso e attestati stanno tutti in `src/content/data.ts`. I testi dell'interfaccia sono in `src/content/ui.ts`.

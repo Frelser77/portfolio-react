@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FiCheck, FiCopy, FiDownload } from "react-icons/fi";
+import { FiArrowRight, FiCheck, FiCopy, FiMail } from "react-icons/fi";
 import { FaGithub, FaLinkedin, FaWhatsapp } from "react-icons/fa6";
 import { profile } from "../content/data";
 import { ui } from "../content/ui";
@@ -8,7 +8,7 @@ import { usePrefs } from "../prefs";
 export default function Contact() {
 	const { t } = usePrefs();
 	const [copy, setCopy] = useState<"idle" | "ok" | "fail">("idle");
-	const timer = useRef<number>(0);
+	const timer = useRef(0);
 
 	useEffect(() => () => clearTimeout(timer.current), []);
 
@@ -24,57 +24,55 @@ export default function Contact() {
 	};
 
 	const wa = `https://wa.me/${profile.whatsapp}?text=${encodeURIComponent(t(ui.contact.waText))}`;
+	const mail = `mailto:${profile.email}`;
 
 	return (
-		<section id="contatti" className="section contact" aria-labelledby="contact-title">
-			<div className="wrap">
-				<h2 id="contact-title" className="contact__title">
-					{t(ui.contact.title)}
-				</h2>
-				<p className="section__intro">{t(ui.contact.lead)}</p>
-
-				<div className="contact__mail">
-					<a href={`mailto:${profile.email}`} className="contact__address">
-						{profile.email}
+		<section className="sec" id="contatti" aria-labelledby="contact-title">
+			<div className="glass card contact">
+				<div className="scene">{t(profile.location)}</div>
+				<div className="ctext">
+					<p className="eyebrow">
+						<b>04.</b>
+						{t(ui.contact.eyebrow)}
+					</p>
+					<h2 id="contact-title">{t(ui.contact.title)}</h2>
+					<p className="muted">{t(ui.contact.text)}</p>
+					<a className="btn pri" href={mail}>
+						{t(ui.contact.cta)}
+						<FiArrowRight aria-hidden="true" />
 					</a>
-					<button type="button" className="tool-btn tool-btn--lg" onClick={copyEmail}>
-						{copy === "ok" ? <FiCheck aria-hidden="true" /> : <FiCopy aria-hidden="true" />}
-						<span className="sr-only">{t(ui.contact.copy)}</span>
-					</button>
-					<span className="contact__toast" role="status">
-						{copy === "ok" ? t(ui.contact.copied) : copy === "fail" ? t(ui.contact.copyFail) : ""}
-					</span>
+					<div className="mailrow">
+						<a href={mail}>{profile.email}</a>
+						<button type="button" className="ico" onClick={copyEmail}>
+							{copy === "ok" ? <FiCheck aria-hidden="true" /> : <FiCopy aria-hidden="true" />}
+							<span className="sr-only">{t(ui.contact.copy)}</span>
+						</button>
+						<span className="toast" role="status">
+							{copy === "ok" ? t(ui.contact.copied) : copy === "fail" ? t(ui.contact.copyFail) : ""}
+						</span>
+					</div>
 				</div>
-
-				<ul className="contact__links" role="list">
-					<li>
-						<a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn--solid">
-							<FaWhatsapp aria-hidden="true" />
-							{t(ui.contact.whatsapp)}
-						</a>
-					</li>
-					<li>
-						<a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
-							<FaLinkedin aria-hidden="true" />
-							LinkedIn
-						</a>
-					</li>
-					<li>
-						<a href={profile.github} target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
-							<FaGithub aria-hidden="true" />
-							GitHub
-						</a>
-					</li>
-					<li>
-						<a href={profile.cv} download className="btn btn--ghost">
-							<FiDownload aria-hidden="true" />
-							{t(ui.contact.cv)}
-						</a>
-					</li>
-				</ul>
-				<p className="contact__based">
-					{t(ui.contact.based)} {t(profile.location)}
-				</p>
+				<div className="cbtns">
+					<a className="cb" href={mail}>
+						<FiMail aria-hidden="true" />
+						Email
+					</a>
+					<a className="cb" href={profile.github} target="_blank" rel="noopener noreferrer">
+						<FaGithub aria-hidden="true" />
+						GitHub
+						<span className="sr-only">({t(ui.projects.newTab)})</span>
+					</a>
+					<a className="cb" href={profile.linkedin} target="_blank" rel="noopener noreferrer">
+						<FaLinkedin aria-hidden="true" />
+						LinkedIn
+						<span className="sr-only">({t(ui.projects.newTab)})</span>
+					</a>
+					<a className="cb" href={wa} target="_blank" rel="noopener noreferrer">
+						<FaWhatsapp aria-hidden="true" />
+						WhatsApp
+						<span className="sr-only">({t(ui.projects.newTab)})</span>
+					</a>
+				</div>
 			</div>
 		</section>
 	);

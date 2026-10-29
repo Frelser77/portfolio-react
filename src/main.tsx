@@ -1,8 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "@fontsource-variable/bricolage-grotesque";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
+import "@fontsource-variable/sora";
+import "@fontsource-variable/dm-sans";
 import "./styles.css";
 import App from "./App";
 import { PrefsProvider } from "./prefs";

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it" data-theme="light">
+<html lang="it">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -11,8 +11,8 @@
 		<meta name="author" content="Salvatore Alessandro D'Amico" />
 		<meta name="robots" content="index, follow" />
 		<link rel="canonical" href="__SITE_URL__/" />
-		<meta name="theme-color" content="#f3f5f7" />
-		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" content="#070b1a" />
+		<meta name="color-scheme" content="dark" />
 
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
@@ -40,7 +40,7 @@
 				"name": "Salvatore Alessandro D'Amico",
 				"jobTitle": "Full Stack Developer",
 				"url": "__SITE_URL__/",
-				"image": "__SITE_URL__/img/salvatore-320.webp",
+				"image": "__SITE_URL__/og-image.png",
 				"email": "mailto:damicosalvatorea@icloud.com",
 				"address": { "@type": "PostalAddress", "addressLocality": "Oria", "addressRegion": "BR", "addressCountry": "IT" },
 				"sameAs": ["https://github.com/Frelser77", "https://www.linkedin.com/in/salvatore-dam/"],
@@ -48,17 +48,8 @@
 			}
 		</script>
 
-		<!-- Applica il tema prima del primo paint, così non c'è il lampo di colore sbagliato -->
-		<script>
-			(function () {
-				var t = null;
-				try { t = localStorage.getItem("theme"); } catch (e) {}
-				if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-				document.documentElement.dataset.theme = t;
-			})();
-		</script>
 	</head>
-	<body>
+	<body style="margin:0;background:#070b1a">
 		<div id="root"></div>
 		<noscript>
 			<p style="padding: 24px; font-family: system-ui, sans-serif">

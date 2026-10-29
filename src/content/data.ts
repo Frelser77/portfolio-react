@@ -13,23 +13,90 @@ export const SITE_URL = __SITE_URL__;
 export const profile = {
 	name: "Salvatore D'Amico",
 	fullName: "Salvatore Alessandro D'Amico",
+	/** Da aggiornare al prossimo compleanno */
+	age: 30,
 	email: "damicosalvatorea@icloud.com",
 	whatsapp: "393792242254",
 	github: "https://github.com/Frelser77",
 	linkedin: "https://www.linkedin.com/in/salvatore-dam/",
 	cv: "/cv/Salvatore-DAmico-CV.pdf",
+	town: "Oria (BR)",
 	location: { it: "Oria (BR), Puglia", en: "Oria (Brindisi), Apulia, Italy" } as L,
 };
+
+/* ---------------------------- Competenze ---------------------------- */
+
+export interface Skill {
+	name: string;
+	/** sigla nel riquadro colorato */
+	mark: string;
+	color: string;
+}
+
+export const skillGroups: { title: L; items: Skill[] }[] = [
+	{
+		title: { it: "Frontend", en: "Frontend" },
+		items: [
+			{ name: "React", mark: "Re", color: "#61dafb" },
+			{ name: "Next.js", mark: "Nx", color: "#e8ecff" },
+			{ name: "TypeScript", mark: "TS", color: "#4a8fe7" },
+			{ name: "JavaScript", mark: "JS", color: "#f7df1e" },
+			{ name: "Tailwind CSS", mark: "Tw", color: "#5ad1ff" },
+			{ name: "MUI", mark: "Mu", color: "#8fb4ff" },
+		],
+	},
+	{
+		title: { it: "Backend", en: "Backend" },
+		items: [
+			{ name: "NestJS", mark: "Ne", color: "#ff7d9a" },
+			{ name: "Node.js", mark: "No", color: "#6fcf97" },
+			{ name: "ASP.NET Core", mark: "NET", color: "#b08cff" },
+			{ name: "C#", mark: "C#", color: "#c4a8ff" },
+		],
+	},
+	{
+		title: { it: "Database", en: "Databases" },
+		items: [
+			{ name: "Oracle", mark: "Or", color: "#ff8a7a" },
+			{ name: "SQL Server", mark: "SQ", color: "#9fb0d8" },
+			{ name: "MySQL", mark: "My", color: "#5ab0ff" },
+			{ name: "MongoDB", mark: "Mo", color: "#6fcf97" },
+			{ name: "Redis", mark: "Rd", color: "#ff7a6b" },
+		],
+	},
+	{
+		title: { it: "Infrastruttura", en: "Infrastructure" },
+		items: [
+			{ name: "Cloudflare", mark: "Cf", color: "#ffb066" },
+			{ name: "Linux", mark: "Lx", color: "#ffe27a" },
+			{ name: "Nginx", mark: "Ngx", color: "#7fe0a0" },
+			{ name: "Git", mark: "Gi", color: "#ff8a65" },
+		],
+	},
+	{
+		title: { it: "Integrazioni", en: "Integrations" },
+		items: [
+			{ name: "3CX", mark: "3C", color: "#7fdcff" },
+			{ name: "Slack", mark: "Sl", color: "#ff9ec4" },
+			{ name: "Salesforce", mark: "Sf", color: "#5ad1ff" },
+			{ name: "Stripe", mark: "St", color: "#b9a8ff" },
+		],
+	},
+];
 
 /* ---------------------------- Progetti ---------------------------- */
 
 export type ProjectStatus = "live" | "dev" | "internal" | "desktop" | "offline" | "code";
-export type ProjectKind = "client" | "work" | "personal" | "training";
 
 export interface Project {
 	id: string;
 	name: string;
-	kind: ProjectKind;
+	/** sigla grande sulla copertina della scheda */
+	mark: string;
+	/** tre colori del gradiente della copertina, dal più scuro al più chiaro */
+	tint: [string, string, string];
+	/** riga sotto il nome, nella scheda */
+	tag: L;
 	status: ProjectStatus;
 	years?: string;
 	summary: L;
@@ -46,33 +113,28 @@ export const statusLabel: Record<ProjectStatus, L> = {
 	dev: { it: "In sviluppo", en: "In progress" },
 	internal: { it: "Uso interno", en: "Internal tool" },
 	desktop: { it: "App desktop", en: "Desktop app" },
-	offline: { it: "Offline", en: "Offline" },
+	offline: { it: "Non più online", en: "No longer online" },
 	code: { it: "Codice su GitHub", en: "Code on GitHub" },
-};
-
-export const kindLabel: Record<ProjectKind, L> = {
-	client: { it: "Per clienti", en: "Client work" },
-	work: { it: "In azienda", en: "In-house" },
-	personal: { it: "Personali", en: "Personal" },
-	training: { it: "Formazione", en: "Training" },
 };
 
 export const projects: Project[] = [
 	{
 		id: "bite-the-trouble",
 		name: "Bite the Trouble",
-		kind: "client",
+		mark: "BT",
+		tint: ["#2b1238", "#9b3d2e", "#e0902f"],
+		tag: { it: "Menu digitale | React", en: "Digital menu | React" },
 		status: "live",
 		summary: {
-			it: "Il menu digitale del locale: si apre dal telefono e si consulta in pochi secondi.",
-			en: "The venue's digital menu: opens on any phone and reads in seconds.",
+			it: "Il menu online del locale: si apre dal telefono e si consulta in pochi secondi.",
+			en: "The venue's online menu: opens on any phone and reads in seconds.",
 		},
 		details: {
-			it: "Ho progettato, sviluppato e pubblicato il menu online di Bite the Trouble. È pensato prima di tutto per lo smartphone: si carica in fretta e si legge bene anche in sala.",
-			en: "I designed, built and shipped Bite the Trouble's online menu. It is phone-first: quick to load and easy to read in a busy room.",
+			it: "Ho sviluppato e pubblicato il menu online di Bite the Trouble in React. È pensato prima di tutto per lo smartphone: si carica in fretta e si legge bene anche in sala.",
+			en: "I built and shipped Bite the Trouble's online menu in React. It is phone-first: quick to load and easy to read in a busy room.",
 		},
 		highlights: [
-			{ it: "Progettato per lo smartphone, funziona anche su tablet e desktop", en: "Built for phones first, works on tablet and desktop too" },
+			{ it: "Pensato per lo smartphone, funziona anche su tablet e desktop", en: "Built for phones first, works on tablet and desktop too" },
 			{ it: "Online e mantenuto da me", en: "Live, and maintained by me" },
 		],
 		stack: ["React", "Render"],
@@ -82,14 +144,16 @@ export const projects: Project[] = [
 	{
 		id: "casaurea",
 		name: "Domus per Casaurea",
-		kind: "client",
+		mark: "Ca",
+		tint: ["#0a2748", "#1a6aa6", "#4cc3d9"],
+		tag: { it: "Gestionale | Lodgify", en: "Management tool | Lodgify" },
 		status: "dev",
 		summary: {
 			it: "Il gestionale di un'attività di affitti brevi: prenotazioni da Lodgify, conti e amministrazione in un unico posto.",
 			en: "Management software for a short-term rental business: Lodgify bookings, accounts and admin in one place.",
 		},
 		details: {
-			it: "Domus importa i dati da Lodgify e li usa per gestire l'intera parte economica e amministrativa di Casaurea: ricavi, calendario, ruoli degli utenti. Lo sviluppo per Casaurea insieme al loro nuovo sito web, con un'architettura pensata per diventare un SaaS.",
+			it: "Domus importa i dati da Lodgify e li usa per gestire l'intera parte economica e amministrativa di Casaurea: ricavi, calendario, ruoli degli utenti. Lo sto sviluppando per Casaurea insieme al loro nuovo sito web, con un'architettura pensata per diventare un SaaS.",
 			en: "Domus pulls data from Lodgify and uses it to run Casaurea's whole financial and administrative side: revenue, calendar, user roles. I'm building it for Casaurea together with their new website, on an architecture designed to become a SaaS.",
 		},
 		highlights: [
@@ -102,8 +166,10 @@ export const projects: Project[] = [
 	},
 	{
 		id: "san-antonio",
-		name: "San Antonio Champion",
-		kind: "client",
+		name: "Campionato San Antonio",
+		mark: "SA",
+		tint: ["#0c2a22", "#1f7a4f", "#c8c462"],
+		tag: { it: "Piattaforma web | React + TS", en: "Web platform | React + TS" },
 		status: "offline",
 		summary: {
 			it: "Piattaforma per un campionato di calcio, con pannelli live e back-office usabile anche senza rete.",
@@ -122,12 +188,14 @@ export const projects: Project[] = [
 	{
 		id: "primed",
 		name: "Primed Group",
-		kind: "work",
+		mark: "PG",
+		tint: ["#141a52", "#3b3fb5", "#7a5cf0"],
+		tag: { it: "Software aziendale | NestJS + Oracle", en: "Company software | NestJS + Oracle" },
 		status: "internal",
 		years: "2024 – 2025",
 		summary: {
-			it: "Piattaforma gestionale aziendale: refactoring del legacy, permessi, telefonia, credito e notifiche.",
-			en: "Company platform: legacy refactoring, permissions, telephony, credit checks and notifications.",
+			it: "Piattaforma gestionale aziendale: riscrittura del legacy, permessi, telefonia, credito e notifiche.",
+			en: "Company platform: legacy rewrite, permissions, telephony, credit checks and notifications.",
 		},
 		details: {
 			it: "Come Full-Stack Developer & IT Specialist ho portato moduli Classic ASP su NestJS con Oracle 9i, progettato il sistema di autorizzazioni e integrato centralino, Slack, CreditSafe e WhatsApp.",
@@ -146,7 +214,9 @@ export const projects: Project[] = [
 	{
 		id: "restofull",
 		name: "Restofull",
-		kind: "personal",
+		mark: "Rf",
+		tint: ["#3a1020", "#a8325a", "#f08a6b"],
+		tag: { it: "Gestionale web | Next.js + NestJS", en: "Web app | Next.js + NestJS" },
 		status: "offline",
 		summary: {
 			it: "Gestionale web per ristoranti: ordini, tavoli, menu e prenotazioni. Con un mini-gioco arcade integrato.",
@@ -165,7 +235,9 @@ export const projects: Project[] = [
 	{
 		id: "crypto-monitor",
 		name: "Crypto Monitor",
-		kind: "personal",
+		mark: "CM",
+		tint: ["#1a1440", "#5b3fd0", "#2fd0c4"],
+		tag: { it: "Web app | React + ASP.NET", en: "Web app | React + ASP.NET" },
 		status: "offline",
 		summary: {
 			it: "Monitoraggio di criptovalute con account, ruoli e pagamenti.",
@@ -184,7 +256,9 @@ export const projects: Project[] = [
 	{
 		id: "crud-builder",
 		name: "CRUD Builder",
-		kind: "personal",
+		mark: "CB",
+		tint: ["#10223a", "#2d5b9e", "#8fa0ff"],
+		tag: { it: "App desktop | Electron + React", en: "Desktop app | Electron + React" },
 		status: "desktop",
 		summary: {
 			it: "Genera interfacce e schemi tipizzati partendo da una collezione MongoDB.",
@@ -202,8 +276,10 @@ export const projects: Project[] = [
 	},
 	{
 		id: "epicode",
-		name: "Progetti del percorso Epicode",
-		kind: "training",
+		name: "Progetti Epicode",
+		mark: "Ep",
+		tint: ["#241046", "#7a2fa0", "#d85ab8"],
+		tag: { it: "Formazione | React + ASP.NET", en: "Training | React + ASP.NET" },
 		status: "code",
 		years: "2023 – 2024",
 		summary: {
@@ -229,127 +305,39 @@ export const projects: Project[] = [
 	},
 ];
 
-/* ------------------------- Livelli dello stack ------------------------- */
-
-export interface Layer {
-	id: string;
-	tag: string;
-	name: L;
-	what: L;
-	tools: string[];
-	projects: string[];
-	/** posizione e lunghezza della barra nella "traccia", in % */
-	bar: [number, number];
-}
-
-export const layers: Layer[] = [
-	{
-		id: "dns",
-		tag: "dns",
-		name: { it: "Dominio, DNS ed email", en: "Domain, DNS and email" },
-		what: {
-			it: "Registro e configuro domini, record DNS, caselle email e certificati SSL. Di solito su Cloudflare.",
-			en: "I register and set up domains, DNS records, mailboxes and SSL certificates, usually on Cloudflare.",
-		},
-		tools: ["Cloudflare", "DNS", "Email", "SSL/TLS"],
-		projects: ["restofull"],
-		bar: [0, 9],
-	},
-	{
-		id: "server",
-		tag: "edge",
-		name: { it: "Server e deploy", en: "Servers and deploys" },
-		what: {
-			it: "Preparo VPS Linux, Nginx e tunnel Cloudflare, gestisco permessi e processi con PM2 e job pianificati.",
-			en: "I set up Linux VPSs, Nginx and Cloudflare Tunnels, and manage permissions, PM2 processes and scheduled jobs.",
-		},
-		tools: ["Linux", "Nginx", "Cloudflare Tunnel", "PM2", "Cron", "Git"],
-		projects: ["restofull", "primed"],
-		bar: [7, 14],
-	},
-	{
-		id: "api",
-		tag: "api",
-		name: { it: "API e backend", en: "APIs and backend" },
-		what: {
-			it: "Scrivo API REST sicure in NestJS e ASP.NET: microservizi o monolite, JWT in cookie HttpOnly, ruoli, rate limiting e log tracciabili.",
-			en: "I write secure REST APIs in NestJS and ASP.NET: microservices or monolith, JWT in HttpOnly cookies, roles, rate limiting and traceable logs.",
-		},
-		tools: ["NestJS", "Node.js", "ASP.NET Core", "C#", "Entity Framework", "JWT", "WebSocket"],
-		projects: ["primed", "restofull", "crypto-monitor", "casaurea"],
-		bar: [19, 30],
-	},
-	{
-		id: "data",
-		tag: "db",
-		name: { it: "Database", en: "Databases" },
-		what: {
-			it: "Progetto schemi e scrivo query e transazioni su database relazionali e NoSQL, dal vecchio Oracle 9i a MongoDB.",
-			en: "I design schemas and write queries and transactions on relational and NoSQL databases, from legacy Oracle 9i to MongoDB.",
-		},
-		tools: ["Oracle 9i", "PL/SQL", "SQL Server", "MySQL", "MongoDB", "Redis"],
-		projects: ["primed", "restofull", "crypto-monitor", "crud-builder"],
-		bar: [33, 22],
-	},
-	{
-		id: "integrations",
-		tag: "hook",
-		name: { it: "Integrazioni", en: "Integrations" },
-		what: {
-			it: "Collego il software ai servizi che l'azienda usa già: telefonia, chat, CRM, pagamenti, prenotazioni.",
-			en: "I connect software to the services a business already runs on: telephony, chat, CRM, payments, bookings.",
-		},
-		tools: ["3CX", "Slack API", "Salesforce", "WhatsApp", "Stripe", "Lodgify", "CreditSafe", "Outlook"],
-		projects: ["primed", "casaurea", "crypto-monitor"],
-		bar: [44, 18],
-	},
-	{
-		id: "ui",
-		tag: "ui",
-		name: { it: "Interfacce", en: "Interfaces" },
-		what: {
-			it: "Costruisco interfacce React e Next.js veloci e accessibili, curate nel dettaglio su telefono, tablet e desktop.",
-			en: "I build fast, accessible React and Next.js interfaces, polished on phone, tablet and desktop.",
-		},
-		tools: ["React", "Next.js", "TypeScript", "Vite", "Tailwind", "MUI", "Redux Toolkit", "Electron", "i18next"],
-		projects: ["bite-the-trouble", "casaurea", "san-antonio", "primed"],
-		bar: [62, 38],
-	},
-];
-
 /* ------------------------------ Percorso ------------------------------ */
 
 export interface Step {
-	years: string;
+	years: L;
 	role: L;
-	place: string;
+	place: L;
 	text: L;
 	certificates?: boolean;
 }
 
 export const journey: Step[] = [
 	{
-		years: "2025 –",
-		role: { it: "Sviluppatore full stack per clienti", en: "Full stack developer for clients" },
-		place: "Casaurea, Bite the Trouble, San Antonio",
+		years: { it: "Oggi", en: "Now" },
+		role: { it: "Sviluppatore full stack", en: "Full stack developer" },
+		place: { it: "Casaurea, Bite the Trouble e progetti miei", en: "Casaurea, Bite the Trouble and my own projects" },
 		text: {
-			it: "Seguo i progetti da capo a fondo: raccolta delle esigenze, sviluppo, dominio ed email, messa online e manutenzione.",
-			en: "I run projects end to end: gathering requirements, development, domain and email, launch and maintenance.",
+			it: "Sviluppo e metto online software dal codice al dominio, ai DNS e all'email, tra gestionali, siti e prodotti miei.",
+			en: "I build and ship software from code to domain, DNS and email: management tools, websites and products of my own.",
 		},
 	},
 	{
-		years: "2024 – 2025",
+		years: { it: "2024 – 2025", en: "2024 – 2025" },
 		role: { it: "Full-Stack Developer & IT Specialist", en: "Full-Stack Developer & IT Specialist" },
-		place: "Primed Group",
+		place: { it: "Primed Group", en: "Primed Group" },
 		text: {
-			it: "Refactoring del legacy Classic ASP verso NestJS su Oracle 9i, architettura a microservizi, autorizzazioni, integrazioni 3CX, Slack, CreditSafe e Salesforce.",
-			en: "Refactored legacy Classic ASP into NestJS on Oracle 9i, microservice architecture, authorization, 3CX, Slack, CreditSafe and Salesforce integrations.",
+			it: "Ho riscritto in NestJS i moduli legacy Classic ASP su Oracle 9i (processi critici da 20 s a circa 3 s), progettato autorizzazioni e microservizi, integrato 3CX, Slack, CreditSafe e Salesforce.",
+			en: "I rewrote legacy Classic ASP modules on Oracle 9i in NestJS (critical processes from 20 s to about 3 s), designed authorization and microservices, and integrated 3CX, Slack, CreditSafe and Salesforce.",
 		},
 	},
 	{
-		years: "2023 – 2024",
+		years: { it: "2023 – 2024", en: "2023 – 2024" },
 		role: { it: "Corso Full-Stack Developer", en: "Full-Stack Developer course" },
-		place: "Epicode",
+		place: { it: "Epicode", en: "Epicode" },
 		text: {
 			it: "Percorso intensivo da HTML e CSS fino a React, Redux, ASP.NET MVC, Entity Framework e SQL Server, più un corso su AI e prompt design.",
 			en: "Intensive programme from HTML and CSS to React, Redux, ASP.NET MVC, Entity Framework and SQL Server, plus a course on AI and prompt design.",
@@ -376,35 +364,4 @@ export const certificates: { file: string; label: L }[] = [
 	{ file: "modulo-13", label: { it: "ASP.NET MVC", en: "ASP.NET MVC" } },
 	{ file: "modulo-14", label: { it: "Validazione, autenticazione e API REST", en: "Validation, authentication and REST APIs" } },
 	{ file: "modulo-16", label: { it: "Entity Framework e LINQ", en: "Entity Framework and LINQ" } },
-];
-
-export const principles: { title: L; text: L }[] = [
-	{
-		title: { it: "Misuro prima di ottimizzare", en: "I measure before I optimise" },
-		text: {
-			it: "Prima capisco dove si perde davvero il tempo, poi intervengo dove serve.",
-			en: "First I find where the time actually goes, then I fix what matters."
-		},
-	},
-	{
-		title: { it: "Lascio tracce", en: "I leave a trail" },
-		text: {
-			it: "Log con correlation-id, audit e storico delle modifiche: quando qualcosa si rompe, si capisce perché.",
-			en: "Correlated logs, audits and change history, so when something breaks you can see why.",
-		},
-	},
-	{
-		title: { it: "Sicuro di default", en: "Secure by default" },
-		text: {
-			it: "Token in cookie HttpOnly, segreti fuori dal codice, CORS mirato, GDPR rispettato.",
-			en: "Tokens in HttpOnly cookies, secrets out of the code, scoped CORS, GDPR respected.",
-		},
-	},
-	{
-		title: { it: "L'AI come strumento", en: "AI as a tool" },
-		text: {
-			it: "La uso ogni giorno per lavorare meglio e per entrare in fretta anche in stack nuovi, rileggendo sempre ciò che produce.",
-			en: "I use it daily to work better and to get productive fast in unfamiliar stacks, always reviewing what it produces.",
-		},
-	},
 ];

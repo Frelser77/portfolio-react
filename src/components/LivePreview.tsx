@@ -23,7 +23,7 @@ export default function LivePreview({ url }: { url: string }) {
 				<div className="phone__screen">
 					{state === "idle" ? (
 						<div className="phone__poster">
-							<button type="button" className="btn btn--solid" onClick={() => setState("loading")}>
+							<button type="button" className="btn pri" onClick={() => setState("loading")}>
 								<FiPlay aria-hidden="true" />
 								{t(ui.projects.loadPreview)}
 							</button>

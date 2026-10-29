@@ -1,101 +1,43 @@
-import type { L } from "./data";
 
 /** Testi dell'interfaccia (etichette, pulsanti, titoli di sezione). */
 export const ui = {
 	skip: { it: "Vai al contenuto", en: "Skip to content" },
 	nav: {
+		label: { it: "Menu principale", en: "Main menu" },
+		home: { it: "Home", en: "Home" },
+		about: { it: "Chi sono", en: "About" },
+		skills: { it: "Competenze", en: "Skills" },
 		projects: { it: "Progetti", en: "Work" },
-		case: { it: "Caso studio", en: "Case study" },
-		journey: { it: "Percorso", en: "Journey" },
 		contact: { it: "Contatti", en: "Contact" },
-		menu: { it: "Menu", en: "Menu" },
+		lang: { it: "Read in English", en: "Leggi in italiano" },
 		close: { it: "Chiudi", en: "Close" },
 	},
-	theme: {
-		toLight: { it: "Passa al tema chiaro", en: "Switch to light theme" },
-		toDark: { it: "Passa al tema scuro", en: "Switch to dark theme" },
-	},
-	lang: { it: "Read in English", en: "Leggi in italiano" },
 
 	hero: {
-		hello: { it: "Salvatore D'Amico, sviluppatore full stack", en: "Salvatore D'Amico, full stack developer" },
-		title: { it: "Dal DNS all'ultimo pixel.", en: "From DNS to the last pixel." },
+		hello: { it: "Ciao, sono", en: "Hi, I'm" },
+		role: { it: "Full Stack Developer", en: "Full Stack Developer" },
 		lead: {
-			it: "Progetto interfacce in React, scrivo API in NestJS e .NET, riscrivo software legacy in tecnologie moderne e metto tutto online, dominio ed email compresi. Da tre anni trasformo esigenze reali in software che funziona.",
-			en: "I design React interfaces, write APIs in NestJS and .NET, rewrite legacy software on a modern stack and put everything online, domain and email included. For three years I've been turning real needs into software that works.",
+			it: "Progetto e sviluppo software dal database all'interfaccia: React e Next.js davanti, NestJS e ASP.NET dietro. Metto tutto online, con dominio, DNS ed email. Da tre anni trasformo esigenze reali in software che funziona.",
+			en: "I design and build software from database to interface: React and Next.js on the front, NestJS and ASP.NET behind. I put it all online, domain, DNS and email included. For three years I've been turning real needs into software that works.",
 		},
-		ctaWork: { it: "Guarda i progetti", en: "See the work" },
-		ctaContact: { it: "Scrivimi", en: "Get in touch" },
-		available: {
-			it: "Disponibile per un ruolo full stack: da remoto o in Puglia",
-			en: "Open to full stack roles: remote, or on-site in Apulia",
-		},
+		ctaWork: { it: "Scopri i miei progetti", en: "See my work" },
+		ctaContact: { it: "Contattami", en: "Get in touch" },
+		quote: { it: "Dal DNS all'ultimo pixel.", en: "From DNS to the last pixel." },
+		quoteGo: { it: "Vedi le competenze", en: "See the skills" },
+		email: { it: "Email", en: "Email" },
 	},
 
-	trace: {
-		label: { it: "Una richiesta, dall'indirizzo allo schermo", en: "One request, from address bar to screen" },
-		hint: { it: "Tocca un livello per vedere cosa faccio lì.", en: "Tap a layer to see what I do there." },
-		tools: { it: "Strumenti", en: "Tools" },
-		seenIn: { it: "Dove l'ho fatto", en: "Where I've done it" },
-		replay: { it: "Riproduci", en: "Replay" },
-	},
-
-	oracle: {
-		title: { it: "Riscrivere il legacy", en: "Rewriting legacy code" },
-		intro: {
-			it: "In Primed Group molti moduli erano ancora in Classic ASP su Oracle 9i: difficili da mantenere e lenti, con processi critici che arrivavano a 20 secondi. Li ho portati su NestJS, un modulo alla volta.",
-			en: "At Primed Group many modules still ran on Classic ASP and Oracle 9i: hard to maintain and slow, with critical processes taking up to 20 seconds. I moved them to NestJS, one module at a time.",
+	about: {
+		eyebrow: { it: "Chi sono", en: "About me" },
+		title: { it: "La mia storia", en: "My story" },
+		text: {
+			it: "Sono Salvatore D'Amico, ho {age} anni e vengo da Oria, in provincia di Brindisi. Sono diventato sviluppatore full stack con il corso Epicode e lavoro da tre anni su software vero: in Primed Group ho riscritto moduli legacy e collegato telefonia, Slack e CRM. Oggi seguo Casaurea, Bite the Trouble e altri progetti dall'idea alla messa online.",
+			en: "I'm Salvatore D'Amico, I'm {age} and I come from Oria, in the province of Brindisi. I became a full stack developer through the Epicode course and have worked on real software for three years: at Primed Group I rewrote legacy modules and connected telephony, Slack and CRM. Today I take Casaurea, Bite the Trouble and other projects from idea to launch.",
 		},
-		steps: [
-			{
-				it: "Ho riscritto la logica in NestJS, con DTO, validazione e log tracciabili.",
-				en: "I rewrote the logic in NestJS, with DTOs, validation and traceable logs.",
-			},
-			{
-				it: "Ho diviso le query più pesanti in interrogazioni più piccole, con indici dove servivano.",
-				en: "I split the heaviest queries into smaller ones, adding indexes where needed.",
-			},
-			{
-				it: "Ho spostato l'elaborazione dei dati nel backend, lasciando al database solo il necessario.",
-				en: "I moved data processing into the backend, leaving the database only what it needs to do.",
-			},
-		] as L[],
-		before: { it: "Prima", en: "Before" },
-		after: { it: "Dopo", en: "After" },
-		run: { it: "Avvia il confronto", en: "Run the comparison" },
-		running: { it: "In esecuzione…", en: "Running…" },
-		again: { it: "Riavvia", en: "Run again" },
-		scale: {
-			it: "Tempi in scala 1:5 per non farti aspettare 20 secondi.",
-			en: "Timings scaled 1:5 so you don't wait 20 seconds.",
-		},
-	},
-
-	projects: {
-		title: { it: "Progetti", en: "Work" },
-		intro: {
-			it: "Lavori per clienti, software aziendale e prodotti miei. Alcuni non sono pubblici: per quelli racconto cosa ho fatto.",
-			en: "Client work, in-house software and my own products. Some aren't public, so for those I describe what I built.",
-		},
-		all: { it: "Tutti", en: "All" },
-		liveNow: { it: "Online ora", en: "Live now" },
-		featured: { it: "Online adesso", en: "Live right now" },
-		loadPreview: { it: "Carica l'anteprima live", en: "Load the live preview" },
-		previewNote: {
-			it: "Il server potrebbe impiegare qualche secondo a rispondere al primo caricamento.",
-			en: "The server may take a few seconds to wake up on first load.",
-		},
-		previewTitle: { it: "Anteprima live del menu di Bite the Trouble", en: "Live preview of the Bite the Trouble menu" },
-		openNewTab: { it: "si apre in una nuova scheda", en: "opens in a new tab" },
-		empty: { it: "Nessun progetto in questa categoria.", en: "No projects in this category." },
-		showAll: { it: "Mostra tutti", en: "Show all" },
-		stack: { it: "Tecnologie", en: "Built with" },
-		more: { it: "Dettagli", en: "Details" },
-	},
-
-	journey: {
-		title: { it: "Percorso", en: "Journey" },
-		howTitle: { it: "Come lavoro", en: "How I work" },
+		cv: { it: "Scarica il CV (PDF)", en: "Download CV (PDF, Italian)" },
+		years: { it: "{age} anni", en: "{age} years old" },
+		remote: { it: "Remoto o in Puglia", en: "Remote or in Apulia" },
+		path: { it: "Il mio percorso", en: "My path" },
 		certs: { it: "Vedi gli attestati", en: "View certificates" },
 		certsTitle: { it: "Attestati Epicode", en: "Epicode certificates" },
 		prev: { it: "Precedente", en: "Previous" },
@@ -103,29 +45,69 @@ export const ui = {
 		back: { it: "Torna alla griglia", en: "Back to grid" },
 	},
 
-	contact: {
-		title: { it: "Parliamone", en: "Let's talk" },
-		lead: {
-			it: "Cerco un ruolo da sviluppatore full stack, da remoto o in Puglia. Se hai un progetto o una posizione aperta, scrivimi e ti rispondo al più presto.",
-			en: "I'm looking for a full stack developer role, remote or in Apulia. If you have a project or an open position, write to me and I'll get back to you soon.",
+	mascot: {
+		label: { it: "FR7 Bot, la mascotte: toccala", en: "FR7 Bot, the mascot: poke it" },
+		bubble: {
+			it: "Ciao! Sono FR7 Bot. Qui trovi chi è Salvatore, le sue competenze e i suoi progetti: scorri giù o usa il menu in alto.",
+			en: "Hi! I'm FR7 Bot. Here you'll find who Salvatore is, his skills and his projects: scroll down or use the menu above.",
 		},
+	},
+
+	skills: {
+		eyebrow: { it: "Le mie competenze", en: "My skills" },
+		title: { it: "Tecnologie e strumenti", en: "Technologies and tools" },
+		text: {
+			it: "Dal frontend al server: gli strumenti che uso ogni giorno nei progetti e nel lavoro.",
+			en: "From frontend to server: the tools I use every day in projects and at work.",
+		},
+		cta: { it: "Vedi i progetti", en: "See the projects" },
+	},
+
+	projects: {
+		eyebrow: { it: "I miei progetti", en: "My projects" },
+		title: { it: "Cosa ho realizzato", en: "What I've built" },
+		text: {
+			it: "Lavori per clienti, software aziendale e prodotti miei. Alcuni non sono più online: per quelli trovi comunque cosa ho fatto.",
+			en: "Client work, in-house software and products of my own. Some are no longer online, but you can still see what I built.",
+		},
+		github: { it: "Il mio GitHub", en: "My GitHub" },
+		openDetails: { it: "Dettagli", en: "Details" },
+		openLive: { it: "Apri il sito", en: "Open the site" },
+		newTab: { it: "si apre in una nuova scheda", en: "opens in a new tab" },
+		stack: { it: "Tecnologie", en: "Built with" },
+		links: { it: "Link", en: "Links" },
+		loadPreview: { it: "Carica l'anteprima live", en: "Load the live preview" },
+		previewNote: {
+			it: "Il server potrebbe impiegare qualche secondo a rispondere al primo caricamento.",
+			en: "The server may take a few seconds to wake up on first load.",
+		},
+		previewTitle: { it: "Anteprima live del menu di Bite the Trouble", en: "Live preview of the Bite the Trouble menu" },
+	},
+
+	contact: {
+		eyebrow: { it: "Contatti", en: "Contact" },
+		title: { it: "Parliamo del tuo progetto", en: "Let's talk about your project" },
+		text: {
+			it: "Cerco un ruolo da sviluppatore full stack, da remoto o in Puglia. Hai una posizione aperta o un progetto da realizzare? Scrivimi e ti rispondo al più presto.",
+			en: "I'm looking for a full stack developer role, remote or in Apulia. Have an open position or a project to build? Write to me and I'll get back to you soon.",
+		},
+		cta: { it: "Scrivimi ora", en: "Write to me" },
 		copy: { it: "Copia indirizzo", en: "Copy address" },
 		copied: { it: "Indirizzo copiato", en: "Address copied" },
 		copyFail: { it: "Copia non riuscita: seleziona l'indirizzo a mano", en: "Couldn't copy: select the address manually" },
-		whatsapp: { it: "Scrivimi su WhatsApp", en: "Message me on WhatsApp" },
 		waText: {
 			it: "Ciao Salvatore, ti scrivo dal tuo portfolio.",
 			en: "Hi Salvatore, I'm writing from your portfolio.",
 		},
-		cv: { it: "Scarica il CV (PDF)", en: "Download CV (PDF, Italian)" },
-		based: { it: "Base a", en: "Based in" },
 	},
 
 	footer: {
-		made: {
-			it: "Progettato e sviluppato da me con React e TypeScript. Nessun cookie, nessun tracciamento.",
-			en: "Designed and built by me with React and TypeScript. No cookies, no tracking.",
-		},
+		rights: { it: "Tutti i diritti riservati.", en: "All rights reserved." },
+		menu: { it: "Menu footer", en: "Footer menu" },
 		top: { it: "Torna su", en: "Back to top" },
 	},
 };
+
+/** Sostituisce {age} nei testi. */
+export const withAge = (text: string, age: number) => text.replace("{age}", String(age));
+
