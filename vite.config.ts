@@ -6,7 +6,7 @@ import react from "@vitejs/plugin-react";
  * Se cambi dominio (o il nome del progetto su Cloudflare Pages) aggiorna solo questa riga:
  * canonical, Open Graph, dati strutturati, sitemap e robots.txt si aggiornano da soli.
  */
-const SITE_URL = "https://salvatore-damico.pages.dev";
+const SITE_URL = "https://portfolio.damicosalvatorealessandro.workers.dev";
 
 function siteUrl(): Plugin {
 	return {

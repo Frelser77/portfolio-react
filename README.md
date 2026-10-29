@@ -33,6 +33,6 @@ Per collegarlo a un livello della traccia nell'hero, aggiungi il suo `id` a `lay
    - Build command: `npm run build`
    - Build output directory: `dist`
    - Variabile d'ambiente: `NODE_VERSION` = `22`
-4. Chiama il progetto `salvatore-damico`: l'indirizzo sarà `https://salvatore-damico.pages.dev`. Se il nome è già preso, scegline un altro e aggiorna `SITE_URL` in `vite.config.ts`.
+4. Il progetto è un Worker chiamato `portfolio` (vedi `wrangler.jsonc`): l'indirizzo è `https://portfolio.damicosalvatorealessandro.workers.dev`. Se cambi nome o dominio, aggiorna `SITE_URL` in `vite.config.ts`.
 
 Ogni push sul branch scelto pubblica il sito in automatico. Gli header di sicurezza e di cache sono in `public/_headers`.
