@@ -97,13 +97,13 @@ export default function Ecosystem() {
 		const pos = new Map<string, { x: number; y: number }>();
 
 		const r = rnd(7 + eco.nodes.length);
-		const stars = Array.from({ length: Math.round(w / 5) }, () => ({ x: r() * w, y: r() * w, s: 0.4 + r() * 1.1, ph: r() * 6.28, sp: 0.6 + r() * 1.8 }));
-		const dust = Array.from({ length: Math.round(w / 9) }, () => ({ rad: 0.15 * w + r() * 0.36 * w, a: r() * 6.28, sp: (r() - 0.5) * 0.12, s: 0.8 + r() * 1.6, hue: r() }));
+		const stars = Array.from({ length: Math.round(w / 5) }, () => ({ x: r() * w, y: r() * w, s: 0.4 + r() * 1.1, ph: r() * 6.28, sp: 0.4 + r() * 0.9 }));
+		const dust = Array.from({ length: Math.round(w / 9) }, () => ({ rad: 0.15 * w + r() * 0.36 * w, a: r() * 6.28, sp: (r() - 0.5) * 0.05, s: 0.8 + r() * 1.6, hue: r() }));
 		const parts: Part[] = [];
 		for (const n of eco.nodes) {
 			const count = 7;
 			for (let k = 0; k < count; k++) {
-				parts.push({ key: n.key, t: (k / count + n.slot * 0.137) % 1, v: 0.11 + r() * 0.1, kind: k === 0 ? 2 : k % 2 ? 1 : 0, dir: k % 2 ? 1 : -1, ch: r() > 0.5 ? "1" : "0", ph: r() * 6.28 });
+				parts.push({ key: n.key, t: (k / count + n.slot * 0.137) % 1, v: 0.045 + r() * 0.04, kind: k === 0 ? 2 : k % 2 ? 1 : 0, dir: k % 2 ? 1 : -1, ch: r() > 0.5 ? "1" : "0", ph: r() * 6.28 });
 			}
 		}
 		const byKey = new Map(eco.nodes.map((n) => [n.key, n]));
@@ -115,15 +115,15 @@ export default function Ecosystem() {
 		let visible = true;
 
 		const frame = (now: number) => {
-			const dt = Math.min(0.05, (now - last) / 1000);
+			const dt = Math.min(0.034, (now - last) / 1000);
 			last = now;
-			const target = selRef.current || hover.current ? 0.2 : 1;
-			speed += (target - speed) * Math.min(1, dt * 4);
+			const target = selRef.current || hover.current ? 0.25 : 1;
+			speed += (target - speed) * Math.min(1, dt * 1.6);
 			if (!calm) sim += dt * speed;
 
 			for (const n of eco.nodes) {
 				const dir = n.ring % 2 ? -1 : 1;
-				const omega = (0.42 / (1 + n.ring * 0.55)) * dir;
+				const omega = (0.17 / (1 + n.ring * 0.55)) * dir;
 				const phase = (n.slot / n.slots) * Math.PI * 2 + n.ring * 0.9;
 				const a = phase + sim * omega;
 				const rad = ringR(n.ring);
@@ -211,7 +211,7 @@ export default function Ecosystem() {
 				ctx.fill();
 				if (p.kind === 2) {
 					// qubit: due punti che si girano attorno e un anello di sovrapposizione
-					const th = sim * 5 + p.ph;
+					const th = sim * 2.4 + p.ph;
 					ctx.globalAlpha = 0.9 * env * dim;
 					for (const sgn of [1, -1]) {
 						ctx.beginPath();

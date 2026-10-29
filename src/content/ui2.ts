@@ -245,7 +245,7 @@ export const ui2 = {
 		noToken: { it: "ADMIN_TOKEN non è impostato su questo Worker (Settings → Variables and Secrets, tipo Secret), poi ridistribuisci.", en: "ADMIN_TOKEN isn't set on this Worker (Settings → Variables and Secrets, type Secret), then redeploy." },
 		noDb: { it: "Il database D1 non è collegato al Worker.", en: "The D1 database isn't bound to the Worker." },
 		reposTitle: { it: "Repository GitHub (privati e di collaborazione)", en: "GitHub repositories (private and collaborations)" },
-		noGh: { it: "Per vedere i repository privati aggiungi il secret GITHUB_TOKEN al Worker.", en: "To see private repositories, add the GITHUB_TOKEN secret to the Worker." },
+		noGh: { it: "Facoltativo: per vedere qui anche i repository privati aggiungi un secret GITHUB_TOKEN al Worker. Senza, il resto funziona uguale.", en: "Optional: to also list private repositories here, add a GITHUB_TOKEN secret to the Worker. Everything else works without it." },
 		priv: { it: "privato", en: "private" },
 		pub: { it: "pubblico", en: "public" },
 		collab: { it: "collaborazione", en: "collaboration" },

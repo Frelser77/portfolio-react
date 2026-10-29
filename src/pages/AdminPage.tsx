@@ -85,7 +85,7 @@ export default function AdminPage() {
 						))}
 					</ul>
 				)}
-				{repos === "none" && <p className="muted">{t(ui2.admin.noGh)}</p>}
+				{repos === "none" && <p className="muted" style={{ fontSize: 13 }}>{t(ui2.admin.noGh)}</p>}
 				{Array.isArray(repos) && (
 					<>
 						<h2 className="h3">{t(ui2.admin.reposTitle)}</h2>
