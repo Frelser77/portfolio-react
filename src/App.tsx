@@ -36,7 +36,7 @@ function Page({ path }: { path: string }) {
 		case "stack":
 			return (
 				<>
-					<Skills between={<Ecosystem />} />
+					<Skills cards={false} between={<Ecosystem />} />
 					<GithubLive />
 				</>
 			);

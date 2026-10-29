@@ -20,7 +20,7 @@ const usage = (name: string) => {
 };
 
 /** Scheda personaggio + inventario: le competenze come oggetti, con dettaglio dei progetti dove le ho usate. */
-export default function Skills({ between }: { between?: ReactNode }) {
+export default function Skills({ between, cards = true }: { between?: ReactNode; cards?: boolean }) {
 	const { t } = usePrefs();
 	const [bag, setBag] = useState(0);
 	const [sel, setSel] = useState(skillGroups[0].items[0].name);
@@ -75,6 +75,8 @@ export default function Skills({ between }: { between?: ReactNode }) {
 
 				{between}
 
+				{cards && (
+					<>
 				<p className="muted">{t(ui.skills.text)}</p>
 
 				<div className="inv">
@@ -157,6 +159,8 @@ export default function Skills({ between }: { between?: ReactNode }) {
 					{t(ui.skills.cta)}
 					<FiArrowRight aria-hidden="true" />
 				</Link>
+					</>
+				)}
 			</div>
 		</section>
 	);
