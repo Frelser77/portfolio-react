@@ -1,12 +1,28 @@
 {
-  "name": "Salvatore D'Amico, sviluppatore full stack",
+  "id": "/",
+  "name": "Salvatore D'Amico · sviluppatore full stack",
   "short_name": "Salvatore D'Amico",
-  "icons": [
-    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
-  ],
+  "description": "Portfolio di Salvatore D'Amico: progetti, stack, laboratorio AI e contatti.",
+  "lang": "it",
+  "dir": "ltr",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
   "theme_color": "#070b1a",
   "background_color": "#070b1a",
-  "display": "standalone",
-  "start_url": "/"
+  "categories": ["portfolio", "business", "productivity"],
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Progetti", "url": "/progetti", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Contatti", "url": "/contatti", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "screenshots": [
+    { "src": "/og/home.jpg", "sizes": "1200x630", "type": "image/jpeg", "form_factor": "wide", "label": "Home" }
+  ]
 }

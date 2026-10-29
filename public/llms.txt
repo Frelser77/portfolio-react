@@ -1,0 +1,11 @@
+# Salvatore D'Amico
+
+> Sviluppatore full stack di Oria (BR), Puglia. React, Next.js, NestJS, ASP.NET, Oracle/SQL, integrazioni API, deploy su Cloudflare e VPS Linux. Aperto a un ruolo e a progetti su misura.
+
+- [Progetti](/progetti): menu digitale Bite the Trouble, gestionale Casaurea, piattaforma Campionato San Antonio, app desktop Cable (Rust + Tauri), software aziendale.
+- [Stack e competenze](/stack): tecnologie usate e attività GitHub in diretta.
+- [Lab AI](/lab): dal problema al piano di lavoro, chat con FR7 Bot.
+- [Chi sono](/chi-sono)
+- [Contatti](/contatti): damicosalvatorealessandro@gmail.com
+- GitHub: https://github.com/Frelser77
+- LinkedIn: https://www.linkedin.com/in/salvatore-dam/

@@ -14,6 +14,7 @@
  * Ogni parte degrada con garbo: senza AI il sito usa le risposte locali, senza D1 spariscono contatori e "mi piace".
  */
 import { needs, profile, projects, skillGroups } from "../src/content/data";
+import { keywords, seoFor } from "../src/content/seo";
 import { PLAN_SCHEMA, cleanBrief, validatePlan, type Lang } from "../src/shared";
 
 interface D1Statement {
@@ -558,6 +559,77 @@ async function brief(req: Request, env: Env, ctx: Ctx) {
 	return saved || notified ? json({ ok: true }) : json({ ok: false, error: "not_delivered" }, 502);
 }
 
+
+/* ------------------------------ SEO: titolo, descrizione e anteprima giusti per ogni link ------------------------------ */
+
+const escAttr = (v: string) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const escRe = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const PAGE_PATH = /^\/(?:progetti(?:\/[^/]+)?|stack|lab|chi-sono|contatti|admin)?$/;
+
+function setMeta(html: string, attr: "name" | "property", key: string, value: string) {
+	const tag = `<meta ${attr}="${key}" content="${escAttr(value)}" />`;
+	const re = new RegExp(`<meta\\s+${attr}="${escRe(key)}"[^>]*>`);
+	return re.test(html) ? html.replace(re, () => tag) : html.replace("</head>", () => `${tag}\n</head>`);
+}
+
+/**
+ * Le anteprime di WhatsApp, LinkedIn, Telegram e dei motori di ricerca leggono solo l'HTML, senza eseguire il sito:
+ * qui il titolo, la descrizione e l'immagine della pagina richiesta vengono scritti dentro l'HTML prima di inviarlo.
+ */
+export function injectSeo(html: string, origin: string, path: string): { html: string; status: number; index: boolean } {
+	const baked = /property="og:url"\s+content="([^"]*?)\/?"/.exec(html)?.[1] ?? "";
+	if (baked && baked !== origin) html = html.split(baked).join(origin);
+	const { seo, canonical, index } = seoFor(path || "/");
+	const unknown = path.startsWith("/progetti/") && !index;
+	const hidden = !index || path === "/admin";
+	const url = `${origin}${canonical === "/" ? "/" : canonical}`;
+	const img = `${origin}${seo.image}`;
+	const title = seo.title.it;
+	const desc = seo.description.it;
+	html = html.replace(/<title>[\s\S]*?<\/title>/, () => `<title>${escAttr(title)}</title>`);
+	html = html.replace(/<link rel="canonical"[^>]*>/, () => `<link rel="canonical" href="${escAttr(url)}" />`);
+	html = setMeta(html, "name", "description", desc);
+	html = setMeta(html, "name", "keywords", keywords.it.join(", "));
+	if (hidden) html = setMeta(html, "name", "robots", "noindex, nofollow");
+	html = setMeta(html, "property", "og:type", seo.type ?? "website");
+	html = setMeta(html, "property", "og:url", url);
+	html = setMeta(html, "property", "og:title", title);
+	html = setMeta(html, "property", "og:description", desc);
+	html = setMeta(html, "property", "og:image", img);
+	html = setMeta(html, "property", "og:image:secure_url", img);
+	html = setMeta(html, "property", "og:image:alt", seo.imageAlt.it);
+	html = setMeta(html, "name", "twitter:title", title);
+	html = setMeta(html, "name", "twitter:description", desc);
+	html = setMeta(html, "name", "twitter:image", img);
+	html = setMeta(html, "name", "twitter:image:alt", seo.imageAlt.it);
+	const pr = /^\/progetti\/([^/]+)$/.exec(path) ? projects.find((x) => x.id === path.split("/")[2]) : undefined;
+	if (pr) {
+		const ld = {
+			"@context": "https://schema.org",
+			"@graph": [
+				{ "@type": "CreativeWork", "@id": `${url}#work`, name: pr.name, description: pr.summary.it, url, image: img, keywords: pr.stack.join(", "), author: { "@id": `${origin}/#person` }, inLanguage: "it-IT" },
+				{ "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: `${origin}/` }, { "@type": "ListItem", position: 2, name: "Progetti", item: `${origin}/progetti` }, { "@type": "ListItem", position: 3, name: pr.name, item: url }] },
+			],
+		};
+		html = html.replace("</head>", () => `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>\n</head>`);
+	}
+	return { html, status: unknown ? 404 : 200, index: !hidden };
+}
+
+async function page(req: Request, env: Env, url: URL, path: string) {
+	if (!env.ASSETS) return new Response("Not found", { status: 404 });
+	const res = await env.ASSETS.fetch(new Request(new URL("/", url).toString(), { method: "GET" }));
+	if (!res.ok || !(res.headers.get("content-type") ?? "").includes("text/html")) return res;
+	const out = injectSeo(await res.text(), url.origin, path || "/");
+	const headers = new Headers(res.headers);
+	headers.set("content-type", "text/html; charset=utf-8");
+	headers.set("cache-control", "public, max-age=0, s-maxage=300, must-revalidate");
+	headers.delete("content-length");
+	headers.delete("etag");
+	if (!out.index) headers.set("x-robots-tag", "noindex, nofollow");
+	return new Response(req.method === "HEAD" ? null : out.html, { status: out.status, headers });
+}
+
 const COOKIE = "fr7_admin";
 const SESSION_MS = 7 * 24 * 3600 * 1000;
 
@@ -623,7 +695,10 @@ export default {
 		const env: Env = { ...rawEnv, GITHUB_TOKEN: rawEnv.GITHUB_TOKEN?.trim() || undefined, ADMIN_TOKEN: rawEnv.ADMIN_TOKEN?.trim() || undefined };
 		const url = new URL(req.url);
 		const path = url.pathname.replace(/\/+$/, "");
-		if (!path.startsWith("/api/")) return env.ASSETS ? env.ASSETS.fetch(req) : new Response("Not found", { status: 404 });
+		if (!path.startsWith("/api/")) {
+			if ((req.method === "GET" || req.method === "HEAD") && PAGE_PATH.test(path)) return page(req, env, url, path);
+			return env.ASSETS ? env.ASSETS.fetch(req) : new Response("Not found", { status: 404 });
+		}
 
 		try {
 			const post = req.method === "POST";

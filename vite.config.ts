@@ -19,12 +19,12 @@ function siteUrl(): Plugin {
 			this.emitFile({
 				type: "asset",
 				fileName: "robots.txt",
-				source: `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`,
+				source: `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`,
 			});
 			this.emitFile({
 				type: "asset",
 				fileName: "sitemap.xml",
-				source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${SITE_URL}${p}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`,
+				source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${paths.map((p) => `  <url><loc>${SITE_URL}${p}</loc><lastmod>${today}</lastmod><priority>${p === "/" ? "1.0" : p.startsWith("/progetti/") ? "0.6" : "0.8"}</priority></url>`).join("\n")}\n</urlset>\n`,
 			});
 		},
 	};

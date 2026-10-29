@@ -1,3 +1,4 @@
+import { applySeo } from "./seo";
 import { useEffect } from "react";
 import Nav from "./components/Nav";
 import Dock from "./components/Dock";
@@ -21,8 +22,6 @@ import { initLiquidGlass } from "./liquid";
 import { match, usePath, useRouteFocus } from "./router";
 import { usePrefs } from "./prefs";
 import { ui } from "./content/ui";
-import { ui2 } from "./content/ui2";
-import { projects } from "./content/data";
 
 function Page({ path }: { path: string }) {
 	const r = match(path);
@@ -62,12 +61,9 @@ export default function App() {
 	useReveal(path);
 	useRouteFocus(path);
 
-	// titolo e meta della pagina corrente
+	// titolo e meta della pagina corrente (descrizione, canonical, anteprime di condivisione)
 	useEffect(() => {
-		const project = r.name === "progetto" ? projects.find((p) => p.id === r.id) : null;
-		document.title = project ? `${project.name} · Salvatore D'Amico` : t(ui2.titles[r.name] ?? ui2.titles.home);
-		const robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
-		if (robots) robots.content = r.name === "admin" ? "noindex" : "index, follow";
+		applySeo(path, lang, r.name === "admin" || r.name === "404");
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [path, lang]);
 
