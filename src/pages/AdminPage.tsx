@@ -180,7 +180,8 @@ export default function AdminPage() {
 				})
 				.sort((a, b) => rank(a) - rank(b))
 		: [];
-	const canAct = (r: AdminRepo) => r.permission === "ADMIN";
+	const isSite = (r: AdminRepo) => /\/portfolio-react$/i.test(r.name);
+	const canAct = (r: AdminRepo) => r.permission === "ADMIN" && (!isSite(r) || r.archived);
 	const toggle = (n: string) => setChosen((c) => (c.includes(n) ? c.filter((x) => x !== n) : [...c, n]));
 	const runAction = async () => {
 		if (!ask) return;
@@ -507,7 +508,7 @@ export default function AdminPage() {
 										const on = picks.some((p) => p.name === r.name);
 										return (
 											<li key={r.name}>
-												<input type="checkbox" checked={chosen.includes(r.name)} disabled={!canAct(r)} title={canAct(r) ? undefined : t(A.noPerm)} onChange={() => toggle(r.name)} aria-label={r.name} />
+												<input type="checkbox" checked={chosen.includes(r.name)} disabled={!canAct(r)} title={canAct(r) ? undefined : isSite(r) ? t(A.siteRepo) : t(A.noPerm)} onChange={() => toggle(r.name)} aria-label={r.name} />
 												<div className="adm__rinfo">
 													<a href={r.url} target="_blank" rel="noopener noreferrer">
 														<b>{r.name}</b>

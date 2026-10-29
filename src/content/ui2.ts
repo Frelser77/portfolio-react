@@ -323,6 +323,7 @@ export const ui2 = {
 		confirmPrivate: { it: "Diventeranno privati su GitHub: spariscono dal tuo profilo pubblico, i fork pubblici si staccano, stelle e osservatori possono andare persi e GitHub Pages si spegne. Si può tornare indietro, ma non sempre ciò che si perde.", en: "They will become private on GitHub: they leave your public profile, public forks detach, stars and watchers may be lost and GitHub Pages stops. You can undo it, but not always what's lost." },
 		confirmArchive: { it: "Verranno archiviati: restano visibili ma in sola lettura. Puoi riattivarli quando vuoi.", en: "They will be archived: still visible but read-only. You can reactivate them any time." },
 		confirmPublic: { it: "Diventeranno pubblici su GitHub: chiunque potrà vedere il codice. Controlla di non avere chiavi o dati riservati.", en: "They will become public on GitHub: anyone can see the code. Make sure there are no keys or confidential data." },
+		siteRepo: { it: "Repository di questo sito: protetto, archiviarlo bloccherebbe i deploy", en: "This site's repository: protected, archiving it would block deploys" },
 		noPerm: { it: "Non sei amministratore di questo repository", en: "You're not an admin of this repository" },
 		done: { it: "fatto", en: "done" },
 		failed: { it: "non riusciti", en: "failed" },

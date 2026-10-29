@@ -385,6 +385,7 @@ async function adminRepoAction(req: Request, env: Env) {
 		const r = typeof name === "string" ? byName.get(name) : undefined;
 		if (!r) results.push({ name: String(name), ok: false, error: "not_found" });
 		else if (r.permission !== "ADMIN") results.push({ name, ok: false, error: "no_permission" });
+		else if (/\/portfolio-react$/i.test(r.name) && (b.action === "archive" || b.action === "private")) results.push({ name, ok: false, error: "protetto: è il repository di questo sito, archiviarlo blocca i deploy" });
 		else {
 			const res = await fetch(`https://api.github.com/repos/${r.name}`, {
 				method: "PATCH",
