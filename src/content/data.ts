@@ -86,7 +86,7 @@ export const skillGroups: { title: L; items: Skill[] }[] = [
 
 /* ---------------------------- Progetti ---------------------------- */
 
-export type ProjectStatus = "live" | "dev" | "internal" | "desktop" | "offline" | "code";
+export type ProjectStatus = "live" | "dev" | "internal" | "desktop" | "offline" | "code" | "private";
 
 export interface Project {
 	id: string;
@@ -123,6 +123,7 @@ export const statusLabel: Record<ProjectStatus, L> = {
 	desktop: { it: "App desktop", en: "Desktop app" },
 	offline: { it: "Non più online", en: "No longer online" },
 	code: { it: "Codice su GitHub", en: "Code on GitHub" },
+	private: { it: "Codice privato", en: "Private code" },
 };
 
 export const projects: Project[] = [
@@ -293,7 +294,7 @@ export const projects: Project[] = [
 		logo: { src: "/img/progetti/restofull-logo.webp", w: 392, h: 110, plate: true },
 		tint: ["#fff8ec", "#ffe7c2", "#f6c98a"],
 		tag: { it: "Menu digitali per locali | Next.js + Prisma", en: "Digital menus for venues | Next.js + Prisma" },
-		status: "code",
+		status: "private",
 		summary: {
 			it: "Piattaforma SaaS di menu digitali per bar e ristoranti: più locali per account, QR code, abbonamenti con pagamenti ricorrenti.",
 			en: "SaaS platform of digital menus for bars and restaurants: several venues per account, QR codes, recurring-payment subscriptions.",
