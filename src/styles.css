@@ -4990,3 +4990,13 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 	.dock.none .dock__lens { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .dock__lens, .dock a { transition: none !important; } }
+
+/* barra in basso più stretta, Lab AI in alto */
+.labbtn { display: none; }
+@media (max-width: 720px) {
+	.dock.glass { left: 22px; right: 22px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+	.labbtn { display: grid; place-items: center; }
+	.labbtn svg { width: 20px; height: 20px; }
+	.labbtn.on { background: rgba(255, 255, 255, 0.24); color: #fff; }
+	.nav__tools { gap: 8px; }
+}

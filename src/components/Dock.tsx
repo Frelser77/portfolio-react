@@ -1,11 +1,13 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
-import { FiCpu, FiFolder, FiHome, FiLayers, FiMail, FiUser } from "react-icons/fi";
+import { FiFolder, FiHome, FiLayers, FiMail, FiUser } from "react-icons/fi";
 import { Link, navigate, usePath } from "../router";
 import { prefersReducedMotion, usePrefs } from "../prefs";
 import { ui2 } from "../content/ui2";
 import { isOn, routes } from "./Nav";
 
-const icons = [FiHome, FiFolder, FiLayers, FiCpu, FiUser, FiMail];
+// "Lab AI" sta in alto, accanto al trofeo: sul telefono la barra in basso ha cinque schede
+const tabs = routes.filter((r) => r.to !== "/lab");
+const iconOf: Record<string, typeof FiHome> = { "/": FiHome, "/progetti": FiFolder, "/stack": FiLayers, "/chi-sono": FiUser, "/contatti": FiMail };
 
 /**
  * Barra di navigazione in basso, solo su telefono, come la tab bar di iOS:
@@ -19,7 +21,7 @@ export default function Dock() {
 	const list = () => Array.from(nav.current?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
 	const st = useRef({ id: -1, sx: 0, drag: false, idx: -1, justDragged: false });
 
-	const activeIndex = routes.findIndex((r) => isOn(path, r.to));
+	const activeIndex = tabs.findIndex((r) => isOn(path, r.to));
 
 	/** Mette la lente sopra la scheda `i` (centro in px dal bordo sinistro della barra). */
 	const place = useCallback((cx: number) => {
@@ -93,7 +95,7 @@ export default function Dock() {
 		}
 		const r = el.getBoundingClientRect();
 		const w = list()[0]?.offsetWidth ?? 0;
-		const cx = Math.min(Math.max(e.clientX - r.left, centerOf(0) - w * 0.15), centerOf(routes.length - 1) + w * 0.15);
+		const cx = Math.min(Math.max(e.clientX - r.left, centerOf(0) - w * 0.15), centerOf(tabs.length - 1) + w * 0.15);
 		place(cx);
 		const idx = magnify(cx);
 		if (idx !== s.idx) {
@@ -127,7 +129,7 @@ export default function Dock() {
 		});
 		el.classList.remove("dragging");
 		place(centerOf(idx));
-		if (idx !== activeIndex && routes[idx]) navigate(routes[idx].to);
+		if (idx !== activeIndex && tabs[idx]) navigate(tabs[idx].to);
 	};
 	const onCancel = (e: React.PointerEvent) => {
 		if (st.current.id !== e.pointerId) return;
@@ -148,8 +150,8 @@ export default function Dock() {
 			onPointerCancel={onCancel}
 		>
 			<span className="dock__lens" aria-hidden="true" />
-			{routes.map((r, i) => {
-				const Icon = icons[i];
+			{tabs.map((r, i) => {
+				const Icon = iconOf[r.to];
 				const on = i === activeIndex;
 				return (
 					<Link

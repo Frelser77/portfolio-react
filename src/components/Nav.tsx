@@ -1,3 +1,4 @@
+import { FiCpu } from "react-icons/fi";
 import { Link, usePath } from "../router";
 import { usePrefs } from "../prefs";
 import { AchievementsHud } from "./Achievements";
@@ -36,6 +37,10 @@ export default function Nav() {
 				})}
 			</nav>
 			<div className="nav__tools">
+				<Link to="/lab" className={`ico glass labbtn${isOn(path, "/lab") ? " on" : ""}`} aria-current={isOn(path, "/lab") ? "page" : undefined} title={t(ui2.nav.lab)}>
+					<FiCpu aria-hidden="true" />
+					<span className="sr-only">{t(ui2.nav.lab)}</span>
+				</Link>
 				<AchievementsHud />
 				<button type="button" className="ico lang glass" onClick={toggleLang} title={t(ui.nav.lang)}>
 					<span aria-hidden="true">{lang === "it" ? "EN" : "IT"}</span>
