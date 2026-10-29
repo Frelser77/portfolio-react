@@ -217,9 +217,9 @@ export const projects: Project[] = [
 		stack: ["Rust", "Tauri 2", "tokio", "LocalSend v2"],
 		links: [{ label: { it: "Codice su GitHub", en: "Code on GitHub" }, href: "https://github.com/lonelyfrank/cable" }],
 		shots: [
-			{ src: "/img/progetti/cable-home.webp", w: 1000, h: 790, alt: { it: "Cable: schermata Home con destinatario, invio file e appunti condivisi", en: "Cable: Home screen with recipient, file sending and shared clipboard" } },
-			{ src: "/img/progetti/cable-condividi.webp", w: 1000, h: 748, alt: { it: "Cable: elenco dei dispositivi vicini e trasferimenti", en: "Cable: nearby devices and transfers" } },
-			{ src: "/img/progetti/cable-schermo.webp", w: 1000, h: 626, alt: { it: "Cable: schermo dell'iPhone sul PC", en: "Cable: iPhone screen on the PC" } },
+			{ src: "/img/progetti/cable-home.webp", w: 1070, h: 845, alt: { it: "Cable: schermata Home con destinatario, invio file e appunti condivisi", en: "Cable: Home screen with recipient, file sending and shared clipboard" } },
+			{ src: "/img/progetti/cable-condividi.webp", w: 1070, h: 825, alt: { it: "Cable: elenco dei dispositivi vicini e trasferimenti", en: "Cable: nearby devices and transfers" } },
+			{ src: "/img/progetti/cable-schermo.webp", w: 1070, h: 670, alt: { it: "Cable: schermo dell'iPhone sul PC", en: "Cable: iPhone screen on the PC" } },
 		],
 	},
 	{

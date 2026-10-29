@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone } from "react-icons/fi";
+import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone, FiMonitor, FiGitBranch, FiSettings } from "react-icons/fi";
 import type { AdminRepo } from "../api";
 import { ui2 } from "../content/ui2";
 import type { L } from "../content/data";
@@ -12,6 +12,7 @@ interface Row {
 	reach: string;
 	need: string;
 	message: string;
+	archived?: number;
 }
 interface Status {
 	ghInfo?: { login: string; kind: string; scopes: string } | null;
@@ -39,6 +40,26 @@ export default function AdminPage() {
 	const [key, setKey] = useState("");
 	const [phase, setPhase] = useState<"check" | "out" | "in">("check");
 	const [fail, setFail] = useState<Fail>("");
+	const [tab, setTab] = useState<"req" | "site" | "repos">(() => {
+		try {
+			const v = localStorage.getItem("fr7-adm-tab");
+			return v === "site" || v === "repos" ? v : "req";
+		} catch {
+			return "req";
+		}
+	});
+	const [sys, setSys] = useState(false);
+	const [bf, setBf] = useState<"new" | "arch" | "all">("new");
+	const [bsel, setBsel] = useState<number[]>([]);
+	const [bask, setBask] = useState<"" | "delete">("");
+	const pickTab = (k: "req" | "site" | "repos") => {
+		setTab(k);
+		try {
+			localStorage.setItem("fr7-adm-tab", k);
+		} catch {
+			/* nessuna memoria */
+		}
+	};
 	const [needCode, setNeedCode] = useState(false);
 	const [code, setCode] = useState("");
 	const [wait, setWait] = useState(0);
@@ -168,6 +189,21 @@ export default function AdminPage() {
 			/* si copia a mano */
 		}
 	};
+	const briefAction = async (action: "archive" | "unarchive" | "delete", ids: number[]) => {
+		if (!ids.length) return;
+		setBusy(true);
+		try {
+			const r = await fetch("/api/admin/briefs-action", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, ids }) });
+			if (r.ok) {
+				setRows((cur) => (cur ?? []).flatMap((x) => (!ids.includes(x.id) ? [x] : action === "delete" ? [] : [{ ...x, archived: action === "archive" ? 1 : 0 }])));
+				setBsel((cur) => cur.filter((id) => !ids.includes(id)));
+			}
+		} catch {
+			/* riprova */
+		}
+		setBask("");
+		setBusy(false);
+	};
 	const logoutAll = async () => {
 		if (!window.confirm(t(A.logoutAllAsk))) return;
 		await fetch("/api/admin/logout-all", { method: "POST", credentials: "same-origin" }).catch(() => undefined);
@@ -271,6 +307,7 @@ export default function AdminPage() {
 				{ id: "hook", icon: FiBell, label: A.sHook, ok: status.notify, optional: true, yes: A.sHookOk, no: A.sHookNo },
 			]
 		: [];
+	const shown = (rows ?? []).filter((x) => (bf === "all" ? true : bf === "arch" ? !!x.archived : !x.archived));
 	const alerts = checks.filter((c) => !c.ok).length;
 	const level = (c: (typeof checks)[number]): Level => (c.ok ? "ok" : c.optional ? "info" : "warn");
 
@@ -283,6 +320,11 @@ export default function AdminPage() {
 				</div>
 				{phase === "in" && (
 					<div className="adm__tools">
+						<button type="button" className="btn glass sm adm__sysbtn" onClick={() => setSys((v) => !v)} aria-expanded={sys}>
+							<FiSettings aria-hidden="true" />
+							{t(A.sysBtn)}
+							{alerts > 0 && <span className="adm__count warn">{alerts}</span>}
+						</button>
 						<button type="button" className="btn glass sm" onClick={refresh} disabled={busy}>
 							<FiRefreshCw aria-hidden="true" className={busy ? "spin" : undefined} />
 							{t(A.refresh)}
@@ -337,6 +379,8 @@ export default function AdminPage() {
 
 			{phase === "in" && status && (
 				<>
+					{sys && (
+						<div className="adm__sys">
 					<div className="glass adm__card" data-lg-bezel="26">
 						<div className="adm__top">
 							<h2 className="h3">{t(A.statusTitle)}</h2>
@@ -378,8 +422,7 @@ export default function AdminPage() {
 							})}
 						</ul>
 					</div>
-
-					<div className="glass adm__card" data-lg-bezel="26">
+<div className="glass adm__card" data-lg-bezel="26">
 						<div className="adm__top">
 							<h2 className="h3">{t(A.secTitle)}</h2>
 							<span className={`adm__badge ${status.totp ? "ok" : "info"}`}>
@@ -433,12 +476,50 @@ export default function AdminPage() {
 							{t(A.logoutAll)}
 						</button>
 					</div>
+						</div>
+					)}
 
-					<div className="glass adm__card" data-lg-bezel="26">
+					<div className="adm__tabs glass" role="tablist" aria-label={t(A.title)} data-lg-bezel="22">
+						{(
+							[
+								["req", FiInbox, A.tabReq, (rows ?? []).filter((x) => !x.archived).length, false],
+								["site", FiMonitor, A.tabSite, picks.length, dirty],
+								["repos", FiGitBranch, A.tabRepos, Array.isArray(repos) ? repos.length : 0, false],
+							] as const
+						).map(([k, Ico, label, n, dot]) => (
+							<button key={k} type="button" role="tab" id={`tab-${k}`} aria-selected={tab === k} aria-controls={`panel-${k}`} className="adm__tab" onClick={() => pickTab(k)}>
+								<Ico aria-hidden="true" />
+								<span className="adm__tabl">{t(label)}</span>
+								{n > 0 && <span className="adm__count">{n}</span>}
+								{dot && <i className="adm__dot" aria-label={t(A.unsaved)} />}
+							</button>
+						))}
+					</div>
+
+					{tab === "req" && (
+						<div role="tabpanel" id="panel-req" aria-labelledby="tab-req">
+<div className="glass adm__card" data-lg-bezel="26">
 						<div className="adm__top">
 							<h2 className="h3">{t(A.briefsTitle)}</h2>
-							{rows && rows.length > 0 && <span className="adm__badge ok">{rows.length}</span>}
+							{rows && rows.length > 0 && <span className="adm__badge ok">{rows.filter((x) => !x.archived).length}</span>}
 						</div>
+						{rows && rows.length > 0 && (
+							<div className="adm__sticky adm__sticky--b">
+								<div className="adm__chips" role="group">
+									{(
+										[
+											["new", A.bNew, rows.filter((x) => !x.archived).length],
+											["arch", A.bArch, rows.filter((x) => x.archived).length],
+											["all", A.fAll, rows.length],
+										] as const
+									).map(([k, label, n]) => (
+										<button key={k} type="button" className="cchip" aria-pressed={bf === k} onClick={() => { setBf(k); setBsel([]); }}>
+											{t(label)} · {n}
+										</button>
+									))}
+								</div>
+							</div>
+						)}
 						{rows && rows.length === 0 && (
 							<div className="adm__empty">
 								<FiInbox aria-hidden="true" />
@@ -447,44 +528,106 @@ export default function AdminPage() {
 							</div>
 						)}
 						{rows && rows.length > 0 && (
-							<ul className="adm__list" role="list">
-								{rows.map((r) => (
-									<li key={r.id}>
-										<div className="adm__row">
-											<b>{r.name || "—"}</b>
-											{r.need && <span className="adm__tag">{r.need}</span>}
-											<time>{r.created_at}</time>
-										</div>
-										<a className="adm__mail" href={r.reach.includes("@") ? `mailto:${r.reach}` : undefined}>
-											<FiMail aria-hidden="true" />
-											{r.reach}
-										</a>
-										<p>{r.message}</p>
-									</li>
-								))}
-							</ul>
+							<>
+								<div className="adm__bar">
+									<button type="button" className="adm__mini" onClick={() => setBsel(shown.map((x) => x.id))}>
+										{t(A.selVisible)}
+									</button>
+									{bsel.length > 0 && (
+										<button type="button" className="adm__mini" onClick={() => setBsel([])}>
+											{t(A.selNone)}
+										</button>
+									)}
+									<span className="muted">
+										{bsel.length} {t(A.selected)} · {shown.length}
+									</span>
+								</div>
+								{shown.length === 0 && <p className="muted adm__sub">{bf === "new" ? t(A.bAllDone) : t(A.nothing)}</p>}
+								<ul className="adm__list adm__briefs" role="list">
+									{shown.map((r) => (
+										<li key={r.id} className={r.archived ? "is-arch" : undefined}>
+											<div className="adm__row">
+												<input type="checkbox" checked={bsel.includes(r.id)} onChange={() => setBsel((c) => (c.includes(r.id) ? c.filter((x) => x !== r.id) : [...c, r.id]))} aria-label={r.name || String(r.id)} />
+												<b>{r.name || "—"}</b>
+												{r.need && <span className="adm__tag">{r.need}</span>}
+												{r.archived ? <span className="adm__tag">{t(A.archived)}</span> : null}
+												<time>{r.created_at}</time>
+											</div>
+											<a className="adm__mail" href={r.reach.includes("@") ? `mailto:${r.reach}` : undefined}>
+												<FiMail aria-hidden="true" />
+												{r.reach}
+											</a>
+											<p>{r.message}</p>
+											<div className="adm__bar adm__rowacts">
+												<button type="button" className="adm__mini" disabled={busy} onClick={() => briefAction(r.archived ? "unarchive" : "archive", [r.id])}>
+													{r.archived ? t(A.bRestore) : t(A.bDone)}
+												</button>
+												<button type="button" className="adm__mini danger" disabled={busy} onClick={() => { setBsel([r.id]); setBask("delete"); }}>
+													{t(A.bDelete)}
+												</button>
+											</div>
+										</li>
+									))}
+								</ul>
+								{bsel.length > 0 && (
+									<div className="adm__bar adm__acts adm__dockbar">
+										{bf !== "arch" && (
+											<button type="button" className="adm__mini on" disabled={busy} onClick={() => briefAction("archive", bsel)}>
+												{t(A.bDone)} ({bsel.length})
+											</button>
+										)}
+										{bf !== "new" && (
+											<button type="button" className="adm__mini" disabled={busy} onClick={() => briefAction("unarchive", bsel)}>
+												{t(A.bRestore)} ({bsel.length})
+											</button>
+										)}
+										<button type="button" className="adm__mini danger" disabled={busy} onClick={() => setBask("delete")}>
+											{t(A.bDelete)} ({bsel.length})
+										</button>
+									</div>
+								)}
+								{bask === "delete" && bsel.length > 0 && (
+									<div className="adm__note warn adm__confirm" role="alertdialog">
+										<FiAlertTriangle aria-hidden="true" />
+										<span>
+											<b>
+												{t(A.bDelete)} · {bsel.length}
+											</b>
+											<small>{t(A.bConfirm)}</small>
+											<span className="adm__bar">
+												<button type="button" className="adm__mini danger on" onClick={() => briefAction("delete", bsel)} disabled={busy}>
+													{t(A.confirm)}
+												</button>
+												<button type="button" className="adm__mini" onClick={() => setBask("")} disabled={busy}>
+													{t(A.cancel)}
+												</button>
+											</span>
+										</span>
+									</div>
+								)}
+							</>
 						)}
 					</div>
-
-					<div className="glass adm__card" data-lg-bezel="26">
-						<div className="adm__top">
-							<div>
-								<h2 className="h3">{t(A.reposTitle)}</h2>
-								<p className="muted">{t(A.reposSub)}</p>
-							</div>
 						</div>
+					)}
+
+					{tab === "site" && (
+						<div role="tabpanel" id="panel-site" aria-labelledby="tab-site">
+							<div className="glass adm__card" data-lg-bezel="26">
+								<div className="adm__top">
+									<div>
+										<h2 className="h3">{t(A.featTitle)}</h2>
+										<p className="muted adm__sub">{t(A.featText)}</p>
+									</div>
+								</div>
 						{repos === "none" && (
 							<p className="adm__note info">
 								<FiInfo aria-hidden="true" />
 								<span>{t(A.noGh)}</span>
 							</p>
 						)}
-						{Array.isArray(repos) && (
-							<>
-								<div>
-									<h3 className="h3">{t(A.featTitle)}</h3>
-									<p className="muted adm__sub">{t(A.featText)}</p>
-								</div>
+								{Array.isArray(repos) && (
+									<>
 								{picks.length === 0 && <p className="muted adm__sub">{t(A.featNone)}</p>}
 								<ul className="adm__pick" role="list">
 									{picks.map((p, i) => {
@@ -520,6 +663,27 @@ export default function AdminPage() {
 										);
 									})}
 								</ul>
+								<label className="adm__add">
+									<span>{t(A.addRepo)}</span>
+									<select
+										value=""
+										disabled={picks.length >= 8}
+										onChange={(e) => {
+											const r = repoByName.get(e.target.value);
+											if (r) setPicks((x) => [...x, { name: r.name, label: "", blurb: "", link: r.homepage ?? "" }]);
+										}}
+									>
+										<option value="">{picks.length >= 8 ? t(A.max) : t(A.chooseRepo)}</option>
+										{repos
+											.filter((r) => !r.archived && !picks.some((x) => x.name === r.name))
+											.map((r) => (
+												<option key={r.name} value={r.name}>
+													{r.name}
+													{r.private ? " 🔒" : ""}
+												</option>
+											))}
+									</select>
+								</label>
 								<div className={`adm__save${dirty ? " dirty" : ""}`}>
 									<span>{dirty ? t(A.unsaved) : t(A.inSync)}</span>
 									<span className="adm__tools">
@@ -539,8 +703,30 @@ export default function AdminPage() {
 										<span>{t(saved === "ok" ? A.saved : A.saveFail)}</span>
 									</p>
 								)}
+									</>
+								)}
+							</div>
+						</div>
+					)}
 
-								<h3 className="h3">{t(A.allRepos)}</h3>
+					{tab === "repos" && (
+						<div role="tabpanel" id="panel-repos" aria-labelledby="tab-repos">
+							<div className="glass adm__card" data-lg-bezel="26">
+								<div className="adm__top">
+									<div>
+										<h2 className="h3">{t(A.allRepos)}</h2>
+										<p className="muted adm__sub">{t(A.reposSub)}</p>
+									</div>
+								</div>
+						{repos === "none" && (
+							<p className="adm__note info">
+								<FiInfo aria-hidden="true" />
+								<span>{t(A.noGh)}</span>
+							</p>
+						)}
+								{Array.isArray(repos) && (
+									<>
+								<div className="adm__sticky">
 								<div className="adm__filters">
 									<input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t(A.search)} aria-label={t(A.search)} />
 									<div className="adm__chips" role="group">
@@ -574,8 +760,9 @@ export default function AdminPage() {
 										{chosen.length} {t(A.selected)} · {visible.length}/{repos.length}
 									</span>
 								</div>
+								</div>
 								{chosen.length > 0 && !ask && (
-									<div className="adm__bar adm__acts">
+									<div className="adm__bar adm__acts adm__dockbar">
 										<button type="button" className="adm__mini" onClick={() => setAsk("private")}>
 											{t(A.toPrivate)} ({chosen.length})
 										</button>
@@ -654,9 +841,11 @@ export default function AdminPage() {
 										);
 									})}
 								</ul>
-							</>
-						)}
-					</div>
+									</>
+								)}
+							</div>
+						</div>
+					)}
 				</>
 			)}
 		</section>

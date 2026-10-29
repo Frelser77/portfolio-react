@@ -9,6 +9,7 @@ import { Link } from "../router";
 import { pickNeed } from "../bus";
 import { likeProject } from "../api";
 import { useStats } from "../stats";
+import Shots from "../components/Shots";
 import LivePreview from "../components/LivePreview";
 import NotFound from "./NotFound";
 
@@ -76,15 +77,7 @@ export default function ProjectPage({ id }: { id: string }) {
 					)}
 				</div>
 
-				{p.shots && (
-					<ul className="pshots" role="list">
-						{p.shots.map((sh, n) => (
-							<li key={sh.src}>
-								<img src={sh.src} width={sh.w} height={sh.h} alt={t(sh.alt)} loading={n === 0 ? "eager" : "lazy"} decoding="async" />
-							</li>
-						))}
-					</ul>
-				)}
+				{p.shots && <Shots shots={p.shots} />}
 
 				<div className={`pdetail${p.preview ? " has-preview" : ""}`}>
 					<div className="pdetail__text">

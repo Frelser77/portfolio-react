@@ -101,6 +101,7 @@ function init(db: D1) {
 		])
 		// la colonna `link` è nata dopo: sulle tabelle già create si aggiunge una volta sola (se c'è già l'errore è innocuo)
 		.then(() => db.prepare("ALTER TABLE featured ADD COLUMN link TEXT").run().then(() => undefined, () => undefined))
+		.then(() => db.prepare("ALTER TABLE briefs ADD COLUMN archived INTEGER DEFAULT 0").run().then(() => undefined, () => undefined))
 		.catch((e) => {
 			ready = null;
 			throw e;
@@ -854,8 +855,22 @@ async function adminBriefs(req: Request, env: Env) {
 	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
 	if (!env.DB) return json({ error: "no_db" }, 404);
 	await init(env.DB);
-	const rows = await env.DB.prepare("SELECT id, created_at, name, reach, need, message FROM briefs ORDER BY id DESC LIMIT 100").all();
+	const rows = await env.DB.prepare("SELECT id, created_at, name, reach, need, message, COALESCE(archived, 0) AS archived FROM briefs ORDER BY id DESC LIMIT 300").all();
 	return json({ rows: rows.results });
+}
+
+/** Richieste: archivia (si nascondono ma restano), ripristina o elimina per sempre. Fino a 100 per volta. */
+async function adminBriefAction(req: Request, env: Env) {
+	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	if (!env.DB) return json({ error: "no_db" }, 404);
+	const b = await body<{ action?: string; ids?: unknown }>(req, 4000);
+	const ids = Array.isArray(b?.ids) ? [...new Set(b.ids.filter((x): x is number => Number.isInteger(x) && (x as number) > 0))].slice(0, 100) : [];
+	if (!b || !ids.length || !["archive", "unarchive", "delete"].includes(b.action ?? "")) return json({ error: "bad_request" }, 400);
+	await init(env.DB);
+	const q = b.action === "delete" ? "DELETE FROM briefs WHERE id = ?" : "UPDATE briefs SET archived = ? WHERE id = ?";
+	await env.DB.batch(ids.map((id) => (b.action === "delete" ? env.DB!.prepare(q).bind(id) : env.DB!.prepare(q).bind(b.action === "archive" ? 1 : 0, id))));
+	return json({ ok: true, count: ids.length });
 }
 
 /* ------------------------------ ingresso ------------------------------ */
@@ -914,6 +929,10 @@ export default {
 				case "/api/admin/briefs":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await adminBriefs(req, env);
+				case "/api/admin/briefs-action":
+					if (!post) return json({ error: "method" }, 405);
+					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
+					return await adminBriefAction(req, env);
 				case "/api/admin/featured":
 					if (limited(`admin:${who}`, 30, 60_000)) return json({ error: "rate_limited" }, 429);
 					if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
