@@ -1269,7 +1269,6 @@ main:focus,
 /* Comparsa allo scroll (translate separato da transform, così non si pesta con l'inclinazione) */
 [data-rv="out"] {
 	opacity: 0;
-	translate: 0 28px;
 }
 [data-rv="in"] {
 	opacity: 1;
@@ -1947,9 +1946,7 @@ main:focus,
 		inset -18px -24px 60px #00000055,
 		0 40px 90px -30px var(--b);
 	opacity: 0.92;
-	translate: 0 calc(var(--sy, 0) * var(--par) * -0.00025px);
-	animation: orbfloat 14s ease-in-out infinite alternate;
-	will-change: transform, translate;
+	/* sfondo fermo: nessun movimento di sfere, nessun parallasse */
 }
 @keyframes orbfloat {
 	from {
@@ -4943,3 +4940,7 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 	}
 	fieldset .cfg__chips.scrollrow::-webkit-scrollbar { display: none; }
 }
+
+/* sfondo fermo: sfere e aurora statiche */
+.aurora i, .aurora .o1, .aurora .o2, .aurora .o3 { animation: none !important; transform: none !important; }
+.orb { animation: none !important; translate: none !important; will-change: auto !important; }
