@@ -5297,3 +5297,8 @@ html { -webkit-tap-highlight-color: transparent; }
 @keyframes achin { from { opacity: 0; transform: translateY(-16px) scale(0.94); } to { opacity: 1; transform: none; } }
 .toast-ach { animation: achin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both; }
 @media (prefers-reduced-motion: reduce) { .toast-ach { animation: none; } }
+/* l'entrata di pagina non deve mai creare un riferimento per gli elementi fixed (barra admin): solo dissolvenza, senza fill-mode */
+@media (max-width: 720px) {
+	.page { animation: apfade 0.3s ease-out; }
+	@keyframes apfade { from { opacity: 0; } to { opacity: 1; } }
+}
