@@ -70,3 +70,34 @@ export const cleanBrief = (raw: unknown): BriefInput | null => {
 	if (b.message.length < 10 || b.reach.length < 5) return null;
 	return b;
 };
+
+/** Compatibilità tra un annuncio di lavoro e le competenze di Salvatore. */
+export interface Fit {
+	role: string;
+	score: number;
+	verdict: string;
+	matches: { skill: string; why: string }[];
+	gaps: string[];
+	pitch: string;
+}
+
+/** Accetta solo un risultato ben formato: tutto ciò che arriva dall'AI passa da qui. */
+export function validateFit(raw: unknown): Fit | null {
+	if (!raw || typeof raw !== "object") return null;
+	const r = raw as Record<string, unknown>;
+	const matches = (Array.isArray(r.matches) ? r.matches : [])
+		.map((m) => {
+			const o = (m ?? {}) as Record<string, unknown>;
+			return { skill: str(o.skill, 40), why: str(o.why, 200) };
+		})
+		.filter((m) => m.skill)
+		.slice(0, 6);
+	const gaps = (Array.isArray(r.gaps) ? r.gaps : []).map((x) => str(x, 140)).filter(Boolean).slice(0, 4);
+	let score = Math.round(Number(r.score));
+	if (!Number.isFinite(score)) return null;
+	score = Math.max(0, Math.min(100, score));
+	const verdict = str(r.verdict, 300);
+	const pitch = typeof r.pitch === "string" ? r.pitch.replace(/[ \t]+/g, " ").trim().slice(0, 900) : "";
+	if (!verdict || !pitch || !matches.length) return null;
+	return { role: str(r.role, 80), score, verdict, matches, gaps, pitch };
+}

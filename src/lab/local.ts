@@ -1,5 +1,5 @@
 import { needs, profile, projects, skillGroups } from "../content/data";
-import type { Lang, Plan } from "../shared";
+import type { Fit, Lang, Plan } from "../shared";
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const has = (q: string, words: string[]) => words.some((w) => q.includes(w));
@@ -95,5 +95,35 @@ export function localPlan(problem: string, lang: Lang): Plan {
 			it ? "Quali dati e strumenti usi oggi, e chi li usa" : "Which data and tools you use today, and who uses them",
 			it ? "Cosa è indispensabile subito e cosa può aspettare" : "What is essential now and what can wait",
 		],
+	};
+}
+
+const OTHER_TECH = ["java", "python", "php", "laravel", "angular", "vue", "aws", "azure", "docker", "kubernetes", "golang", "rust", "django", "spring", "swift", "kotlin", "flutter", "salesforce", "sap"];
+
+/** Valutazione di riserva: confronta le parole dell'annuncio con le competenze reali (nessuna AI). */
+export function localFit(job: string, lang: Lang): Fit {
+	const q = norm(job);
+	const it = lang === "it";
+	const skills = skillGroups.flatMap((g) => g.items.map((i) => i.name));
+	const found = skills.filter((s) => new RegExp(`(^|[^a-z0-9])${norm(s).replace(/[.+*?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`).test(q));
+	const gaps = OTHER_TECH.filter((w) => new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(q) && !skills.some((s) => norm(s).includes(w)));
+	const score = Math.max(25, Math.min(90, 35 + found.length * 9 - gaps.length * 5));
+	const top = found.slice(0, 5);
+	const role = "";
+	return {
+		role,
+		score,
+		verdict: found.length
+			? it
+				? `Nell'annuncio compaiono ${found.length} tecnologie che Salvatore usa davvero. Per una valutazione più fine serve il lab con l'AI attiva.`
+				: `The posting mentions ${found.length} technologies Salvatore really uses. For a finer assessment the AI lab needs to be online.`
+			: it
+				? "Non trovo tecnologie in comune in modo esplicito: scrivigli, il quadro potrebbe essere più ampio di quanto emerge dall'annuncio."
+				: "I can't find explicit shared technologies: write to him, the picture may be wider than the posting shows.",
+		matches: (top.length ? top : ["React", "TypeScript"]).map((s) => ({ skill: s, why: it ? "Compare nell'annuncio e fa parte del suo stack quotidiano." : "It appears in the posting and is part of his daily stack." })),
+		gaps: gaps.slice(0, 3).map((g) => (it ? `${g}: non fa parte del suo stack attuale` : `${g}: not part of his current stack`)),
+		pitch: it
+			? `Buongiorno, sono Salvatore D'Amico, sviluppatore full stack. Ho letto con interesse l'annuncio${top.length ? `: lavoro ogni giorno con ${top.join(", ")}` : ""}. Se può farle piacere, le mostro volentieri i progetti che ho portato online e ne parliamo. Grazie per l'attenzione.`
+			: `Hello, I'm Salvatore D'Amico, a full stack developer. I read your posting with interest${top.length ? `: I work daily with ${top.join(", ")}` : ""}. I'd be glad to show you the projects I've taken live and talk it through. Thank you.`,
 	};
 }

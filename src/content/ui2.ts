@@ -102,8 +102,9 @@ export const ui2 = {
 		tabs: [
 			{ id: "chat", label: { it: "Chiedi a FR7 Bot", en: "Ask FR7 Bot" } },
 			{ id: "plan", label: { it: "Dal problema al piano", en: "From problem to plan" } },
+			{ id: "fit", label: { it: "Annuncio → compatibilità", en: "Job post → fit" } },
 			{ id: "making", label: { it: "Come è fatto", en: "How it's made" } },
-		] as { id: "chat" | "plan" | "making"; label: L }[],
+		] as { id: "chat" | "plan" | "fit" | "making"; label: L }[],
 		tabsLabel: { it: "Sezioni del laboratorio", en: "Lab sections" },
 		chat: {
 			hello: {

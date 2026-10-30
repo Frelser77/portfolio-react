@@ -1,5 +1,5 @@
-import type { BriefInput, Lang, Plan } from "./shared";
-import { validatePlan } from "./shared";
+import type { BriefInput, Fit, Lang, Plan } from "./shared";
+import { validateFit, validatePlan } from "./shared";
 
 /**
  * Collegamento con il Worker (/api/*). Ogni chiamata restituisce null se il Worker non c'è o non risponde
@@ -57,6 +57,11 @@ export const sendBrief = async (b: BriefInput & { website?: string }) => {
 export async function planWithAi(problem: string, lang: Lang): Promise<Plan | null> {
 	const r = await json<{ plan: unknown }>("/api/plan", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ problem, lang }) }, 30000);
 	return r ? validatePlan(r.plan) : null;
+}
+
+export async function fitWithAi(job: string, lang: Lang): Promise<Fit | null> {
+	const r = await json<{ fit: unknown }>("/api/fit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ job, lang }) }, 35000);
+	return r ? validateFit(r.fit) : null;
 }
 
 /** Chat in streaming (SSE). Restituisce false se l'AI non è disponibile, così la pagina passa alle risposte locali. */

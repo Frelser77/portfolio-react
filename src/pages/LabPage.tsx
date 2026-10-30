@@ -3,9 +3,10 @@ import { ui2 } from "../content/ui2";
 import { usePrefs } from "../prefs";
 import Chat from "../components/Chat";
 import Planner from "../components/Planner";
+import FitCheck from "../components/FitCheck";
 import MakingOf from "../components/MakingOf";
 
-type Tab = "chat" | "plan" | "making";
+type Tab = "chat" | "plan" | "fit" | "making";
 
 export default function LabPage() {
 	const { t } = usePrefs();
@@ -40,6 +41,7 @@ export default function LabPage() {
 				<div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
 					{tab === "chat" && <Chat />}
 					{tab === "plan" && <Planner />}
+					{tab === "fit" && <FitCheck />}
 					{tab === "making" && <MakingOf />}
 				</div>
 			</div>
