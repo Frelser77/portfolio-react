@@ -974,7 +974,7 @@ async function adminProjects(req: Request, env: Env) {
 /* ------------------------------ Interruttori del sito e riassunto AI ------------------------------ */
 
 const SITE_CACHE = () => new Request("https://cache.fr7.local/site-flags-v1");
-const DIGEST_CACHE = (lang: Lang) => new Request(`https://cache.fr7.local/digest-v2-${lang}`);
+const DIGEST_CACHE = (lang: Lang) => new Request(`https://cache.fr7.local/digest-v3-${lang}`);
 
 /** Le cose nascoste: per default è tutto visibile, quindi si salva solo ciò che si nasconde. */
 async function loadHidden(env: Env): Promise<string[]> {
@@ -1022,7 +1022,7 @@ async function adminSite(req: Request, env: Env) {
 
 const digestSystem = (lang: Lang) =>
 	`Scrivi per il portfolio di Salvatore D'Amico un breve riassunto, in prima persona, di ciò su cui ha lavorato di recente, in ${lang === "it" ? "italiano" : "English"}.
-Massimo 3 frasi, tono semplice e caldo, niente elenchi, niente emoji. Usa SOLO i dati forniti: nomi dei progetti, descrizioni, linguaggi elencati, numero di contributi (dell'ultimo anno), date. Non nominare linguaggi o progetti che non sono nei dati. Non inventare risultati, clienti o funzionalità.`;
+Massimo 3 frasi, tono semplice e caldo, niente elenchi, niente emoji. Se i dati lo dicono, precisa che alcuni progetti sono privati. Usa SOLO i dati forniti: nomi dei progetti, descrizioni, linguaggi elencati, numero di contributi (dell'ultimo anno), date. Non nominare linguaggi o progetti che non sono nei dati. Non inventare risultati, clienti o funzionalità.`;
 
 async function digest(req: Request, env: Env, ctx: Ctx, lang: Lang) {
 	const cache = edgeCache();
@@ -1039,11 +1039,40 @@ async function digest(req: Request, env: Env, ctx: Ctx, lang: Lang) {
 	} catch {
 		return json({ error: "github_unavailable" }, 502);
 	}
-	// se hai scelto dal pannello admin quali repository mostrare, si parla solo di quelle (con il nome che hai dato loro); altrimenti le ultime pubbliche
-	const picked = (g.featured ?? []).slice(0, 5);
-	const recent = picked.length
-		? picked.map((x) => ({ name: x.name, blurb: x.blurb, language: x.language, pushedAt: (x.pushedAt ?? "").slice(0, 10), url: x.private ? (x.link ?? "") : x.url || (x.link ?? "") }))
-		: (g.recent ?? []).slice(0, 4).map((x) => ({ name: x.name, blurb: "", language: x.language, pushedAt: x.pushedAt.slice(0, 10), url: x.url ?? "" }));
+	// attività reale: ultimi 60 giorni, anche privati (con il token). I privati compaiono solo col nome pubblico che hai scelto, altrimenti in forma anonima, e mai con un link.
+	const since = Date.now() - 60 * 864e5;
+	let active: { name: string; blurb: string; language: string; pushedAt: string; url: string }[] = [];
+	if (env.GITHUB_TOKEN) {
+		try {
+			const [d, rows] = await Promise.all([
+				gql<{ user: { repositories: { nodes: GqlRepo[] } } }>(
+					env.GITHUB_TOKEN,
+					`query($login:String!){ user(login:$login){ repositories(first:30, ownerAffiliations:[OWNER,COLLABORATOR,ORGANIZATION_MEMBER], orderBy:{field:PUSHED_AT,direction:DESC}){ nodes{ name isPrivate isFork url pushedAt description primaryLanguage{ name } } } } }`,
+					{ login: GH_USER },
+				),
+				loadFeatured(env),
+			]);
+			const label = new Map(rows.map((r) => [r.name.toLowerCase(), r]));
+			let anon = 0;
+			for (const r of d.user.repositories.nodes) {
+				if (r.isFork || r.name.toLowerCase() === GH_USER.toLowerCase() || Date.parse(r.pushedAt) < since) continue;
+				const f = label.get(r.name.toLowerCase());
+				if (r.isPrivate) {
+					const nm = f?.label?.trim();
+					if (!nm) anon++;
+					active.push({ name: nm || (anon > 1 ? `progetto privato ${anon}` : "un progetto privato"), blurb: nm ? f?.blurb ?? "" : "", language: r.primaryLanguage?.name ?? "", pushedAt: r.pushedAt.slice(0, 10), url: f?.link ?? "" });
+				} else {
+					active.push({ name: f?.label?.trim() || r.name, blurb: f?.blurb || r.description || "", language: r.primaryLanguage?.name ?? "", pushedAt: r.pushedAt.slice(0, 10), url: r.url });
+				}
+			}
+			active = active.slice(0, 5);
+		} catch {
+			active = [];
+		}
+	}
+	const recent = active.length
+		? active
+		: (g.recent ?? []).filter((x) => Date.parse(x.pushedAt) >= since).slice(0, 4).map((x) => ({ name: x.name, blurb: "", language: x.language, pushedAt: x.pushedAt.slice(0, 10), url: x.url ?? "" }));
 	const facts = {
 		contributions: g.contributions ?? null,
 		languages: [...new Set(recent.map((x) => x.language).filter(Boolean))].slice(0, 3),
@@ -1056,7 +1085,7 @@ async function digest(req: Request, env: Env, ctx: Ctx, lang: Lang) {
 			const out = (await runAi(env, {
 				messages: [
 					{ role: "system", content: digestSystem(lang) },
-					{ role: "user", content: `Dati di oggi (${today()}). "contributions" sono i contributi GitHub dell'ultimo anno; "recent" sono i progetti in evidenza, con descrizione ("blurb") e data dell'ultimo aggiornamento:\n${JSON.stringify(facts)}` },
+					{ role: "user", content: `Dati di oggi (${today()}). "contributions" sono i contributi GitHub dell'ultimo anno; "recent" sono i progetti su cui ha lavorato negli ultimi 60 giorni (alcuni privati, senza nome), con eventuale descrizione ("blurb") e data dell'ultimo aggiornamento. Se "recent" è vuoto parla solo del ritmo dei contributi:\n${JSON.stringify(facts)}` },
 				],
 				max_tokens: 220,
 				temperature: 0.4,
