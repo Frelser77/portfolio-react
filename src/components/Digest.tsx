@@ -55,7 +55,17 @@ export default function Digest() {
 				</div>
 			</section>
 		);
-	if (!d || (!d.text && !d.facts.recent.length)) return null;
+	if (!d || (!d.text && !d.facts.recent.length))
+		return (
+			<section className="sec digest" aria-labelledby="digest-title">
+				<div className="glass digest__card" data-lg="off">
+					<h2 id="digest-title" className="h3">
+						{t(uiDigest.title)}
+					</h2>
+					<p className="digest__text">{t(uiDigest.none)}</p>
+				</div>
+			</section>
+		);
 	const w = d.facts.weeks;
 	const max = Math.max(1, ...w);
 	const last = d.facts.recent[0];

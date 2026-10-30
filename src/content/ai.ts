@@ -54,5 +54,6 @@ export const uiDigest = {
 	weeks: { it: "Attività delle ultime settimane", en: "Activity over the last weeks" } as L,
 	last: { it: "Ultimo aggiornamento", en: "Last update" } as L,
 	contrib: { it: "contributi nell'ultimo anno", en: "contributions in the last year" } as L,
+	none: { it: "In questo momento non riesco a leggere l'attività da GitHub: riprova tra poco.", en: "I can't read the GitHub activity right now: please try again shortly." } as L,
 	open: { it: "Apri su GitHub", en: "Open on GitHub" } as L,
 };

@@ -5271,21 +5271,27 @@ html { -webkit-tap-highlight-color: transparent; }
 }
 @media (max-width: 720px) and (prefers-reduced-motion: reduce) { .page { animation: none; } }
 
-/* Home a schede (telefono) */
+/* Home a pagine (telefono): si scorre di lato, la pagina resta ferma */
 .htabs { display: none; }
 @media (max-width: 720px) {
-	.htabs { display: flex; gap: 4px; position: sticky; top: calc(6px + env(safe-area-inset-top, 0px)); z-index: 40; margin: 8px 0 14px; padding: 4px; border-radius: 999px; background: rgba(10, 14, 44, 0.72); border: 1px solid rgba(255, 255, 255, 0.14); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); }
-	.htabs button { flex: 1; min-width: 0; padding: 9px 4px; border: 0; border-radius: 999px; background: transparent; color: rgba(232, 236, 255, 0.72); font: 600 13px/1 inherit; font-family: inherit; white-space: nowrap; transition: background 0.2s, color 0.2s; }
+	html.home-app, html.home-app body { overflow: hidden; height: 100dvh; }
+	html.home-app .foot { display: none; }
+	html.home-app .pf { padding-bottom: 0; min-height: 0; height: 100dvh; overflow: hidden; }
+	.happ { display: flex; flex-direction: column; height: calc(100dvh - 64px - env(safe-area-inset-top, 0px)); }
+	.htabs { display: flex; gap: 4px; flex: none; margin: 4px 0 8px; padding: 4px; border-radius: 999px; background: rgba(10, 14, 44, 0.62); border: 1px solid rgba(255, 255, 255, 0.14); }
+	.htabs button { flex: 1; min-width: 0; padding: 9px 2px; border: 0; border-radius: 999px; background: transparent; color: rgba(232, 236, 255, 0.72); font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1; white-space: nowrap; transition: background 0.2s, color 0.2s; }
 	.htabs button.on { background: linear-gradient(135deg, #6b7bff, #8a63ff); color: #fff; }
-	.hero { display: block; }
-	.hometabs [data-pane] { display: none; }
-	.hometabs[data-tab="need"] [data-pane="need"], .hometabs[data-tab="ai"] [data-pane="ai"], .hometabs[data-tab="now"] [data-pane="now"], .hometabs[data-tab="go"] [data-pane="go"] { display: block; animation: apin 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
-	/* la presentazione si accorcia: il paragrafo lungo resta, ma i social vanno accanto ai pulsanti */
-	.hero .lead { font-size: 16px; }
-}
-@media (max-width: 720px) {
+	.hpager { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin: 0 -16px; padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+	.hpager::-webkit-scrollbar { display: none; }
+	.hpager > *, .hero { scroll-snap-align: start; scroll-snap-stop: always; }
+	.hero { display: contents; }
+	.hpager > [data-pane], .hero__main { flex: 0 0 100%; width: 100%; min-width: 0; box-sizing: border-box; padding: 4px 16px 8px; overflow-y: auto; overflow-x: hidden; overscroll-behavior-y: contain; scroll-snap-align: start; scroll-snap-stop: always; }
+	.hpager .sec { padding-top: 6px; padding-bottom: 6px; }
+	.hpager .lens { display: none; }
+	.hero__main { display: flex; flex-direction: column; justify-content: center; gap: 4px; }
 	.hero .socials { display: none; }
-	.hero .lead { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+	.hero h1 { font-size: 40px; }
+	.hero .lead { font-size: 16px; }
 }
 
 /* Notifica obiettivo: centrata con margini veri, senza trasformazioni sul contenitore */

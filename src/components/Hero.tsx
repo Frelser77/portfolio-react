@@ -9,14 +9,13 @@ import { Link } from "../router";
 import Configurator from "./Configurator";
 import Lens from "./Lens";
 import { useShown } from "../siteFlags";
-import type { ReactNode } from "react";
 
-export default function Hero({ tabs }: { tabs?: ReactNode }) {
+export default function Hero({ noSide }: { noSide?: boolean }) {
 	const { t } = usePrefs();
 	const shown = useShown();
 	return (
 		<section className="hero" id="home" aria-labelledby="hero-title">
-			<div className="hero__main">
+			<div className="hero__main" data-pane="hero">
 				<p className="avail">
 					<i aria-hidden="true" />
 					{t(ui.hero.avail)}
@@ -48,8 +47,7 @@ export default function Hero({ tabs }: { tabs?: ReactNode }) {
 				</div>
 			</div>
 
-			{tabs}
-			{shown("home.hero.config") && (
+			{!noSide && shown("home.hero.config") && (
 				<div className="hero__side" data-pane="need">
 					<Configurator />
 				</div>
