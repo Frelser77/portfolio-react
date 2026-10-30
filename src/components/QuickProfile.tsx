@@ -5,7 +5,7 @@ import { usePrefs } from "../prefs";
 import { Link } from "../router";
 
 const L = {
-	title: { it: "Profilo in 30 secondi", en: "Profile in 30 seconds" },
+	title: { it: "In breve", en: "At a glance" },
 	role: { it: "Ruolo", en: "Role" },
 	roleV: { it: "Full stack developer", en: "Full stack developer" },
 	since: { it: "Nel settore", en: "In the field" },

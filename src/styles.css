@@ -5474,3 +5474,4 @@ html { -webkit-tap-highlight-color: transparent; }
 	.hero__main > .aud button { flex: 1; padding: 0 8px; font-size: 13px; }
 }
 @media (max-width: 720px) { .hpager .hero h1 { margin: 8px 0 10px; } .hpager .hero .avail { margin-bottom: 4px !important; } .hpager .hero .row { margin-top: 4px; } }
+@media (max-width: 720px) { .hpager .hero h1 { font-size: 31px; line-height: 1.08; } }

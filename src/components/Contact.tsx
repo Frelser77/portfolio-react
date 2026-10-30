@@ -6,7 +6,6 @@ import { ui } from "../content/ui";
 import { unlock } from "../achievements";
 import { usePrefs } from "../prefs";
 import AppPager, { usePhone } from "./AppPager";
-import { useAudience } from "../audience";
 import { takePendingBrief } from "../bus";
 import { ui2 } from "../content/ui2";
 import { getHealth, sendBrief } from "../api";
@@ -51,8 +50,7 @@ export default function Contact() {
 	const [msg, setMsg] = useState("");
 	const [name, setName] = useState("");
 	const [reach, setReach] = useState("");
-	const aud = useAudience();
-	const [kind, setKind] = useState<Kind>(aud === "proj" ? "proj" : "job");
+	const [kind, setKind] = useState<Kind>("job");
 	const [company, setCompany] = useState("");
 	const [mode, setMode] = useState<"" | "office" | "hybrid" | "remote">("");
 	const timer = useRef(0);
