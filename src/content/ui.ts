@@ -32,8 +32,9 @@ export const ui = {
 	},
 
 	config: {
+		step: { it: "Scegli cosa ti serve", en: "Pick what you need" },
 		title: { it: "Di cosa hai bisogno?", en: "What do you need?" },
-		hint: { it: "Tocca una voce: ti mostro come la affronto.", en: "Tap one: I'll show you how I'd tackle it." },
+		hint: { it: "Ti mostro come la affronto, passo per passo.", en: "I'll show you how I'd tackle it, step by step." },
 		how: { it: "Come la affronto", en: "How I'd do it" },
 		done: { it: "Già fatto", en: "Already done" },
 		open: { it: "Guarda il progetto", en: "See the project" },

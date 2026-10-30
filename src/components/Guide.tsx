@@ -112,6 +112,8 @@ export default function Guide() {
 	const quiet = useRef(false);
 	const sayTimer = useRef(0);
 	const prevSide = useRef<"l" | "r">(SIDE["/"]);
+	const calmTimer = useRef(0);
+	useEffect(() => () => clearTimeout(calmTimer.current), []);
 	const timers = useRef<number[]>([]);
 	const later = (fn: () => void, ms: number) => {
 		const id = window.setTimeout(fn, ms);
@@ -383,11 +385,13 @@ export default function Guide() {
 		speak(t0.current(pickOne(ui2.pet.mad)), 4500);
 		later(dodge, 700);
 		// almeno 10 secondi in cui non si lascia prendere
-		later(() => {
+		// timer a parte: il cambio pagina svuota `timers`, e così non tornava mai calmo
+		clearTimeout(calmTimer.current);
+		calmTimer.current = window.setTimeout(() => {
 			setAngry(false);
 			incidents.current = [];
 			speak(t0.current(ui2.pet.calm), 4200);
-		}, 13_000);
+		}, 9_000);
 	};
 	const hide = () => {
 		if (angryRef.current) return dodge();

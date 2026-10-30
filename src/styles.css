@@ -5000,3 +5000,34 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 	.labbtn.on { background: rgba(255, 255, 255, 0.24); color: #fff; }
 	.nav__tools { gap: 8px; }
 }
+
+/* ===== Home: card "di cosa hai bisogno" sempre piena, con demo automatica ===== */
+.cfg__step { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; }
+.cfg__step b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg,#5d73ff,#8b5cf6); color: #fff; font-size: 12px; }
+.needgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.need { position: relative; overflow: hidden; display: grid; justify-items: start; align-content: space-between; gap: 10px; min-height: 84px; padding: 12px 12px 14px; text-align: left; border-radius: 18px; border: 1px solid transparent; background: rgba(255,255,255,.09); color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 600; line-height: 1.2; cursor: pointer; transition: background-color .25s, transform .25s, box-shadow .25s; }
+.need svg { width: 20px; height: 20px; opacity: .9; }
+.need:hover { background: rgba(255,255,255,.17); transform: translateY(-2px); }
+.need:active { transform: scale(.97); }
+.need[aria-pressed="true"] { background: linear-gradient(135deg,#5d73ff,#8b5cf6); box-shadow: 0 10px 28px #5d73ff66; }
+.need--wide { grid-column: 1 / -1; min-height: 0; grid-template-columns: auto 1fr; align-items: center; justify-items: start; }
+.need__bar { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: rgba(255,255,255,.85); transform-origin: left; animation: needbar 5.2s linear both; }
+@keyframes needbar { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+.cfg__res { animation: cfgin .45s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes cfgin { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+.cfg__out { min-height: 262px; }
+@media (max-width: 720px) {
+	.needgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.need { min-height: 74px; }
+	.cfg__out { min-height: 290px; }
+}
+/* entrata a cascata dell'hero */
+@media (prefers-reduced-motion: no-preference) {
+	.hero__main > * { animation: heroin .7s cubic-bezier(.2,.8,.2,1) both; }
+	.hero__main > :nth-child(2) { animation-delay: .06s } .hero__main > :nth-child(3) { animation-delay: .12s }
+	.hero__main > :nth-child(4) { animation-delay: .2s } .hero__main > :nth-child(5) { animation-delay: .28s } .hero__main > :nth-child(6) { animation-delay: .36s }
+	.hero__side { animation: heroin .8s .25s cubic-bezier(.2,.8,.2,1) both; }
+}
+@keyframes heroin { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
+.need:nth-last-child(2) { grid-column: span 2; }
+@media (max-width: 720px) { .need.need--wide { min-height: 0; padding-block: 14px; } }
