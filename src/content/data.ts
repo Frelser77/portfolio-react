@@ -283,7 +283,7 @@ export const projects: Project[] = [
 	{
 		id: "primed",
 		kind: "company",
-		result: { value: { it: "20 s → 3 s", en: "20 s → 3 s" }, label: { it: "Processi critici dopo la riscrittura da Classic ASP a NestJS", en: "Critical processes after the Classic ASP to NestJS rewrite" } },
+		result: { value: { it: "Più veloce", en: "Faster" }, label: { it: "Moduli legacy riscritti in NestJS e processi critici ottimizzati", en: "Legacy modules rewritten in NestJS, critical processes optimised" } },
 		name: "Primed Group",
 		mark: "PG",
 		tint: ["#141a52", "#3b3fb5", "#7a5cf0"],
@@ -299,7 +299,7 @@ export const projects: Project[] = [
 			en: "As Full-Stack Developer & IT Specialist I moved Classic ASP modules to NestJS on Oracle 9i, designed the authorization system and integrated the phone system, Slack, CreditSafe and WhatsApp.",
 		},
 		highlights: [
-			{ it: "Moduli Classic ASP riscritti in NestJS: processi critici da 20 s a circa 3 s", en: "Classic ASP modules rewritten in NestJS: critical processes from 20 s to about 3 s" },
+			{ it: "Moduli Classic ASP riscritti in NestJS, con i processi critici ottimizzati", en: "Classic ASP modules rewritten in NestJS, with critical processes optimised" },
 			{ it: "Autorizzazioni end-to-end: profili, ruoli, permessi, pagine per ruolo", en: "End-to-end authorization: profiles, roles, permissions, role-based pages" },
 			{ it: "Centralino 3CX: chiamate live, notifiche di chiamate perse, CDR", en: "3CX phone system: live calls, missed-call alerts, CDR" },
 			{ it: "WhatsApp e profilazione clienti tramite Salesforce", en: "WhatsApp messaging and customer profiling via Salesforce" },
@@ -359,8 +359,8 @@ export const journey: Step[] = [
 		role: { it: "Full-Stack Developer & IT Specialist", en: "Full-Stack Developer & IT Specialist" },
 		place: { it: "Primed Group", en: "Primed Group" },
 		text: {
-			it: "Ho riscritto in NestJS i moduli legacy Classic ASP su Oracle 9i (processi critici da 20 s a circa 3 s), progettato autorizzazioni e microservizi, integrato 3CX, Slack, CreditSafe e Salesforce.",
-			en: "I rewrote legacy Classic ASP modules on Oracle 9i in NestJS (critical processes from 20 s to about 3 s), designed authorization and microservices, and integrated 3CX, Slack, CreditSafe and Salesforce.",
+			it: "Ho riscritto in NestJS i moduli legacy Classic ASP su Oracle 9i, ottimizzando i processi critici, progettato autorizzazioni e microservizi, integrato 3CX, Slack, CreditSafe e Salesforce.",
+			en: "I rewrote legacy Classic ASP modules on Oracle 9i in NestJS, optimising critical processes, designed authorization and microservices, and integrated 3CX, Slack, CreditSafe and Salesforce.",
 		},
 	},
 	{
