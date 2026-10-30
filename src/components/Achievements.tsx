@@ -84,7 +84,7 @@ export function AchievementToasts() {
 			{queue.map((q) => {
 				const it = find(q.id);
 				return (
-					<div key={q.key} className="toast-ach glass" data-lg-bezel="18">
+					<div key={q.key} className="toast-ach glass" data-lg="off">
 						<span aria-hidden="true">
 							<FiAward />
 						</span>
