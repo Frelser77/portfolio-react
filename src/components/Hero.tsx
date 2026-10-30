@@ -9,8 +9,9 @@ import { Link } from "../router";
 import Configurator from "./Configurator";
 import Lens from "./Lens";
 import { useShown } from "../siteFlags";
+import type { ReactNode } from "react";
 
-export default function Hero() {
+export default function Hero({ tabs }: { tabs?: ReactNode }) {
 	const { t } = usePrefs();
 	const shown = useShown();
 	return (
@@ -47,8 +48,9 @@ export default function Hero() {
 				</div>
 			</div>
 
+			{tabs}
 			{shown("home.hero.config") && (
-				<div className="hero__side">
+				<div className="hero__side" data-pane="need">
 					<Configurator />
 				</div>
 			)}
