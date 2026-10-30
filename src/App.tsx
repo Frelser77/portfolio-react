@@ -24,8 +24,11 @@ import { match, usePath, useRouteFocus } from "./router";
 import { usePrefs } from "./prefs";
 import { ui } from "./content/ui";
 import { useShown } from "./siteFlags";
+import AppPager, { usePhone } from "./components/AppPager";
 
 function Page({ path }: { path: string }) {
+	const { t } = usePrefs();
+	const phone = usePhone();
 	const r = match(path);
 	const shown = useShown();
 	switch (r.name) {
@@ -36,7 +39,15 @@ function Page({ path }: { path: string }) {
 		case "progetto":
 			return <ProjectPage id={r.id!} />;
 		case "stack":
-			return (
+			return phone ? (
+				<AppPager
+					panes={[
+						{ id: "sheet", label: t({ it: "Scheda", en: "Sheet" }), node: <Skills cards={false} /> },
+						{ id: "eco", label: t({ it: "Ecosistema", en: "Ecosystem" }), node: <Ecosystem /> },
+						...(shown("stack.github") ? [{ id: "gh", label: "GitHub", node: <GithubLive /> }] : []),
+					]}
+				/>
+			) : (
 				<>
 					<Skills cards={false} between={<Ecosystem />} />
 					{shown("stack.github") && <GithubLive />}

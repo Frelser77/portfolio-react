@@ -6,8 +6,10 @@ import Planner from "../components/Planner";
 import FitCheck from "../components/FitCheck";
 import MakingOf from "../components/MakingOf";
 import { useShown } from "../siteFlags";
+import AppPager, { usePhone } from "../components/AppPager";
 
 type Tab = "chat" | "plan" | "fit" | "making";
+const short: Record<Tab, { it: string; en: string }> = { chat: { it: "Bot", en: "Bot" }, plan: { it: "Piano", en: "Plan" }, fit: { it: "Annuncio", en: "Fit" }, making: { it: "Dietro", en: "Making of" } };
 
 export default function LabPage() {
 	const { t } = usePrefs();
@@ -15,6 +17,11 @@ export default function LabPage() {
 	const tabs = ui2.lab.tabs.filter((x) => x.id === "making" || shown(`home.ai.${x.id}` as "home.ai.chat"));
 	const [tab0, setTab] = useState<Tab>("chat");
 	const tab: Tab = tabs.some((x) => x.id === tab0) ? tab0 : tabs[0].id;
+	const phone = usePhone();
+	if (phone) {
+		const node = (id: Tab) => (id === "chat" ? <Chat /> : id === "plan" ? <Planner /> : id === "fit" ? <FitCheck /> : <MakingOf />);
+		return <AppPager panes={tabs.map((x) => ({ id: x.id, label: t(short[x.id]), node: <div className="card lab">{node(x.id)}</div> }))} />;
+	}
 	return (
 		<section className="sec" aria-labelledby="lab-title">
 			<div className="card lab">

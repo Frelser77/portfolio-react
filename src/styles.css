@@ -5308,3 +5308,13 @@ html { -webkit-tap-highlight-color: transparent; }
 	.page { animation: apfade 0.3s ease-out; }
 	@keyframes apfade { from { opacity: 0; } to { opacity: 1; } }
 }
+
+/* pagine laterali: titolo compatto e griglia 2x2 dei progetti */
+@media (max-width: 720px) {
+	.apphead { display: flex; align-items: center; justify-content: space-between; margin: 2px 4px 6px; }
+	.apphead h2 { margin: 0; font-size: 26px; }
+	.pcards--app { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 12px; height: 100%; margin: 0; padding: 0; list-style: none; }
+	.pcards--app .pc { min-height: 0; }
+	.hpager > [data-pane] > .card { padding: 14px; }
+	.hpager > [data-pane] > .sec { padding: 0; }
+}

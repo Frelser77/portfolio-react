@@ -1,3 +1,4 @@
+import AppPager, { usePhone, type PagerPane } from "./AppPager";
 import { FiArrowRight, FiArrowUpRight, FiUsers } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa6";
 import { profile, statusLabel, type Project } from "../content/data";
@@ -12,25 +13,7 @@ const gradient = (p: Project) => `linear-gradient(35deg, ${p.tint[0]} 0%, ${p.ti
 export default function Projects() {
 	const { t } = usePrefs();
 	const projects = useProjects();
-	return (
-		<section className="sec" id="progetti" aria-labelledby="projects-title">
-			<div className="card proj">
-				<div className="pjhead glass" data-lg-bezel="26">
-					<p className="eyebrow">
-						<b>01.</b>
-						{t(ui.projects.eyebrow)}
-					</p>
-					<h2 id="projects-title">{t(ui.projects.title)}</h2>
-					<p className="muted">{t(ui.projects.text)}</p>
-					<a className="btn" href={profile.github} target="_blank" rel="noopener noreferrer">
-						<FaGithub aria-hidden="true" />
-						{t(ui.projects.github)}
-						<span className="sr-only">({t(ui.projects.newTab)})</span>
-					</a>
-				</div>
-
-				<ul className="pcards" role="list">
-					{projects.map((p, n) => {
+	const renderCard = (p: (typeof projects)[number], n: number) => {
 						const live = p.status === "live" ? p.links?.[0] : undefined;
 						return (
 							<li key={p.id} className="pc glass tilt" data-lg-bezel="22">
@@ -73,7 +56,44 @@ export default function Projects() {
 								)}
 							</li>
 						);
-					})}
+	};
+	const phone = usePhone();
+	if (phone) {
+		const pages: PagerPane[] = [];
+		for (let k = 0; k < projects.length; k += 4) pages.push({ id: `p${k}`, label: `${k / 4 + 1}/${Math.ceil(projects.length / 4)}`, node: <ul className="pcards pcards--app" role="list">{projects.slice(k, k + 4).map((p, j) => renderCard(p, k + j))}</ul> });
+		return (
+			<AppPager
+				panes={pages}
+				title={
+					<div className="apphead">
+						<h2 id="projects-title">{t(ui.projects.title)}</h2>
+						<a className="ico glass" href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" data-lg="off">
+							<FaGithub aria-hidden="true" />
+						</a>
+					</div>
+				}
+			/>
+		);
+	}
+	return (
+		<section className="sec" id="progetti" aria-labelledby="projects-title">
+			<div className="card proj">
+				<div className="pjhead glass" data-lg-bezel="26">
+					<p className="eyebrow">
+						<b>01.</b>
+						{t(ui.projects.eyebrow)}
+					</p>
+					<h2 id="projects-title">{t(ui.projects.title)}</h2>
+					<p className="muted">{t(ui.projects.text)}</p>
+					<a className="btn" href={profile.github} target="_blank" rel="noopener noreferrer">
+						<FaGithub aria-hidden="true" />
+						{t(ui.projects.github)}
+						<span className="sr-only">({t(ui.projects.newTab)})</span>
+					</a>
+				</div>
+
+				<ul className="pcards" role="list">
+					{projects.map((p, n) => renderCard(p, n))}
 				</ul>
 			</div>
 

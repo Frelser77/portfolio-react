@@ -7,6 +7,7 @@ import { usePrefs } from "../prefs";
 import { useShown } from "../siteFlags";
 import Method from "../components/Method";
 import Portal from "../components/Portal";
+import { usePhone } from "../components/AppPager";
 
 type Pane = "hero" | "need" | "ai" | "now" | "go";
 const labels: Record<Pane, { it: string; en: string }> = {
@@ -16,18 +17,6 @@ const labels: Record<Pane, { it: string; en: string }> = {
 	now: { it: "Ora", en: "Now" },
 	go: { it: "Esplora", en: "Explore" },
 };
-
-const Q = "(max-width: 720px)";
-function usePhone() {
-	const [m, setM] = useState(() => typeof window !== "undefined" && window.matchMedia?.(Q).matches);
-	useEffect(() => {
-		const mq = window.matchMedia(Q);
-		const on = () => setM(mq.matches);
-		mq.addEventListener("change", on);
-		return () => mq.removeEventListener("change", on);
-	}, []);
-	return m;
-}
 
 export default function Home() {
 	const shown = useShown();

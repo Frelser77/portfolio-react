@@ -5,6 +5,7 @@ import { needs, profile, type Need } from "../content/data";
 import { ui } from "../content/ui";
 import { unlock } from "../achievements";
 import { usePrefs } from "../prefs";
+import AppPager, { usePhone } from "./AppPager";
 import { takePendingBrief } from "../bus";
 import { ui2 } from "../content/ui2";
 import { getHealth, sendBrief } from "../api";
@@ -12,6 +13,7 @@ import { cleanBrief } from "../shared";
 
 export default function Contact() {
 	const { t } = usePrefs();
+	const phone = usePhone();
 	const [copy, setCopy] = useState<"idle" | "ok" | "fail">("idle");
 	const [need, setNeed] = useState<Need["id"] | null>(null);
 	const [msg, setMsg] = useState("");
@@ -89,9 +91,7 @@ export default function Contact() {
 	const mail = `mailto:${profile.email}?subject=${encodeURIComponent(`${t(ui.contact.subject)}${picked ? `: ${t(picked.title)}` : ""}`)}&body=${encodeURIComponent(body)}`;
 	const wa = `https://wa.me/${profile.whatsapp}?text=${encodeURIComponent(msg.trim() || picked ? body : t(ui.contact.waText))}`;
 
-	return (
-		<section className="sec" id="contatti" aria-labelledby="contact-title">
-			<div className="card contact">
+	const textBlock = (
 				<div className="ctext">
 					<p className="eyebrow">
 						<b>05.</b>
@@ -123,6 +123,8 @@ export default function Contact() {
 					</div>
 				</div>
 
+	);
+	const formBlock = (
 				<form className="glass brief" id="brief" onSubmit={(e) => {
 						e.preventDefault();
 						if (canDirect) void direct();
@@ -182,6 +184,21 @@ export default function Contact() {
 					</div>
 					<p className="brief__note">{t(ui.contact.note)}</p>
 				</form>
+	);
+	if (phone)
+		return (
+			<AppPager
+				panes={[
+					{ id: "who", label: t({ it: "Contatti", en: "Contact" }), node: <div className="card contact">{textBlock}</div> },
+					{ id: "brief", label: t({ it: "Scrivimi", en: "Write me" }), node: <div className="card contact">{formBlock}</div> },
+				]}
+			/>
+		);
+	return (
+		<section className="sec" id="contatti" aria-labelledby="contact-title">
+			<div className="card contact">
+				{textBlock}
+				{formBlock}
 			</div>
 		</section>
 	);

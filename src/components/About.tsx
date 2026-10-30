@@ -4,6 +4,7 @@ import { certificates, journey, profile, projects, skillGroups } from "../conten
 import { ui, withAge } from "../content/ui";
 import { useCountUp } from "../hooks";
 import { usePrefs } from "../prefs";
+import AppPager, { usePhone } from "./AppPager";
 import Certificates, { type CertificatesHandle } from "./Certificates";
 
 function Stat({ value, plus, label }: { value: number; plus?: boolean; label: string }) {
@@ -24,10 +25,9 @@ const techCount = skillGroups.reduce((n, g) => n + g.items.length, 0);
 export default function About() {
 	const { t, lang } = usePrefs();
 	const certs = useRef<CertificatesHandle>(null);
+	const phone = usePhone();
 
-	return (
-		<section className="sec" id="chi-sono" aria-labelledby="about-title">
-			<div className="card">
+	const aboutBlock = (
 				<div className="about">
 					<div>
 						<p className="eyebrow">
@@ -74,6 +74,8 @@ export default function About() {
 					</div>
 				</div>
 
+	);
+	const statsBlock = (
 				<ul className="stats" role="list">
 					<Stat value={3} plus label={t(ui.stats.years)} />
 					<Stat value={projects.length} label={t(ui.stats.projects)} />
@@ -81,6 +83,8 @@ export default function About() {
 					<Stat value={certificates.length} label={t(ui.stats.certs)} />
 				</ul>
 
+	);
+	const pathBlock = (
 				<div className="path">
 					<h3>{t(ui.about.path)}</h3>
 					<ol className="steps">
@@ -105,6 +109,25 @@ export default function About() {
 						))}
 					</ol>
 				</div>
+	);
+	if (phone)
+		return (
+			<>
+				<AppPager
+					panes={[
+						{ id: "me", label: t({ it: "Chi sono", en: "About" }), node: <div className="card">{aboutBlock}</div> },
+						{ id: "path", label: t({ it: "Percorso", en: "Path" }), node: <div className="card">{statsBlock}{pathBlock}</div> },
+					]}
+				/>
+				<Certificates ref={certs} />
+			</>
+		);
+	return (
+		<section className="sec" id="chi-sono" aria-labelledby="about-title">
+			<div className="card">
+				{aboutBlock}
+				{statsBlock}
+				{pathBlock}
 			</div>
 			<Certificates ref={certs} />
 		</section>
