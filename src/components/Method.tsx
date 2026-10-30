@@ -22,7 +22,7 @@ export default function Method() {
 						{ui.method.values.map((v, i) => {
 							const Icon = valueIcons[i];
 							return (
-								<li key={i} className="value glass tilt" data-lg="off" style={{ ["--vi" as string]: i }}>
+								<li key={i} className="value glass tilt" data-lg-bezel="24">
 									<span className="value__ico" aria-hidden="true">
 										<Icon />
 									</span>
@@ -38,7 +38,7 @@ export default function Method() {
 					<h3>{t(ui.method.stepsTitle)}</h3>
 					<ol className="flow__steps">
 						{ui.method.steps.map((s, i) => (
-							<li key={i} className="fstep glass tilt" data-lg="off" style={{ ["--vi" as string]: i }}>
+							<li key={i} className="fstep glass tilt" data-lg-bezel="24">
 								<span className="fstep__n" aria-hidden="true">
 									{i + 1}
 								</span>
