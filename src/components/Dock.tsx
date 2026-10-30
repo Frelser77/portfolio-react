@@ -1,13 +1,13 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
-import { FiFolder, FiHome, FiLayers, FiMail, FiUser } from "react-icons/fi";
+import { FiCpu, FiFolder, FiHome, FiMail, FiUser } from "react-icons/fi";
 import { Link, navigate, usePath } from "../router";
 import { prefersReducedMotion, usePrefs } from "../prefs";
 import { ui2 } from "../content/ui2";
 import { isOn, routes } from "./Nav";
 
-// "Lab AI" sta in alto, accanto al trofeo: sul telefono la barra in basso ha cinque schede
-const tabs = routes.filter((r) => r.to !== "/lab");
-const iconOf: Record<string, typeof FiHome> = { "/": FiHome, "/progetti": FiFolder, "/stack": FiLayers, "/chi-sono": FiUser, "/contatti": FiMail };
+// sul telefono la barra in basso ha cinque schede: Stack si raggiunge dal Profilo
+const tabs = routes.filter((r) => r.to !== "/stack");
+const iconOf: Record<string, typeof FiHome> = { "/": FiHome, "/progetti": FiFolder, "/chi-sono": FiUser, "/lab": FiCpu, "/contatti": FiMail };
 
 /**
  * Barra di navigazione in basso, solo su telefono, come la tab bar di iOS:

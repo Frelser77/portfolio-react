@@ -1,7 +1,8 @@
+import { useState } from "react";
 import AppPager, { usePhone, type PagerPane } from "./AppPager";
 import { FiArrowRight, FiArrowUpRight, FiUsers } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa6";
-import { profile, statusLabel, type Project } from "../content/data";
+import { kindLabel, profile, statusLabel, type Project, type ProjectKind } from "../content/data";
 import { ui } from "../content/ui";
 import { ui2 } from "../content/ui2";
 import { Link } from "../router";
@@ -58,9 +59,33 @@ export default function Projects() {
 						);
 	};
 	const phone = usePhone();
+	const [filter, setFilter] = useState<"all" | ProjectKind>("all");
 	if (phone) {
-		const pages: PagerPane[] = [];
-		for (let k = 0; k < projects.length; k += 4) pages.push({ id: `p${k}`, label: `${k / 4 + 1}/${Math.ceil(projects.length / 4)}`, node: <ul className="pcards pcards--app" role="list">{projects.slice(k, k + 4).map((p, j) => renderCard(p, k + j))}</ul> });
+		const shownList = filter === "all" ? projects : projects.filter((p) => p.kind === filter);
+		const count = (k: ProjectKind) => projects.filter((p) => p.kind === k).length;
+		const pages: PagerPane[] = [
+			{
+				id: "list",
+				label: "",
+				node: (
+					<>
+						<div className="pfilt" role="radiogroup" aria-label={t({ it: "Filtra i progetti", en: "Filter projects" })}>
+							<button type="button" role="radio" aria-checked={filter === "all"} className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
+								{t({ it: "Tutti", en: "All" })} {projects.length}
+							</button>
+							{(Object.keys(kindLabel) as ProjectKind[]).filter((k) => count(k)).map((k) => (
+								<button key={k} type="button" role="radio" aria-checked={filter === k} className={filter === k ? "on" : ""} onClick={() => setFilter(k)}>
+									{t(kindLabel[k])}
+								</button>
+							))}
+						</div>
+						<ul className="pcards pcards--list" role="list">
+							{shownList.map((p) => renderCard(p, projects.indexOf(p)))}
+						</ul>
+					</>
+				),
+			},
+		];
 		return (
 			<AppPager
 				panes={pages}

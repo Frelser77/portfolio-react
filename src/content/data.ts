@@ -115,7 +115,18 @@ export interface Project {
 	links?: { label: L; href: string }[];
 	/** URL caricabile nell'anteprima live (solo progetti online) */
 	preview?: string;
+	/** per chi: cliente, azienda in cui ho lavorato, progetto mio (filtri della lista) */
+	kind: ProjectKind;
+	/** un risultato concreto da mostrare in evidenza (home e pagina progetto) */
+	result?: { value: L; label: L };
 }
+
+export type ProjectKind = "client" | "company" | "own";
+export const kindLabel: Record<ProjectKind, L> = {
+	client: { it: "Per clienti", en: "For clients" },
+	company: { it: "In azienda", en: "At a company" },
+	own: { it: "Miei", en: "My own" },
+};
 
 export const statusLabel: Record<ProjectStatus, L> = {
 	live: { it: "Online", en: "Live" },
@@ -130,6 +141,8 @@ export const statusLabel: Record<ProjectStatus, L> = {
 export const projects: Project[] = [
 	{
 		id: "bite-the-trouble",
+		kind: "client",
+		result: { value: { it: "Online", en: "Live" }, label: { it: "Il menu del locale, pensato per lo smartphone e già in uso", en: "The venue's menu, built for phones and already in use" } },
 		name: "Bite the Trouble",
 		mark: "BT",
 		logo: { src: "/img/progetti/bt-scritta.webp", w: 400, h: 357 },
@@ -154,6 +167,8 @@ export const projects: Project[] = [
 	},
 	{
 		id: "casaurea",
+		kind: "client",
+		result: { value: { it: "1 posto", en: "1 place" }, label: { it: "Prenotazioni Lodgify, conti e amministrazione insieme", en: "Lodgify bookings, accounts and admin together" } },
 		name: "Casaurea",
 		mark: "Ca",
 		logo: { src: "/img/progetti/casaurea-mark.webp", w: 360, h: 357 },
@@ -178,6 +193,7 @@ export const projects: Project[] = [
 	},
 	{
 		id: "san-antonio",
+		kind: "client",
 		name: "Campionato San Antonio",
 		mark: "SA",
 		logo: { src: "/img/progetti/sa.webp", w: 420, h: 420 },
@@ -200,6 +216,7 @@ export const projects: Project[] = [
 	},
 	{
 		id: "cable",
+		kind: "own",
 		name: "Cable",
 		mark: "Cb",
 		logo: { src: "/img/progetti/cable-icon.webp", w: 320, h: 320 },
@@ -231,6 +248,7 @@ export const projects: Project[] = [
 	},
 	{
 		id: "bt-darts",
+		kind: "own",
 		name: "BT Darts Score Board",
 		mark: "BD",
 		logo: { src: "/img/progetti/darts-logo.webp", w: 300, h: 293 },
@@ -264,6 +282,8 @@ export const projects: Project[] = [
 	},
 	{
 		id: "primed",
+		kind: "company",
+		result: { value: { it: "20 s → 3 s", en: "20 s → 3 s" }, label: { it: "Processi critici dopo la riscrittura da Classic ASP a NestJS", en: "Critical processes after the Classic ASP to NestJS rewrite" } },
 		name: "Primed Group",
 		mark: "PG",
 		tint: ["#141a52", "#3b3fb5", "#7a5cf0"],
@@ -290,6 +310,7 @@ export const projects: Project[] = [
 	},
 	{
 		id: "restofull",
+		kind: "own",
 		name: "Restofull",
 		mark: "Rf",
 		logo: { src: "/img/progetti/restofull-logo.webp", w: 392, h: 110, plate: true },

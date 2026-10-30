@@ -105,6 +105,23 @@ export default function Guide() {
 	const lastDodge = useRef(0);
 
 	const [glOk, setGlOk] = useState(true);
+	// il cane 3D parte dopo che la pagina ha mostrato i contenuti: prima il sito, poi la mascotte
+	const [glReady, setGlReady] = useState(false);
+	useEffect(() => {
+		let id = 0;
+		const go = () => setGlReady(true);
+		const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (n: number) => void };
+		const start = () => {
+			id = w.requestIdleCallback ? w.requestIdleCallback(go, { timeout: 2500 }) : window.setTimeout(go, 1200);
+		};
+		if (document.readyState === "complete") start();
+		else window.addEventListener("load", start, { once: true });
+		return () => {
+			window.removeEventListener("load", start);
+			if (w.cancelIdleCallback && id) w.cancelIdleCallback(id);
+			clearTimeout(id);
+		};
+	}, []);
 	const fail = useCallback(() => setGlOk(false), []);
 	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, face: -1, waving: false, spinAt: -1e9, hopAt: -1e9, mood: "neutral" });
 	const root = useRef<HTMLDivElement>(null);
@@ -198,8 +215,16 @@ export default function Guide() {
 				feel("happy", 2000);
 				later(() => setWave(false), 1700);
 			}
+			// il fumetto parte da solo una volta per visita, mai sul telefono (lì si apre toccando il cane)
 			const phone = window.innerWidth < 720;
-			const skip = phone && (here.key === "/" || seen.has(here.key));
+			let once = false;
+			try {
+				once = sessionStorage.getItem("fr7-tip") === "1";
+				if (!phone && !once && here.key !== "/") sessionStorage.setItem("fr7-tip", "1");
+			} catch {
+				once = seen.size > 0;
+			}
+			const skip = phone || once || here.key === "/";
 			seen.add(here.key);
 			if (mode === "auto" && !quiet.current && !skip) {
 				setShow(true);
@@ -683,7 +708,7 @@ export default function Guide() {
 				{glOk ? (
 					<div className="botgl">
 						<div className="glshadow" />
-						<BotGL pose={pose} onFail={fail} />
+						{glReady && <BotGL pose={pose} onFail={fail} />}
 					</div>
 				) : (
 					<div

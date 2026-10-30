@@ -5,6 +5,9 @@ import { ui, withAge } from "../content/ui";
 import { useCountUp } from "../hooks";
 import { usePrefs } from "../prefs";
 import AppPager, { usePhone } from "./AppPager";
+import QuickProfile from "./QuickProfile";
+import Ecosystem from "./Ecosystem";
+import { Link } from "../router";
 import Certificates, { type CertificatesHandle } from "./Certificates";
 
 function Stat({ value, plus, label }: { value: number; plus?: boolean; label: string }) {
@@ -115,8 +118,10 @@ export default function About() {
 			<>
 				<AppPager
 					panes={[
-						{ id: "me", label: t({ it: "Chi sono", en: "About" }), node: <div className="card">{aboutBlock}</div> },
+						{ id: "quick", label: t({ it: "In breve", en: "Quick" }), node: <QuickProfile pathLink={false} /> },
+						{ id: "me", label: t({ it: "Storia", en: "Story" }), node: <div className="card">{aboutBlock}</div> },
 						{ id: "path", label: t({ it: "Percorso", en: "Path" }), node: <div className="card">{statsBlock}{pathBlock}</div> },
+						{ id: "stack", label: "Stack", node: <><Ecosystem /><Link className="btn glass qp__stacklink" to="/stack">{t({ it: "Competenze e GitHub", en: "Skills and GitHub" })}</Link></> },
 					]}
 				/>
 				<Certificates ref={certs} />

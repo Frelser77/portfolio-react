@@ -1,4 +1,5 @@
-import { FiCpu } from "react-icons/fi";
+import { FiDownload } from "react-icons/fi";
+import { profile } from "../content/data";
 import { Link, usePath } from "../router";
 import { usePrefs } from "../prefs";
 import { AchievementsHud } from "./Achievements";
@@ -9,9 +10,9 @@ import Logo from "./Logo";
 export const routes = [
 	{ to: "/", label: ui2.nav.home },
 	{ to: "/progetti", label: ui2.nav.projects },
+	{ to: "/chi-sono", label: ui2.nav.about },
 	{ to: "/stack", label: ui2.nav.stack },
 	{ to: "/lab", label: ui2.nav.lab },
-	{ to: "/chi-sono", label: ui2.nav.about },
 	{ to: "/contatti", label: ui2.nav.contact },
 ];
 
@@ -37,10 +38,10 @@ export default function Nav() {
 				})}
 			</nav>
 			<div className="nav__tools">
-				<Link to="/lab" className={`ico glass labbtn${isOn(path, "/lab") ? " on" : ""}`} aria-current={isOn(path, "/lab") ? "page" : undefined} title={t(ui2.nav.lab)}>
-					<FiCpu aria-hidden="true" />
-					<span className="sr-only">{t(ui2.nav.lab)}</span>
-				</Link>
+				<a className="glass cvbtn" href={lang === "it" ? profile.cv : profile.cvEn} download title={t(ui2.nav.cv)} data-lg="off">
+					<FiDownload aria-hidden="true" />
+					<span className="cvbtn__t">{t(ui2.nav.cv)}</span>
+				</a>
 				<AchievementsHud />
 				<button type="button" className="ico lang glass" onClick={toggleLang} title={t(ui.nav.lang)}>
 					<span aria-hidden="true">{lang === "it" ? "EN" : "IT"}</span>

@@ -3,7 +3,6 @@ import { ui } from "../content/ui";
 import { usePrefs } from "../prefs";
 import { Link } from "../router";
 import { routes } from "./Nav";
-import Counter from "./Counter";
 import Logo from "./Logo";
 
 export default function Footer() {
@@ -15,7 +14,6 @@ export default function Footer() {
 			</span>
 			<span>
 				© {new Date().getFullYear()} Salvatore D'Amico. {t(ui.footer.rights)}
-				<Counter />
 			</span>
 			<nav aria-label={t(ui.footer.menu)}>
 				{routes.map((r) => (

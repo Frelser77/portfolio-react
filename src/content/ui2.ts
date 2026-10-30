@@ -7,9 +7,10 @@ export const ui2 = {
 		projects: { it: "Progetti", en: "Projects" },
 		stack: { it: "Stack", en: "Stack" },
 		lab: { it: "Lab AI", en: "AI Lab" },
-		about: { it: "Chi sono", en: "About" },
+		about: { it: "Profilo", en: "Profile" },
 		contact: { it: "Contatti", en: "Contact" },
 		dock: { it: "Navigazione principale", en: "Main navigation" },
+		cv: { it: "Scarica CV", en: "Download CV" },
 	},
 	titles: {
 		home: { it: "Salvatore D'Amico · soluzioni digitali su misura", en: "Salvatore D'Amico · tailor-made digital solutions" },
@@ -34,7 +35,7 @@ export const ui2 = {
 			{
 				to: "/stack",
 				title: { it: "Stack", en: "Stack" },
-				text: { it: "Scheda personaggio, inventario e attività reale su GitHub.", en: "Character sheet, inventory and real GitHub activity." },
+				text: { it: "Competenze, tecnologie e attività reale su GitHub.", en: "Skills, technologies and real GitHub activity." },
 			},
 			{
 				to: "/lab",
@@ -219,8 +220,8 @@ export const ui2 = {
 		collabShort: { it: "In coppia", en: "Pair project" },
 		back: { it: "Tutti i progetti", en: "All projects" },
 		stories: { it: "Cambia progetto", en: "Switch project" },
-		prev: { it: "Missione precedente", en: "Previous quest" },
-		next: { it: "Missione successiva", en: "Next quest" },
+		prev: { it: "Progetto precedente", en: "Previous project" },
+		next: { it: "Progetto successivo", en: "Next project" },
 		like: { it: "Mi piace", en: "Like" },
 		liked: { it: "Ti è piaciuto", en: "You liked it" },
 		notFound: { it: "Questo progetto non esiste.", en: "This project doesn't exist." },
@@ -446,14 +447,14 @@ export const ui2 = {
 		],
 		stack: [
 			{
-				it: "Più giù trovi l'inventario e cosa fa davvero Salvatore su GitHub, dal vivo.",
-				en: "Further down you'll find the inventory and what Salvatore really does on GitHub, live.",
+				it: "Più giù trovi le competenze e cosa fa davvero Salvatore su GitHub, dal vivo.",
+				en: "Further down you'll find the skills and what Salvatore really does on GitHub, live.",
 			},
 		],
 		progetto: [
 			{
-				it: "Ogni missione ha la sua pagina. Se ti serve qualcosa di simile, tocca \"Parliamone\".",
-				en: "Every quest has its own page. If you need something similar, tap \"Let's talk\".",
+				it: "Ogni progetto ha la sua pagina. Se ti serve qualcosa di simile, tocca \"Parliamone\".",
+				en: "Every project has its own page. If you need something similar, tap \"Let's talk\".",
 			},
 		],
 	} as Record<string, L[]>,

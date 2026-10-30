@@ -4,7 +4,6 @@ import Nav from "./components/Nav";
 import Dock from "./components/Dock";
 import Footer from "./components/Footer";
 import Guide from "./components/Guide";
-import AvailableBar from "./components/AvailableBar";
 import World from "./components/World";
 import About from "./components/About";
 import Skills from "./components/Skills";
@@ -104,7 +103,6 @@ export default function App() {
 				<Footer />
 			</div>
 			<Dock />
-			{shown("ui.hire") && <AvailableBar />}
 			{shown("ui.dog") && <Guide />}
 			<AchievementToasts />
 		</div>

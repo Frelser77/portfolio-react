@@ -7,6 +7,7 @@ import { usePrefs } from "../prefs";
 import { useShown } from "../siteFlags";
 import Method from "../components/Method";
 import Portal from "../components/Portal";
+import Results from "../components/Results";
 import { usePhone } from "../components/AppPager";
 
 type Pane = "hero" | "need" | "ai" | "now" | "go";
@@ -46,6 +47,7 @@ export default function Home() {
 	const body = (
 		<>
 			<Hero noSide={phone} />
+			{!phone && <Results />}
 			{phone && needOn && (
 				<div data-pane="need">
 					{shown("home.hero.config") && <Configurator />}

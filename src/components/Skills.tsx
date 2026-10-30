@@ -53,7 +53,7 @@ export default function Skills({ between, cards = true }: { between?: ReactNode;
 							</p>
 							<h2 id="skills-title">{t(ui.skills.title)}</h2>
 							<p className="sheet__class">
-								Salvatore D'Amico · {t(ui.skills.class)} · <b>{t(ui.skills.level)} {profile.age}</b>
+								Salvatore D'Amico · {t(ui.skills.class)} · <b>{profile.age} {t(ui.skills.level)}</b>
 							</p>
 						</div>
 					</div>

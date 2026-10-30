@@ -14,7 +14,7 @@ export function AchievementsHud() {
 	const dlg = useRef<HTMLDialogElement>(null);
 	return (
 		<>
-			<button type="button" className="ico glass hud" onClick={() => dlg.current?.showModal()} title={t(ui.ach.hud)} data-lg-bezel="14">
+			<button type="button" className={`ico glass hud${got.size ? "" : " hud--none"}`} onClick={() => dlg.current?.showModal()} title={t(ui.ach.hud)} data-lg-bezel="14">
 				<FiAward aria-hidden="true" />
 				<b aria-hidden="true">
 					{got.size}/{ALL.length}

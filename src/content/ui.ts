@@ -219,14 +219,14 @@ export const ui = {
 	},
 
 	skills: {
-		eyebrow: { it: "Scheda personaggio", en: "Character sheet" },
-		title: { it: "Il mio inventario", en: "My inventory" },
+		eyebrow: { it: "Profilo tecnico", en: "Tech profile" },
+		title: { it: "Le mie competenze", en: "My skills" },
 		text: {
 			it: "Gli strumenti che uso ogni giorno, divisi per zaino. Tocca un oggetto per vedere dove l'ho usato davvero.",
 			en: "The tools I use every day, sorted by bag. Tap an item to see where I've really used it.",
 		},
 		cta: { it: "Vedi le missioni", en: "See the quests" },
-		level: { it: "Liv.", en: "Lv." },
+		level: { it: "anni", en: "years old" },
 		class: { it: "Full Stack Developer", en: "Full Stack Developer" },
 		exp: { it: "esperienza sul campo", en: "field experience" },
 		quests: { it: "missioni", en: "quests" },
@@ -234,13 +234,13 @@ export const ui = {
 		usedIn: { it: "Usato in", en: "Used in" },
 		daily: { it: "Nel mio kit di tutti i giorni.", en: "Part of my everyday kit." },
 		missions: { it: "missioni", en: "quests" },
-		open: { it: "Apri la missione", en: "Open the quest" },
+		open: { it: "Apri il progetto", en: "Open the project" },
 	},
 
 	projects: {
-		eyebrow: { it: "Registro missioni", en: "Quest log" },
+		eyebrow: { it: "Portfolio", en: "Portfolio" },
 		title: { it: "Cosa ho realizzato", en: "What I've built" },
-		quest: { it: "Missione", en: "Quest" },
+		quest: { it: "Progetto", en: "Project" },
 		text: {
 			it: "Lavori per clienti, software aziendale e prodotti miei. Alcuni non sono più online: per quelli trovi comunque cosa ho fatto.",
 			en: "Client work, in-house software and products of my own. Some are no longer online, but you can still see what I built.",
