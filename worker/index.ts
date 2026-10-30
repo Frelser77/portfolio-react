@@ -1125,6 +1125,15 @@ export default {
 		const env: Env = { ...rawEnv, GITHUB_TOKEN: rawEnv.GITHUB_TOKEN?.trim() || undefined, ADMIN_TOKEN: rawEnv.ADMIN_TOKEN?.trim() || undefined, ADMIN_TOTP: rawEnv.ADMIN_TOTP?.replace(/[\s-]/g, "").toUpperCase() || undefined };
 		const url = new URL(req.url);
 		const path = url.pathname.replace(/\/+$/, "");
+		if (path === "/robots.txt" || path === "/sitemap.xml") {
+			const origin = url.origin;
+			if (path === "/robots.txt")
+				return new Response(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`, { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=3600" } });
+			const urls = ["/", "/progetti", "/stack", "/lab", "/chi-sono", "/contatti", ...projects.map((x) => `/progetti/${x.id}`)];
+			const day = new Date().toISOString().slice(0, 10);
+			const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${origin}${u === "/" ? "/" : u}</loc><lastmod>${day}</lastmod><priority>${u === "/" ? "1.0" : u.startsWith("/progetti/") ? "0.6" : "0.8"}</priority></url>`).join("\n")}\n</urlset>\n`;
+			return new Response(xml, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+		}
 		if (!path.startsWith("/api/")) {
 			if ((req.method === "GET" || req.method === "HEAD") && PAGE_PATH.test(path)) return page(req, env, url, path);
 			return env.ASSETS ? env.ASSETS.fetch(req) : new Response("Not found", { status: 404 });
