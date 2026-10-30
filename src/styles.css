@@ -5242,3 +5242,31 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 .shots__slide, .shots__thumb, .story__face { background-image: linear-gradient(90deg, rgba(255,255,255,.05) 20%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.05) 80%); background-size: 220% 100%; animation: skshim 1.6s ease-in-out infinite; }
 .story__face { animation: none; }
 @media (prefers-reduced-motion: reduce) { .shots__slide, .shots__thumb { animation: none; } }
+
+/* ====== Telefono: modo app ====== */
+html { -webkit-tap-highlight-color: transparent; }
+@media (max-width: 720px) {
+	html, body { overscroll-behavior-y: none; }
+	.pf a, .pf button, .pf summary { -webkit-touch-callout: none; touch-action: manipulation; }
+	.pf button, .dock a, .nav a { -webkit-user-select: none; user-select: none; }
+	.pf { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+	/* meno cose che galleggiano: il contatto è già nella barra in basso */
+	.hire { display: none; }
+	/* barra in alto più sottile */
+	.nav { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 6px; }
+	/* il footer diventa una riga */
+	.foot { padding: 20px 16px 8px; gap: 6px; text-align: center; justify-items: center; font-size: 12px; opacity: 0.75; }
+	.foot .brand, .foot nav { display: none; }
+	/* intestazioni di pagina più compatte */
+	.pf h1.h2 { font-size: 26px; line-height: 1.12; }
+	.sec { padding-top: 22px; padding-bottom: 22px; }
+	/* la lente non copre più il testo */
+	.lens { top: 92px; bottom: auto; right: 14px; width: 60px; height: 60px; }
+	.lens__hint { display: none; }
+	/* entrata di pagina in stile app */
+	.page { animation: apin 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+	@keyframes apin { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+	/* la barra in basso reagisce al tocco */
+	.dock a:active { transform: scale(0.92); transition: transform 0.12s; }
+}
+@media (max-width: 720px) and (prefers-reduced-motion: reduce) { .page { animation: none; } }
