@@ -5475,3 +5475,7 @@ html { -webkit-tap-highlight-color: transparent; }
 }
 @media (max-width: 720px) { .hpager .hero h1 { margin: 8px 0 10px; } .hpager .hero .avail { margin-bottom: 4px !important; } .hpager .hero .row { margin-top: 4px; } }
 @media (max-width: 720px) { .hpager .hero h1 { font-size: 31px; line-height: 1.08; } }
+/* progetti su telefono: card grandi 2x2; con meno di 4 progetti le card non si allungano */
+.happ .pfilt { flex: none; margin: 0 0 10px; }
+.pcards--app { grid-auto-rows: minmax(0, 1fr); }
+.pcards--app:has(> li:nth-child(-n+2):last-child) { grid-auto-rows: minmax(0, 50%); }

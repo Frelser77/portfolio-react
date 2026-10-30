@@ -63,39 +63,36 @@ export default function Projects() {
 	if (phone) {
 		const shownList = filter === "all" ? projects : projects.filter((p) => p.kind === filter);
 		const count = (k: ProjectKind) => projects.filter((p) => p.kind === k).length;
-		const pages: PagerPane[] = [
-			{
-				id: "list",
-				label: "",
-				node: (
-					<>
-						<div className="pfilt" role="radiogroup" aria-label={t({ it: "Filtra i progetti", en: "Filter projects" })}>
-							<button type="button" role="radio" aria-checked={filter === "all"} className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
-								{t({ it: "Tutti", en: "All" })} {projects.length}
-							</button>
-							{(Object.keys(kindLabel) as ProjectKind[]).filter((k) => count(k)).map((k) => (
-								<button key={k} type="button" role="radio" aria-checked={filter === k} className={filter === k ? "on" : ""} onClick={() => setFilter(k)}>
-									{t(kindLabel[k])}
-								</button>
-							))}
-						</div>
-						<ul className="pcards pcards--list" role="list">
-							{shownList.map((p) => renderCard(p, projects.indexOf(p)))}
-						</ul>
-					</>
-				),
-			},
-		];
+		const pages: PagerPane[] = [];
+		const n = Math.ceil(shownList.length / 4);
+		for (let k = 0; k < shownList.length; k += 4)
+			pages.push({ id: `p${k}`, label: `${k / 4 + 1}/${n}`, node: <ul className="pcards pcards--app" role="list">{shownList.slice(k, k + 4).map((p) => renderCard(p, projects.indexOf(p)))}</ul> });
+		const filters = (
+			<div className="pfilt" role="radiogroup" aria-label={t({ it: "Filtra i progetti", en: "Filter projects" })}>
+				<button type="button" role="radio" aria-checked={filter === "all"} className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
+					{t({ it: "Tutti", en: "All" })} {projects.length}
+				</button>
+				{(Object.keys(kindLabel) as ProjectKind[]).filter((k) => count(k)).map((k) => (
+					<button key={k} type="button" role="radio" aria-checked={filter === k} className={filter === k ? "on" : ""} onClick={() => setFilter(k)}>
+						{t(kindLabel[k])} {count(k)}
+					</button>
+				))}
+			</div>
+		);
 		return (
 			<AppPager
+				key={filter}
 				panes={pages}
 				title={
+					<>
 					<div className="apphead">
 						<h2 id="projects-title">{t(ui.projects.title)}</h2>
 						<a className="ico glass" href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" data-lg="off">
 							<FaGithub aria-hidden="true" />
 						</a>
 					</div>
+					{filters}
+					</>
 				}
 			/>
 		);
