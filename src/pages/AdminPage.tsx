@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone, FiMonitor, FiGitBranch, FiSettings, FiEye, FiEyeOff, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import type { AdminRepo } from "../api";
 import { ui2 } from "../content/ui2";
@@ -99,6 +100,16 @@ export default function AdminPage() {
 		document.documentElement.classList.add("adm-app");
 		return () => document.documentElement.classList.remove("adm-app");
 	}, []);
+
+	// l'esito dei salvataggi compare come avviso in alto, non come riquadri dentro le schede
+	useEffect(() => {
+		const r = ordSaved || saved;
+		if (!r) return;
+		setFlash(r);
+		setOrdSaved("");
+		setSaved("");
+		window.setTimeout(() => setFlash(""), 2200);
+	}, [ordSaved, saved]);
 
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
 	const failOf = async (r: Response): Promise<Fail> => {
@@ -774,25 +785,6 @@ export default function AdminPage() {
 										);
 									})}
 								</ol>
-								<div className={`adm__save${ordDirty ? " dirty" : ""}`}>
-									<span>{ordDirty ? t(A.unsaved) : t(A.inSync)}</span>
-									<span className="adm__tools">
-										{ordDirty && (
-											<button type="button" className="btn glass sm" onClick={() => setOrd(JSON.parse(ordBase) as Ord[])} disabled={busy}>
-												{t(A.cancel)}
-											</button>
-										)}
-										<button type="button" className="btn pri sm" onClick={saveOrd} disabled={busy || !ordDirty}>
-											{t(A.save)}
-										</button>
-									</span>
-								</div>
-								{ordSaved && (
-									<p className={`adm__note ${ordSaved === "ok" ? "ok" : "warn"}`} role="status">
-										{ordSaved === "ok" ? <FiCheckCircle aria-hidden="true" /> : <FiAlertTriangle aria-hidden="true" />}
-										<span>{t(ordSaved === "ok" ? A.saved : A.saveFail)}</span>
-									</p>
-								)}
 							</div>
 							<div className="glass adm__card" data-lg-bezel="26">
 								<div className="adm__top">
@@ -865,25 +857,6 @@ export default function AdminPage() {
 											))}
 									</select>
 								</label>
-								<div className={`adm__save${dirty ? " dirty" : ""}`}>
-									<span>{dirty ? t(A.unsaved) : t(A.inSync)}</span>
-									<span className="adm__tools">
-										{dirty && (
-											<button type="button" className="btn glass sm" onClick={() => setPicks(JSON.parse(base) as Pick[])} disabled={busy}>
-												{t(A.cancel)}
-											</button>
-										)}
-										<button type="button" className="btn pri sm" onClick={savePicks} disabled={busy || !dirty}>
-											{t(A.save)}
-										</button>
-									</span>
-								</div>
-								{saved && (
-									<p className={`adm__note ${saved === "ok" ? "ok" : "warn"}`} role="status">
-										{saved === "ok" ? <FiCheckCircle aria-hidden="true" /> : <FiAlertTriangle aria-hidden="true" />}
-										<span>{t(saved === "ok" ? A.saved : A.saveFail)}</span>
-									</p>
-								)}
 									</>
 								)}
 							</div>
@@ -942,7 +915,8 @@ export default function AdminPage() {
 									</span>
 								</div>
 								</div>
-								{chosen.length > 0 && !ask && (
+								{chosen.length > 0 && !ask &&
+									createPortal(
 									<div className="adm__bar adm__acts adm__dockbar">
 										<button type="button" className="adm__mini" onClick={() => setAsk("private")}>
 											{t(A.toPrivate)} ({chosen.length})
@@ -957,6 +931,8 @@ export default function AdminPage() {
 											{t(A.toPublic)} ({chosen.length})
 										</button>
 									</div>
+								,
+									document.body,
 								)}
 								{ask && (
 									<div className="adm__note warn" role="alertdialog">
@@ -1009,15 +985,21 @@ export default function AdminPage() {
 														{r.pushedAt && <time>{r.pushedAt.slice(0, 10)}</time>}
 													</small>
 												</div>
-												<button
-													type="button"
-													className={`adm__mini${on ? " on" : ""}`}
-													disabled={on || picks.length >= 8}
-													title={picks.length >= 8 ? t(A.max) : undefined}
-													onClick={() => setPicks((x) => [...x, { name: r.name, label: "", blurb: "", link: r.homepage ?? "" }])}
-												>
-													{on ? "✓" : t(A.add)}
-												</button>
+												{on ? (
+													<span className="adm__onsite" title={t(A.onSite)}>
+														<FiCheckCircle aria-label={t(A.onSite)} />
+													</span>
+												) : (
+													<button
+														type="button"
+														className="adm__mini"
+														disabled={picks.length >= 8}
+														title={picks.length >= 8 ? t(A.max) : undefined}
+														onClick={() => setPicks((x) => [...x, { name: r.name, label: "", blurb: "", link: r.homepage ?? "" }])}
+													>
+														{t(A.add)}
+													</button>
+												)}
 											</li>
 										);
 									})}
@@ -1025,6 +1007,38 @@ export default function AdminPage() {
 									</>
 								)}
 							</div>
+						</div>
+					)}
+					{(ordDirty || dirty) && (
+						<div className="adm__savebar" role="region" aria-label={t(A.unsavedShort)}>
+							<span className="adm__savetxt">
+								<i aria-hidden="true" />
+								{t(A.unsavedShort)}
+							</span>
+							<span className="adm__saveacts">
+								<button
+									type="button"
+									className="adm__sbtn"
+									onClick={() => {
+										if (ordDirty) setOrd(JSON.parse(ordBase) as Ord[]);
+										if (dirty) setPicks(JSON.parse(base) as Pick[]);
+									}}
+									disabled={busy}
+								>
+									{t(A.cancel)}
+								</button>
+								<button
+									type="button"
+									className="adm__sbtn pri"
+									onClick={async () => {
+										if (ordDirty) await saveOrd();
+										if (dirty) await savePicks();
+									}}
+									disabled={busy}
+								>
+									{t(A.save)}
+								</button>
+							</span>
 						</div>
 					)}
 				</>

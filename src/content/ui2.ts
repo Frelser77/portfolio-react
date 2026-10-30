@@ -273,6 +273,7 @@ export const ui2 = {
 		sysBtn: { it: "Sistema", en: "System" },
 		visTitle: { it: "Cosa si vede sul sito", en: "What shows on the site" },
 		visText: { it: "Ogni interruttore agisce subito, senza pubblicare altro. Quello che spegni sparisce dal sito, ma non viene cancellato.", en: "Each switch applies instantly, nothing else to publish. What you turn off disappears from the site but isn't deleted." },
+		unsavedShort: { it: "Modifiche non pubblicate", en: "Unpublished changes" },
 		visSaved: { it: "Salvato", en: "Saved" },
 		visFail: { it: "Non salvato, riprova", en: "Not saved, try again" },
 		visDigest: { it: "Rigenera il riassunto AI ora", en: "Regenerate the AI summary now" },
