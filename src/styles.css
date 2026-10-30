@@ -5093,3 +5093,12 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 	.fit .row .btn { flex: 1 1 100%; justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) { .fit__wait i, .fit__ring { animation: none; } }
+
+/* schermata intera: carosello a scorrimento agganciato, senza ingrandimento; il font non passa dal portale, lo si eredita dal body */
+.lbx { font-family: var(--font-body, inherit); }
+.lbx button, .lbx .btn { font: inherit; }
+.lbx__cap { min-height: 2.9em; display: flex; align-items: center; line-height: 1.4; }
+.lbx__track { display: flex; margin: 0; padding: 0; list-style: none; min-height: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior: contain; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; }
+.lbx__track::-webkit-scrollbar { display: none; }
+.lbx__track > li { flex: 0 0 100%; min-width: 0; display: grid; place-items: center; padding: 0 12px; scroll-snap-align: center; scroll-snap-stop: always; }
+.lbx__track img { display: block; max-width: 100%; max-height: calc(100dvh - 170px); width: auto; height: auto; border-radius: 12px; box-shadow: 0 20px 70px rgba(0,0,0,.6); }

@@ -16,16 +16,34 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 	const track = useRef<HTMLUListElement>(null);
 	const [i, setI] = useState(0);
 	const [open, setOpen] = useState(false);
-	const [zoom, setZoom] = useState(false);
 	const opener = useRef<HTMLElement | null>(null);
 	const closeBtn = useRef<HTMLButtonElement>(null);
 	const swipe = useRef<{ x: number; y: number } | null>(null);
+	const lbTrack = useRef<HTMLUListElement>(null);
+	const reduce = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	/** nella schermata intera si scorre come in un carosello: la foto segue il dito e si aggancia */
+	const lbGo = (n: number) => {
+		const el = lbTrack.current;
+		const k = (n + shots.length) % shots.length;
+		if (el) el.scrollTo({ left: k * el.clientWidth, behavior: reduce() ? "auto" : "smooth" });
+	};
+	const onLbScroll = () => {
+		const el = lbTrack.current;
+		if (!el) return;
+		const k = Math.round(el.scrollLeft / el.clientWidth);
+		if (k !== i && k >= 0 && k < shots.length) setI(k);
+	};
+	useEffect(() => {
+		if (!open) return;
+		const el = lbTrack.current;
+		if (el) el.scrollTo({ left: i * el.clientWidth, behavior: "auto" });
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [open]);
 
 	const go = useCallback(
 		(n: number) => {
 			const k = (n + shots.length) % shots.length;
 			setI(k);
-			setZoom(false);
 			const el = track.current;
 			if (el) el.scrollTo({ left: k * el.clientWidth, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 		},
@@ -44,8 +62,8 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 		if (!open) return;
 		const onKey = (e: KeyboardEvent) => {
 			if (e.key === "Escape") setOpen(false);
-			else if (e.key === "ArrowRight") go(i + 1);
-			else if (e.key === "ArrowLeft") go(i - 1);
+			else if (e.key === "ArrowRight") lbGo(i + 1);
+			else if (e.key === "ArrowLeft") lbGo(i - 1);
 		};
 		document.addEventListener("keydown", onKey);
 		document.documentElement.classList.add("noscroll");
@@ -55,7 +73,7 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 			document.documentElement.classList.remove("noscroll");
 			opener.current?.focus();
 		};
-	}, [open, i, go]);
+	}, [open, i]);
 
 	const cur = shots[i];
 	return (
@@ -71,7 +89,6 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 								onClick={(e) => {
 									opener.current = e.currentTarget;
 									setI(n);
-									setZoom(false);
 									setOpen(true);
 								}}
 								aria-label={`${t(ui2.shots.enlarge)}: ${t(sh.alt)}`}
@@ -111,52 +128,52 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 
 			{open &&
 				createPortal(
-				<div className="lbx" role="dialog" aria-modal="true" aria-label={t(cur.alt)} onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
-					<div className="lbx__bar">
-						<span>
-							{t(cur.alt)} · {i + 1}/{shots.length}
-						</span>
-						<button ref={closeBtn} type="button" className="lbx__x" onClick={() => setOpen(false)} aria-label={t(ui2.shots.close)}>
-							<FiX aria-hidden="true" />
-						</button>
-					</div>
-					<div
-						className={`lbx__view${zoom ? " zoomed" : ""}`}
-						onTouchStart={(e) => {
-							const q = e.touches[0];
-							swipe.current = e.touches.length === 1 && !zoom ? { x: q.clientX, y: q.clientY } : null;
-						}}
-						onTouchEnd={(e) => {
-							const s0 = swipe.current;
-							swipe.current = null;
-							if (!s0 || shots.length < 2) return;
-							const q = e.changedTouches[0];
-							const dx = q.clientX - s0.x;
-							const dy = q.clientY - s0.y;
-							if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6) go(i + (dx < 0 ? 1 : -1));
-							else if (dy > 110 && Math.abs(dy) > Math.abs(dx) * 1.6) setOpen(false);
-						}}
-						onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
-						<img src={cur.src} alt={t(cur.alt)} width={cur.w} height={cur.h} draggable={false} onClick={() => setZoom((z) => !z)} style={zoom ? { width: cur.w } : undefined} />
-					</div>
-					<div className="lbx__foot">
-						{shots.length > 1 && (
-							<button type="button" className="btn glass sm" onClick={() => go(i - 1)} aria-label={t(ui2.shots.prev)}>
-								<FiChevronLeft aria-hidden="true" />
+					<div className="lbx" role="dialog" aria-modal="true" aria-label={t(cur.alt)} onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+						<div className="lbx__bar">
+							<span className="lbx__cap">
+								{t(cur.alt)} · {i + 1}/{shots.length}
+							</span>
+							<button ref={closeBtn} type="button" className="lbx__x" onClick={() => setOpen(false)} aria-label={t(ui2.shots.close)}>
+								<FiX aria-hidden="true" />
 							</button>
-						)}
-						<button type="button" className="btn glass sm" onClick={() => setZoom((z) => !z)} aria-pressed={zoom}>
-							{zoom ? t(ui2.shots.fit) : t(ui2.shots.real)}
-						</button>
+						</div>
+						<ul
+							className="lbx__track"
+							ref={lbTrack}
+							onScroll={onLbScroll}
+							onTouchStart={(e) => {
+								const q = e.touches[0];
+								swipe.current = e.touches.length === 1 ? { x: q.clientX, y: q.clientY } : null;
+							}}
+							onTouchEnd={(e) => {
+								const s0 = swipe.current;
+								swipe.current = null;
+								if (!s0) return;
+								const q = e.changedTouches[0];
+								const dx = q.clientX - s0.x;
+								const dy = q.clientY - s0.y;
+								if (dy > 110 && Math.abs(dy) > Math.abs(dx) * 1.6) setOpen(false);
+							}}
+						>
+							{shots.map((sh, n) => (
+								<li key={sh.src} onClick={(e) => e.target === e.currentTarget && setOpen(false)} aria-hidden={n !== i}>
+									<img src={sh.src} alt={t(sh.alt)} width={sh.w} height={sh.h} draggable={false} decoding="async" loading={Math.abs(n - i) <= 1 ? "eager" : "lazy"} />
+								</li>
+							))}
+						</ul>
 						{shots.length > 1 && (
-							<button type="button" className="btn glass sm" onClick={() => go(i + 1)} aria-label={t(ui2.shots.next)}>
-								<FiChevronRight aria-hidden="true" />
-							</button>
+							<div className="lbx__foot">
+								<button type="button" className="btn glass sm" onClick={() => lbGo(i - 1)} aria-label={t(ui2.shots.prev)}>
+									<FiChevronLeft aria-hidden="true" />
+								</button>
+								<button type="button" className="btn glass sm" onClick={() => lbGo(i + 1)} aria-label={t(ui2.shots.next)}>
+									<FiChevronRight aria-hidden="true" />
+								</button>
+							</div>
 						)}
-					</div>
-				</div>,
-				document.body,
-			)}
+					</div>,
+					document.body,
+				)}
 		</div>
 	);
 }
