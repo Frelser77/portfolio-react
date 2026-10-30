@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { FiArrowUpRight } from "react-icons/fi";
 import { uiDigest } from "../content/ai";
-import { profile } from "../content/data";
 import { usePrefs } from "../prefs";
 import { swr } from "../swr";
 
 interface Data {
 	text: string | null;
-	facts: { contributions: number | null; languages: string[]; recent: { name: string; language: string; pushedAt: string }[]; weeks: number[] };
+	facts: { contributions: number | null; languages: string[]; recent: { name: string; language: string; pushedAt: string; url?: string }[]; weeks: number[] };
 	at: string;
 }
 const valid = (d: unknown): d is Data => !!d && typeof d === "object" && !!(d as Data).facts && Array.isArray((d as Data).facts.recent);
@@ -59,11 +58,18 @@ export default function Digest() {
 					<ul className="digest__repos" role="list">
 						{d.facts.recent.map((r) => (
 							<li key={r.name}>
-								<a className="cchip" href={`${profile.github.replace(/\/$/, "")}/${r.name}`} target="_blank" rel="noopener noreferrer">
-									{r.name}
-									{r.language && <small>{r.language}</small>}
-									<FiArrowUpRight aria-hidden="true" />
-								</a>
+								{r.url ? (
+									<a className="cchip" href={r.url} target="_blank" rel="noopener noreferrer">
+										{r.name}
+										{r.language && <small>{r.language}</small>}
+										<FiArrowUpRight aria-hidden="true" />
+									</a>
+								) : (
+									<span className="cchip">
+										{r.name}
+										{r.language && <small>{r.language}</small>}
+									</span>
+								)}
 							</li>
 						))}
 					</ul>

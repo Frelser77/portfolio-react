@@ -5106,7 +5106,7 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 /* ===== "In questo momento" ===== */
 .digest__card { display: grid; gap: 14px; padding: 24px; border-radius: 28px; }
 .digest__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.digest__head h2 { display: inline-flex; align-items: center; gap: 10px; margin: 0; }
+.digest__head h2 { display: inline-flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(19px, 5vw, 24px); white-space: nowrap; }
 .digest__live { width: 10px; height: 10px; border-radius: 50%; background: #7ce3a6; box-shadow: 0 0 0 0 #7ce3a688; animation: livepulse 2s infinite; }
 @keyframes livepulse { 70% { box-shadow: 0 0 0 10px #7ce3a600 } 100% { box-shadow: 0 0 0 0 #7ce3a600 } }
 .digest__ago { color: var(--ink-3); font-size: 12.5px; white-space: nowrap; }
