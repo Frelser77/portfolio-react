@@ -5040,3 +5040,32 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 @keyframes slidenext { from { opacity: 0; transform: translateX(46px) } to { opacity: 1; transform: none } }
 @keyframes slideprev { from { opacity: 0; transform: translateX(-46px) } to { opacity: 1; transform: none } }
 .lbx__view { touch-action: pan-y pinch-zoom; }
+
+/* ===== Home: "Perché" e "Come lavoriamo" — più caratteristici e molto meno alti ===== */
+.value, .fstep { position: relative; overflow: hidden; }
+.value::before, .fstep::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, #5d73ff, #c46bff, transparent); opacity: .9; }
+.value::after { content: ""; position: absolute; right: -40px; top: -40px; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(closest-side, rgba(139,92,246,.35), transparent); pointer-events: none; }
+.fstep__n { background: linear-gradient(135deg, #5d73ff, #c46bff); color: #fff; box-shadow: 0 8px 22px #5d73ff66; }
+
+@media (max-width: 720px) {
+	/* i tre motivi: un unico pannello con righe compatte */
+	.values { gap: 0; border-radius: 26px; overflow: hidden; background: rgba(8,12,40,.5); border: 1px solid rgba(255,255,255,.14); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); }
+	.values .value { grid-template-columns: 44px 1fr; column-gap: 14px; row-gap: 2px; align-items: start; padding: 16px 16px; border-radius: 0; border: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+	.values .value + .value { border-top: 1px solid rgba(255,255,255,.1); }
+	.values .value::before, .values .value::after { display: none; }
+	.values .value__ico { grid-row: span 2; width: 44px; height: 44px; border-radius: 14px; }
+	.values .value h3 { font-size: 16px; align-self: end; }
+	.values .value p { font-size: 13.5px; line-height: 1.45; grid-column: 2; }
+
+	/* i quattro passi: linea del tempo */
+	.flow { margin-top: 28px; }
+	.flow h3 { font-size: 20px; }
+	.flow__steps { grid-template-columns: 1fr; gap: 0; margin-top: 14px; padding-left: 0; }
+	.flow__steps::before { content: ""; position: absolute; left: 19px; top: 18px; bottom: 44px; width: 2px; border-radius: 2px; background: linear-gradient(#5d73ff, #c46bff 60%, rgba(196,107,255,.15)); }
+	.flow__steps .fstep { grid-template-columns: 40px 1fr; column-gap: 14px; row-gap: 1px; padding: 0 0 18px; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; overflow: visible; }
+	.flow__steps .fstep:last-child { padding-bottom: 0; }
+	.flow__steps .fstep::before { display: none; }
+	.flow__steps .fstep__n { grid-row: span 2; width: 40px; height: 40px; margin: 0; position: relative; z-index: 1; font-size: 16px; }
+	.flow__steps .fstep h4 { font-size: 16px; align-self: end; }
+	.flow__steps .fstep p { font-size: 13.5px; line-height: 1.45; grid-column: 2; }
+}
