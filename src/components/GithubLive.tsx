@@ -1,3 +1,4 @@
+import { Sk } from "./Skeleton";
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
 import { FiExternalLink, FiLock, FiStar, FiUserPlus } from "react-icons/fi";
@@ -63,7 +64,22 @@ export default function GithubLive() {
 					</div>
 				</div>
 				<div className="glass ghbox" data-lg-bezel="26" aria-live="polite">
-					{state === "loading" && <p className="muted">{t(ui2.stack.live.loading)}</p>}
+					{state === "loading" && (
+						<div className="ghsk" role="status" aria-busy="true">
+							<span className="sr-only">{t(ui2.stack.live.loading)}</span>
+							<div className="ghsk__nums">
+								<Sk h={58} r={16} />
+								<Sk h={58} r={16} />
+								<Sk h={58} r={16} />
+							</div>
+							<Sk h={92} r={14} />
+							<div className="sk-line">
+								<Sk w={90} h={34} r={17} />
+								<Sk w={70} h={34} r={17} />
+								<Sk w={110} h={34} r={17} />
+							</div>
+						</div>
+					)}
 					{state === "off" && <p className="muted">{t(ui2.stack.live.off)}</p>}
 					{state === "ok" && data && (
 						<>

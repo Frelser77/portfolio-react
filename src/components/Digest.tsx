@@ -3,6 +3,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 import { uiDigest } from "../content/ai";
 import { usePrefs } from "../prefs";
 import { swr } from "../swr";
+import { Sk } from "./Skeleton";
 
 interface Data {
 	text: string | null;
@@ -24,10 +25,36 @@ const ago = (iso: string, lang: "it" | "en") => {
 export default function Digest() {
 	const { t, lang } = usePrefs();
 	const [d, setD] = useState<Data | null>(null);
+	const [wait, setWait] = useState(true);
 	useEffect(() => {
 		setD(null);
-		void swr<Data>(`fr7-digest-${lang}`, `/api/digest?lang=${lang}`, 10 * 60_000, setD, valid);
+		setWait(true);
+		void swr<Data>(`fr7-digest-${lang}`, `/api/digest?lang=${lang}`, 10 * 60_000, setD, valid).finally(() => setWait(false));
 	}, [lang]);
+	if (!d && wait)
+		return (
+			<section className="sec digest" aria-busy="true">
+				<div className="glass digest__card" data-lg="off">
+					<div className="digest__head">
+						<Sk w={180} h={26} r={10} />
+						<Sk w={90} h={13} />
+					</div>
+					<Sk h={15} />
+					<Sk h={15} />
+					<Sk w="70%" h={15} />
+					<div className="digest__spark">
+						{[...Array(12)].map((_, i) => (
+							<Sk key={i} w="100%" h={`${30 + ((i * 37) % 60)}%`} r={4} />
+						))}
+					</div>
+					<div className="sk-line">
+						<Sk w={150} h={40} r={20} />
+						<Sk w={120} h={40} r={20} />
+						<Sk w={130} h={40} r={20} />
+					</div>
+				</div>
+			</section>
+		);
 	if (!d || (!d.text && !d.facts.recent.length)) return null;
 	const w = d.facts.weeks;
 	const max = Math.max(1, ...w);

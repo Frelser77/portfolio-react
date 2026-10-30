@@ -5221,3 +5221,24 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 @media (max-width: 720px) { .adm__sticky { gap: 8px; padding: 8px; } .adm__filters { gap: 8px; } }
 .adm__dockbar { font-family: var(--font-body); color: var(--ink); }
 .adm__dockbar .adm__mini { font: inherit; font-size: 14px; font-weight: 600; color: #fff; }
+
+/* ===== Scheletri di caricamento ===== */
+.sk { display: block; max-width: 100%; background: linear-gradient(90deg, rgba(255,255,255,.07) 20%, rgba(255,255,255,.2) 50%, rgba(255,255,255,.07) 80%); background-size: 220% 100%; animation: skshim 1.4s ease-in-out infinite; }
+@keyframes skshim { from { background-position: 120% 0 } to { background-position: -120% 0 } }
+.sk-card { display: grid; gap: 12px; padding: 22px; border-radius: 28px; }
+.sk-rows { display: grid; }
+.sk-line { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+.adm__skel { display: grid; gap: 14px; }
+.adm__tabs--sk .adm__tab { gap: 6px; cursor: default; }
+.adm__tools--sk { display: flex; gap: 8px; }
+@media (max-width: 720px) {
+	.adm__tools--sk .sk { width: 44px !important; height: 44px !important; border-radius: 50% !important; }
+	.sk-card { padding: 16px; border-radius: 24px; }
+}
+.ghsk { display: grid; gap: 14px; }
+.ghsk__nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+/* le immagini delle schermate partono da un fondo che brilla piano, finché non arrivano */
+.shots__slide, .shots__thumb, .story__face { background-image: linear-gradient(90deg, rgba(255,255,255,.05) 20%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.05) 80%); background-size: 220% 100%; animation: skshim 1.6s ease-in-out infinite; }
+.story__face { animation: none; }
+@media (prefers-reduced-motion: reduce) { .shots__slide, .shots__thumb { animation: none; } }

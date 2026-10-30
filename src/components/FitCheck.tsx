@@ -6,6 +6,7 @@ import { localFit } from "../lab/local";
 import { usePrefs } from "../prefs";
 import { pickNeed } from "../bus";
 import type { Fit } from "../shared";
+import { SkCard } from "./Skeleton";
 
 /** "Annuncio → compatibilità": incolli un annuncio e l'AI lo confronta con le competenze vere. */
 export default function FitCheck() {
@@ -84,7 +85,7 @@ export default function FitCheck() {
 			</form>
 
 			<div className="plan" aria-live="polite">
-				{busy && !res && <div className="fit__wait glass" data-lg="off" aria-hidden="true"><i /><i /><i /></div>}
+				{busy && !res && <SkCard lines={6} />}
 				{f && res && (
 					<article className="glass planres fitres" data-lg-bezel="26">
 						<span className={`badge ${res.ai ? "live" : "offline"}`}>{res.ai ? t(uiAi.fit.fromAi) : t(uiAi.fit.fromRules)}</span>

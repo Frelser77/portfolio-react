@@ -7,6 +7,7 @@ import { projects as allProjects, type L } from "../content/data";
 import { usePrefs } from "../prefs";
 import { siteSwitches } from "../content/adminSite";
 import { applyHidden } from "../siteFlags";
+import { Sk, SkCard, SkRows } from "../components/Skeleton";
 
 interface Row {
 	id: number;
@@ -61,6 +62,7 @@ export default function AdminPage() {
 		}
 	});
 	const [hid, setHid] = useState<string[]>([]);
+	const [loaded, setLoaded] = useState(false);
 	const [flash, setFlash] = useState<"" | "ok" | "fail">("");
 	const [bf, setBf] = useState<"new" | "arch" | "all">("new");
 	const [bsel, setBsel] = useState<number[]>([]);
@@ -158,47 +160,31 @@ export default function AdminPage() {
 	};
 
 	const loadData = useCallback(async () => {
-		try {
-			const sr = await fetch("/api/admin/site", { credentials: "same-origin" });
-			if (sr.ok && isJson(sr)) setHid(((await sr.json()) as { hidden: string[] }).hidden);
-		} catch {
-			/* resta tutto visibile */
-		}
-		try {
-			const b = await fetch("/api/admin/briefs", { credentials: "same-origin" });
-			if (b.ok && isJson(b)) setRows(((await b.json()) as { rows: Row[] }).rows);
-			else setRows([]);
-		} catch {
-			setRows([]);
-		}
-		try {
-			const f = await fetch("/api/admin/featured", { credentials: "same-origin" });
-			if (f.ok && isJson(f)) {
-				const j = (await f.json()) as { rows: { name: string; label: string | null; blurb: string | null; link: string | null }[] };
-				const loaded = j.rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "", link: r.link ?? "" }));
-				setPicks(loaded);
-				setBase(JSON.stringify(loaded));
+		// tutte le richieste partono insieme: il pannello è pronto quando arriva la più lenta, non la somma
+		const get = async (url: string) => {
+			try {
+				const r = await fetch(url, { credentials: "same-origin" });
+				return r.ok && isJson(r) ? await r.json() : null;
+			} catch {
+				return null;
 			}
-		} catch {
-			/* nessuna selezione */
+		};
+		const [sr, b, f, o, g] = await Promise.all([get("/api/admin/site"), get("/api/admin/briefs"), get("/api/admin/featured"), get("/api/admin/projects"), get("/api/admin/repos")]);
+		if (sr) setHid((sr as { hidden: string[] }).hidden);
+		setRows(b ? (b as { rows: Row[] }).rows : []);
+		if (f) {
+			const loaded = (f as { rows: { name: string; label: string | null; blurb: string | null; link: string | null }[] }).rows.map((r) => ({ name: r.name, label: r.label ?? "", blurb: r.blurb ?? "", link: r.link ?? "" }));
+			setPicks(loaded);
+			setBase(JSON.stringify(loaded));
 		}
-		try {
-			const o = await fetch("/api/admin/projects", { credentials: "same-origin" });
-			const rows = o.ok && isJson(o) ? ((await o.json()) as { rows: { id: string; hidden: number }[] }).rows : [];
-			const pos = new Map(rows.map((r, n) => [r.id, n] as const));
-			const hid = new Set(rows.filter((r) => r.hidden).map((r) => r.id));
-			const list = allProjects.map((p, n) => ({ id: p.id, hidden: hid.has(p.id), k: pos.get(p.id) ?? 1000 + n })).sort((a, b) => a.k - b.k).map(({ id, hidden }) => ({ id, hidden }));
-			setOrd(list);
-			setOrdBase(JSON.stringify(list));
-		} catch {
-			/* ordine di default */
-		}
-		try {
-			const g = await fetch("/api/admin/repos", { credentials: "same-origin" });
-			setRepos(g.ok && isJson(g) ? ((await g.json()) as { rows: AdminRepo[] }).rows : "none");
-		} catch {
-			setRepos("none");
-		}
+		const prow = o ? (o as { rows: { id: string; hidden: number }[] }).rows : [];
+		const pos = new Map(prow.map((r, n) => [r.id, n] as const));
+		const hid = new Set(prow.filter((r) => r.hidden).map((r) => r.id));
+		const list = allProjects.map((p, n) => ({ id: p.id, hidden: hid.has(p.id), k: pos.get(p.id) ?? 1000 + n })).sort((a, b) => a.k - b.k).map(({ id, hidden }) => ({ id, hidden }));
+		setOrd(list);
+		setOrdBase(JSON.stringify(list));
+		setRepos(g ? (g as { rows: AdminRepo[] }).rows : "none");
+		setLoaded(true);
 	}, []);
 
 	const enter = useCallback(
@@ -431,6 +417,12 @@ export default function AdminPage() {
 					<h1 className="h2">{t(A.title)}</h1>
 					<p className="muted">{t(A.sub)}</p>
 				</div>
+				{phase === "check" && (
+					<div className="adm__tools adm__tools--sk" aria-hidden="true">
+						<Sk w={110} h={44} r={22} />
+						<Sk w={90} h={44} r={22} />
+					</div>
+				)}
 				{phase === "in" && (
 					<div className="adm__tools">
 						<button type="button" className="btn glass sm" onClick={refresh} disabled={busy}>
@@ -445,7 +437,21 @@ export default function AdminPage() {
 				)}
 			</div>
 
-			{phase === "check" && <p className="muted">{t(A.checking)}</p>}
+			{phase === "check" && (
+				<div className="adm__skel" role="status" aria-busy="true">
+					<span className="sr-only">{t(A.checking)}</span>
+					<SkCard lines={3} />
+					<SkCard lines={4} />
+					<div className="adm__tabs adm__tabs--sk glass" data-lg="off" aria-hidden="true">
+						{[0, 1, 2, 3].map((i) => (
+							<span key={i} className="adm__tab">
+								<Sk w={22} h={22} r={7} />
+								<Sk w={44} h={8} r={4} />
+							</span>
+						))}
+					</div>
+				</div>
+			)}
 
 			{phase === "out" && (
 				<form
@@ -605,7 +611,31 @@ export default function AdminPage() {
 						))}
 					</div>
 
-					{tab === "req" && (
+					{!loaded && tab !== "sys" && (
+						<div className="adm__skel" role="status" aria-busy="true">
+							<span className="sr-only">{t(A.checking)}</span>
+							{tab === "repos" ? (
+								<>
+									<SkCard lines={0} title={false}>
+										<Sk h={46} r={16} />
+										<div className="sk-line">
+											<Sk w={70} h={40} r={20} />
+											<Sk w={60} h={40} r={20} />
+											<Sk w={96} h={40} r={20} />
+										</div>
+									</SkCard>
+									<SkRows n={5} h={84} />
+								</>
+							) : (
+								<>
+									<SkCard lines={1} />
+									<SkRows n={tab === "site" ? 6 : 3} h={tab === "site" ? 64 : 96} />
+								</>
+							)}
+						</div>
+					)}
+
+					{loaded && tab === "req" && (
 						<div role="tabpanel" id="panel-req" aria-labelledby="tab-req">
 <div className="glass adm__card" data-lg-bezel="26">
 						<div className="adm__top">
@@ -678,23 +708,25 @@ export default function AdminPage() {
 										</li>
 									))}
 								</ul>
-								{bsel.length > 0 && (
-									<div className="adm__bar adm__acts adm__dockbar">
-										{bf !== "arch" && (
-											<button type="button" className="adm__mini on" disabled={busy} onClick={() => briefAction("archive", bsel)}>
-												{t(A.bDone)} ({bsel.length})
+								{bsel.length > 0 &&
+									createPortal(
+										<div className="adm__bar adm__acts adm__dockbar">
+											{bf !== "arch" && (
+												<button type="button" className="adm__mini on" disabled={busy} onClick={() => briefAction("archive", bsel)}>
+													{t(A.bDone)} ({bsel.length})
+												</button>
+											)}
+											{bf !== "new" && (
+												<button type="button" className="adm__mini" disabled={busy} onClick={() => briefAction("unarchive", bsel)}>
+													{t(A.bRestore)} ({bsel.length})
+												</button>
+											)}
+											<button type="button" className="adm__mini danger" disabled={busy} onClick={() => setBask("delete")}>
+												{t(A.bDelete)} ({bsel.length})
 											</button>
-										)}
-										{bf !== "new" && (
-											<button type="button" className="adm__mini" disabled={busy} onClick={() => briefAction("unarchive", bsel)}>
-												{t(A.bRestore)} ({bsel.length})
-											</button>
-										)}
-										<button type="button" className="adm__mini danger" disabled={busy} onClick={() => setBask("delete")}>
-											{t(A.bDelete)} ({bsel.length})
-										</button>
-									</div>
-								)}
+										</div>,
+										document.body,
+									)}
 								{bask === "delete" && bsel.length > 0 && (
 									<div className="adm__note warn adm__confirm" role="alertdialog">
 										<FiAlertTriangle aria-hidden="true" />
@@ -720,7 +752,7 @@ export default function AdminPage() {
 						</div>
 					)}
 
-					{tab === "site" && (
+					{loaded && tab === "site" && (
 						<div role="tabpanel" id="panel-site" aria-labelledby="tab-site">
 							<div className="glass adm__card adm__vis" data-lg-bezel="26">
 								<div className="adm__top">
@@ -863,7 +895,7 @@ export default function AdminPage() {
 						</div>
 					)}
 
-					{tab === "repos" && (
+					{loaded && tab === "repos" && (
 						<div role="tabpanel" id="panel-repos" aria-labelledby="tab-repos">
 							<div className="glass adm__card" data-lg-bezel="26">
 								<div className="adm__top">

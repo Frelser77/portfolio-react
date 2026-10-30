@@ -6,6 +6,7 @@ import { localPlan } from "../lab/local";
 import { usePrefs } from "../prefs";
 import { pickNeed } from "../bus";
 import type { Plan } from "../shared";
+import { SkCard } from "./Skeleton";
 
 /** "Dal problema al piano": descrivi cosa non va e ottieni passi, tecnologie e tempi indicativi. */
 export default function Planner() {
@@ -77,6 +78,7 @@ export default function Planner() {
 			</form>
 
 			<div className="plan" aria-live="polite">
+				{busy && !res && <SkCard lines={6} />}
 				{res && (
 					<article className="glass planres" data-lg-bezel="26">
 						<span className={`badge ${res.ai ? "live" : "offline"}`}>{res.ai ? t(ui2.lab.plan.fromAi) : t(ui2.lab.plan.fromRules)}</span>

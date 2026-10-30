@@ -853,6 +853,25 @@ async function recentLog(env: Env) {
 	}
 }
 
+type GhInfo = { login: string; kind: string; scopes: string } | null;
+let ghInfoMemo: { t: number; v: GhInfo } | null = null;
+async function githubInfo(env: Env): Promise<GhInfo> {
+	if (!env.GITHUB_TOKEN) return null;
+	if (ghInfoMemo && Date.now() - ghInfoMemo.t < 5 * 60_000) return ghInfoMemo.v;
+	const tk = env.GITHUB_TOKEN.trim();
+	const kind = tk.startsWith("github_pat_") ? "fine-grained" : tk.startsWith("ghp_") ? "classic" : "?";
+	let v: GhInfo;
+	try {
+		const u = await fetch("https://api.github.com/user", { headers: { authorization: `Bearer ${tk}`, "user-agent": "fr7-portfolio", accept: "application/vnd.github+json" }, signal: AbortSignal.timeout(2500) });
+		const j = (await u.json().catch(() => ({}))) as { login?: string };
+		v = { login: u.ok ? (j.login ?? "") : `errore ${u.status}`, kind, scopes: u.headers.get("x-oauth-scopes") ?? "" };
+		if (u.ok) ghInfoMemo = { t: Date.now(), v };
+	} catch {
+		v = { login: "non raggiungibile", kind, scopes: "" };
+	}
+	return v;
+}
+
 async function adminSession(req: Request, env: Env, login: boolean, who: string) {
 	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
 	const totp = !!env.ADMIN_TOTP;
@@ -876,19 +895,9 @@ async function adminSession(req: Request, env: Env, login: boolean, who: string)
 		if (step !== null) await kvSet(env, "totp_last", String(step)).catch(() => undefined);
 		epoch = await epochOf(env);
 	} else if (!(await isAdmin(req, env))) return json({ error: "unauthorized", totp }, 401);
-	let ghInfo: { login: string; kind: string; scopes: string } | null = null;
-	if (env.GITHUB_TOKEN) {
-		const tk = env.GITHUB_TOKEN.trim();
-		const kind = tk.startsWith("github_pat_") ? "fine-grained" : tk.startsWith("ghp_") ? "classic" : "?";
-		try {
-			const u = await fetch("https://api.github.com/user", { headers: { authorization: `Bearer ${tk}`, "user-agent": "fr7-portfolio", accept: "application/vnd.github+json" } });
-			const j = (await u.json().catch(() => ({}))) as { login?: string };
-			ghInfo = { login: u.ok ? (j.login ?? "") : `errore ${u.status}`, kind, scopes: u.headers.get("x-oauth-scopes") ?? "" };
-		} catch {
-			ghInfo = { login: "non raggiungibile", kind, scopes: "" };
-		}
-	}
-	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, ghInfo, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT, totp, log: await recentLog(env) };
+	// la verifica del token GitHub e il registro accessi partono insieme; la prima si ricorda per 5 minuti e non aspetta oltre 2,5 secondi
+	const [ghInfo, log] = await Promise.all([githubInfo(env), recentLog(env)]);
+	const status = { db: !!env.DB, ai: !!env.AI, github: !!env.GITHUB_TOKEN, ghInfo, notify: !!env.NOTIFY_WEBHOOK, salt: !!env.SALT, totp, log };
 	if (!login) return json({ ok: true, status });
 	const exp = Date.now() + SESSION_MS;
 	return json({ ok: true, status }, 200, { "set-cookie": sessionCookie(`${exp}.${epoch}.${await hmac(sessionKey(env), `admin.${exp}.${epoch}`)}`, SESSION_MS / 1000) });
