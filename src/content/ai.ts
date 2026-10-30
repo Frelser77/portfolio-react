@@ -46,3 +46,13 @@ export const uiAi = {
 		} as L,
 	},
 };
+
+export const uiDigest = {
+	title: { it: "In questo momento", en: "Right now" } as L,
+	ago: { it: "aggiornato", en: "updated" } as L,
+	byAi: { it: "Scritto dall'AI dai dati GitHub di oggi", en: "Written by AI from today's GitHub data" } as L,
+	weeks: { it: "Attività delle ultime settimane", en: "Activity over the last weeks" } as L,
+	last: { it: "Ultimo aggiornamento", en: "Last update" } as L,
+	contrib: { it: "contributi nell'ultimo anno", en: "contributions in the last year" } as L,
+	open: { it: "Apri su GitHub", en: "Open on GitHub" } as L,
+};

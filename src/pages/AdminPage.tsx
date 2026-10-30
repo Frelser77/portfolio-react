@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone, FiMonitor, FiGitBranch, FiSettings } from "react-icons/fi";
+import { FiAlertTriangle, FiBell, FiCheckCircle, FiCpu, FiDatabase, FiGithub, FiInbox, FiInfo, FiLock, FiLogOut, FiMail, FiRefreshCw, FiShield, FiCopy, FiSmartphone, FiMonitor, FiGitBranch, FiSettings, FiEye, FiEyeOff, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import type { AdminRepo } from "../api";
 import { ui2 } from "../content/ui2";
 import { projects as allProjects, type L } from "../content/data";
 import { usePrefs } from "../prefs";
+import { siteSwitches } from "../content/adminSite";
+import { applyHidden } from "../siteFlags";
 
 interface Row {
 	id: number;
@@ -49,19 +51,20 @@ export default function AdminPage() {
 	const [key, setKey] = useState("");
 	const [phase, setPhase] = useState<"check" | "out" | "in">("check");
 	const [fail, setFail] = useState<Fail>("");
-	const [tab, setTab] = useState<"req" | "site" | "repos">(() => {
+	const [tab, setTab] = useState<"req" | "site" | "repos" | "sys">(() => {
 		try {
 			const v = localStorage.getItem("fr7-adm-tab");
-			return v === "site" || v === "repos" ? v : "req";
+			return v === "site" || v === "repos" || v === "sys" ? v : "req";
 		} catch {
 			return "req";
 		}
 	});
-	const [sys, setSys] = useState(false);
+	const [hid, setHid] = useState<string[]>([]);
+	const [flash, setFlash] = useState<"" | "ok" | "fail">("");
 	const [bf, setBf] = useState<"new" | "arch" | "all">("new");
 	const [bsel, setBsel] = useState<number[]>([]);
 	const [bask, setBask] = useState<"" | "delete">("");
-	const pickTab = (k: "req" | "site" | "repos") => {
+	const pickTab = (k: "req" | "site" | "repos" | "sys") => {
 		setTab(k);
 		try {
 			localStorage.setItem("fr7-adm-tab", k);
@@ -91,6 +94,12 @@ export default function AdminPage() {
 	const [ask, setAsk] = useState<"" | "private" | "archive" | "unarchive" | "public">("");
 	const [report, setReport] = useState<{ ok: number; bad: number; errors: string[] } | null>(null);
 
+	// su telefono il pannello diventa un'app: niente barra del sito, schede in basso
+	useEffect(() => {
+		document.documentElement.classList.add("adm-app");
+		return () => document.documentElement.classList.remove("adm-app");
+	}, []);
+
 	const isJson = (r: Response) => (r.headers.get("content-type") ?? "").includes("json");
 	const failOf = async (r: Response): Promise<Fail> => {
 		const body = isJson(r) ? ((await r.json().catch(() => ({}))) as { error?: string; totp?: boolean; retry?: number }) : {};
@@ -107,7 +116,43 @@ export default function AdminPage() {
 		return e === "no_admin_token" ? "noToken" : e === "no_db" ? "noDb" : "bad";
 	};
 
+	/** Interruttore: cambia subito sullo schermo e salva da solo; se il salvataggio fallisce torna com'era. */
+	const toggleKey = async (k: string) => {
+		const before = hid;
+		const next = hid.includes(k) ? hid.filter((x) => x !== k) : [...hid, k];
+		setHid(next);
+		setFlash("");
+		try {
+			const r = await fetch("/api/admin/site", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ hidden: next }) });
+			if (!r.ok || !isJson(r)) throw new Error("save");
+			const j = (await r.json()) as { hidden: string[] };
+			setHid(j.hidden);
+			applyHidden(j.hidden);
+			setFlash("ok");
+		} catch {
+			setHid(before);
+			setFlash("fail");
+		}
+		window.setTimeout(() => setFlash(""), 2200);
+	};
+	const refreshDigest = async () => {
+		setFlash("");
+		try {
+			const r = await fetch("/api/admin/site", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ refreshDigest: true }) });
+			setFlash(r.ok ? "ok" : "fail");
+		} catch {
+			setFlash("fail");
+		}
+		window.setTimeout(() => setFlash(""), 2200);
+	};
+
 	const loadData = useCallback(async () => {
+		try {
+			const sr = await fetch("/api/admin/site", { credentials: "same-origin" });
+			if (sr.ok && isJson(sr)) setHid(((await sr.json()) as { hidden: string[] }).hidden);
+		} catch {
+			/* resta tutto visibile */
+		}
 		try {
 			const b = await fetch("/api/admin/briefs", { credentials: "same-origin" });
 			if (b.ok && isJson(b)) setRows(((await b.json()) as { rows: Row[] }).rows);
@@ -364,6 +409,12 @@ export default function AdminPage() {
 
 	return (
 		<section className="sec adm">
+			{flash && (
+				<p className={`adm__toast ${flash}`} role="status">
+					{flash === "ok" ? <FiCheckCircle aria-hidden="true" /> : <FiAlertTriangle aria-hidden="true" />}
+					{t(flash === "ok" ? A.visSaved : A.visFail)}
+				</p>
+			)}
 			<div className="adm__head">
 				<div>
 					<h1 className="h2">{t(A.title)}</h1>
@@ -371,18 +422,13 @@ export default function AdminPage() {
 				</div>
 				{phase === "in" && (
 					<div className="adm__tools">
-						<button type="button" className="btn glass sm adm__sysbtn" onClick={() => setSys((v) => !v)} aria-expanded={sys}>
-							<FiSettings aria-hidden="true" />
-							{t(A.sysBtn)}
-							{alerts > 0 && <span className="adm__count warn">{alerts}</span>}
-						</button>
 						<button type="button" className="btn glass sm" onClick={refresh} disabled={busy}>
 							<FiRefreshCw aria-hidden="true" className={busy ? "spin" : undefined} />
-							{t(A.refresh)}
+							<span className="adm__lbl">{t(A.refresh)}</span>
 						</button>
 						<button type="button" className="btn glass sm" onClick={logout}>
 							<FiLogOut aria-hidden="true" />
-							{t(A.logout)}
+							<span className="adm__lbl">{t(A.logout)}</span>
 						</button>
 					</div>
 				)}
@@ -430,8 +476,8 @@ export default function AdminPage() {
 
 			{phase === "in" && status && (
 				<>
-					{sys && (
-						<div className="adm__sys">
+					{tab === "sys" && (
+						<div className="adm__sys" role="tabpanel" id="panel-sys" aria-labelledby="tab-sys">
 					<div className="glass adm__card" data-lg-bezel="26">
 						<div className="adm__top">
 							<h2 className="h3">{t(A.statusTitle)}</h2>
@@ -530,12 +576,13 @@ export default function AdminPage() {
 						</div>
 					)}
 
-					<div className="adm__tabs glass" role="tablist" aria-label={t(A.title)} data-lg-bezel="22">
+					<div className="adm__tabs glass" role="tablist" aria-label={t(A.title)} data-lg="off">
 						{(
 							[
 								["req", FiInbox, A.tabReq, (rows ?? []).filter((x) => !x.archived).length, false],
 								["site", FiMonitor, A.tabSite, picks.length, dirty || ordDirty],
 								["repos", FiGitBranch, A.tabRepos, Array.isArray(repos) ? repos.length : 0, false],
+								["sys", FiSettings, A.sysBtn, alerts, false],
 							] as const
 						).map(([k, Ico, label, n, dot]) => (
 							<button key={k} type="button" role="tab" id={`tab-${k}`} aria-selected={tab === k} aria-controls={`panel-${k}`} className="adm__tab" onClick={() => pickTab(k)}>
@@ -664,6 +711,39 @@ export default function AdminPage() {
 
 					{tab === "site" && (
 						<div role="tabpanel" id="panel-site" aria-labelledby="tab-site">
+							<div className="glass adm__card adm__vis" data-lg-bezel="26">
+								<div className="adm__top">
+									<div>
+										<h2 className="h3">{t(A.visTitle)}</h2>
+										<p className="muted adm__sub">{t(A.visText)}</p>
+									</div>
+								</div>
+								{siteSwitches.map((g) => (
+									<div key={g.group.it} className="adm__grp">
+										<h3 className="adm__grph">{t(g.group)}</h3>
+										<ul className="adm__sw" role="list">
+											{g.items.map((it) => {
+												const on = !hid.includes(it.key);
+												return (
+													<li key={it.key}>
+														<button type="button" role="switch" aria-checked={on} className={`adm__swrow${on ? " on" : ""}`} onClick={() => toggleKey(it.key)}>
+															<span className="adm__swtxt">
+																<b>{t(it.label)}</b>
+																<small>{t(it.hint)}</small>
+															</span>
+															<i className="adm__knob" aria-hidden="true" />
+														</button>
+													</li>
+												);
+											})}
+										</ul>
+									</div>
+								))}
+								<button type="button" className="btn glass sm" onClick={refreshDigest}>
+									<FiRefreshCw aria-hidden="true" />
+									{t(A.visDigest)}
+								</button>
+							</div>
 							<div className="glass adm__card" data-lg-bezel="26">
 								<div className="adm__top">
 									<div>
@@ -680,14 +760,14 @@ export default function AdminPage() {
 												<b>{p?.name ?? o.id}</b>
 												{o.hidden && <span className="adm__tag">{t(A.ordHidden)}</span>}
 												<span className="adm__ordbtns">
-													<button type="button" className="adm__mini" onClick={() => ordMove(i, -1)} disabled={i === 0} aria-label={t(A.up)}>
-														↑
+													<button type="button" className="adm__mini adm__ic" onClick={() => ordMove(i, -1)} disabled={i === 0} aria-label={t(A.up)}>
+														<FiChevronUp aria-hidden="true" />
 													</button>
-													<button type="button" className="adm__mini" onClick={() => ordMove(i, 1)} disabled={i === ord.length - 1} aria-label={t(A.down)}>
-														↓
+													<button type="button" className="adm__mini adm__ic" onClick={() => ordMove(i, 1)} disabled={i === ord.length - 1} aria-label={t(A.down)}>
+														<FiChevronDown aria-hidden="true" />
 													</button>
-													<button type="button" className="adm__mini" onClick={() => setOrd((x) => x.map((y, n) => (n === i ? { ...y, hidden: !y.hidden } : y)))}>
-														{t(o.hidden ? A.ordShow : A.ordHide)}
+													<button type="button" className="adm__mini adm__ic" onClick={() => setOrd((x) => x.map((y, n) => (n === i ? { ...y, hidden: !y.hidden } : y)))} aria-label={t(o.hidden ? A.ordShow : A.ordHide)} aria-pressed={!o.hidden}>
+														{o.hidden ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}
 													</button>
 												</span>
 											</li>

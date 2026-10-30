@@ -13,6 +13,7 @@ import { useProjects } from "../projectOrder";
 import Shots from "../components/Shots";
 import LivePreview from "../components/LivePreview";
 import NotFound from "./NotFound";
+import { useShown } from "../siteFlags";
 import { navigate } from "../router";
 
 /** direzione dell'ultimo cambio con lo swipe: serve all'animazione di entrata */
@@ -21,6 +22,7 @@ let slideDir = 0;
 export default function ProjectPage({ id }: { id: string }) {
 	const { t } = usePrefs();
 	const stats = useStats();
+	const shown = useShown();
 	const ordered = useProjects();
 	const p = projects.find((x) => x.id === id);
 	const index = Math.max(0, ordered.findIndex((x) => x.id === id));
@@ -73,7 +75,7 @@ export default function ProjectPage({ id }: { id: string }) {
 
 	return (
 		<section className="sec" aria-labelledby="project-title" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-			<ProjectStories list={ordered} current={p.id} />
+			{shown("ui.stories") && <ProjectStories list={ordered} current={p.id} />}
 			<div key={p.id} className={`card ppage glass${enter ? (enter > 0 ? " slide-next" : " slide-prev") : ""}`} data-lg-bezel="30">
 				<div className="dlg__head">
 					<div>

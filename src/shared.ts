@@ -101,3 +101,20 @@ export function validateFit(raw: unknown): Fit | null {
 	if (!verdict || !pitch || !matches.length) return null;
 	return { role: str(r.role, 80), score, verdict, matches, gaps, pitch };
 }
+
+/** Cose del sito che dal pannello admin si possono mostrare o nascondere (un interruttore ciascuna). */
+export const SITE_KEYS = [
+	"home.hero.config",
+	"home.ai",
+	"home.ai.fit",
+	"home.ai.plan",
+	"home.ai.chat",
+	"home.digest",
+	"home.portal",
+	"home.method",
+	"stack.github",
+	"ui.hire",
+	"ui.dog",
+	"ui.stories",
+] as const;
+export type SiteKey = (typeof SITE_KEYS)[number];

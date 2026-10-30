@@ -8,9 +8,11 @@ import { usePrefs } from "../prefs";
 import { Link } from "../router";
 import Configurator from "./Configurator";
 import Lens from "./Lens";
+import { useShown } from "../siteFlags";
 
 export default function Hero() {
 	const { t } = usePrefs();
+	const shown = useShown();
 	return (
 		<section className="hero" id="home" aria-labelledby="hero-title">
 			<div className="hero__main">
@@ -45,9 +47,11 @@ export default function Hero() {
 				</div>
 			</div>
 
-			<div className="hero__side">
-				<Configurator />
-			</div>
+			{shown("home.hero.config") && (
+				<div className="hero__side">
+					<Configurator />
+				</div>
+			)}
 			<Lens />
 		</section>
 	);

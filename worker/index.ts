@@ -5,6 +5,8 @@
  *   GET  /api/github         attività GitHub in cache (1 ora)
  *   POST /api/chat           chat con FR7 Bot, in streaming (Workers AI)
  *   POST /api/plan           "dal problema al piano" (Workers AI, JSON validato)
+ *   GET  /api/site           cosa è nascosto dal pannello admin
+ *   GET  /api/digest         riassunto AI dell'attività GitHub (in cache 1 ora)
  *   POST /api/fit            annuncio di lavoro -> compatibilità e messaggio (Workers AI, JSON validato)
  *   POST /api/visit          conta una visita anonima (D1)
  *   GET  /api/stats          visite e "mi piace" (D1)
@@ -16,7 +18,7 @@
  */
 import { needs, profile, projects, skillGroups } from "../src/content/data";
 import { keywords, seoFor } from "../src/content/seo";
-import { PLAN_SCHEMA, cleanBrief, validateFit, validatePlan, type Lang } from "../src/shared";
+import { PLAN_SCHEMA, SITE_KEYS, cleanBrief, validateFit, validatePlan, type Lang } from "../src/shared";
 
 interface D1Statement {
 	bind(...v: unknown[]): D1Statement;
@@ -61,8 +63,8 @@ function etagOf(text: string) {
 }
 
 /** Risposta pubblica cacheable: il browser la riusa 5 minuti, poi chiede solo se è cambiata (304). */
-function cacheable(req: Request, text: string, etag: string) {
-	const headers = { ...JSON_HEADERS, etag, "cache-control": "public, max-age=300, stale-while-revalidate=86400" };
+function cacheable(req: Request, text: string, etag: string, maxAge = 300) {
+	const headers = { ...JSON_HEADERS, etag, "cache-control": `public, max-age=${maxAge}, stale-while-revalidate=86400` };
 	if (req.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers });
 	return new Response(text, { status: 200, headers });
 }
@@ -957,6 +959,106 @@ async function adminProjects(req: Request, env: Env) {
 	return json({ rows: await loadProjectOrder(env) });
 }
 
+
+/* ------------------------------ Interruttori del sito e riassunto AI ------------------------------ */
+
+const SITE_CACHE = () => new Request("https://cache.fr7.local/site-flags-v1");
+const DIGEST_CACHE = (lang: Lang) => new Request(`https://cache.fr7.local/digest-v1-${lang}`);
+
+/** Le cose nascoste: per default è tutto visibile, quindi si salva solo ciò che si nasconde. */
+async function loadHidden(env: Env): Promise<string[]> {
+	try {
+		const v = JSON.parse((await kvGet(env, "site_hidden")) ?? "[]") as unknown;
+		return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && (SITE_KEYS as readonly string[]).includes(x)) : [];
+	} catch {
+		return [];
+	}
+}
+
+async function publicSite(req: Request, env: Env, ctx: Ctx) {
+	const cache = edgeCache();
+	const hit = await cache?.match(SITE_CACHE());
+	if (hit) {
+		const text = await hit.text();
+		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text), 30);
+	}
+	const text = JSON.stringify({ hidden: await loadHidden(env) });
+	const etag = etagOf(text);
+	if (cache) ctx.waitUntil(cache.put(SITE_CACHE(), new Response(text, { headers: { ...JSON_HEADERS, etag, "cache-control": "public, max-age=3600" } })));
+	return cacheable(req, text, etag, 30);
+}
+
+async function adminSite(req: Request, env: Env) {
+	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
+	if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
+	if (!env.DB) return json({ error: "no_db" }, 404);
+	if (req.method === "GET") return json({ hidden: await loadHidden(env) });
+	const b = await body<{ hidden?: unknown; refreshDigest?: boolean }>(req, 3000);
+	if (!b) return json({ error: "bad_request" }, 400);
+	await init(env.DB);
+	if (b.refreshDigest) {
+		const c = edgeCache();
+		await Promise.all((["it", "en"] as Lang[]).map((l) => c?.delete(DIGEST_CACHE(l))));
+	}
+	if (Array.isArray(b.hidden)) {
+		const known = new Set<string>(SITE_KEYS);
+		const hidden = [...new Set(b.hidden.filter((x): x is string => typeof x === "string" && known.has(x)))];
+		await kvSet(env, "site_hidden", JSON.stringify(hidden));
+		await edgeCache()?.delete(SITE_CACHE());
+	}
+	return json({ hidden: await loadHidden(env) });
+}
+
+const digestSystem = (lang: Lang) =>
+	`Scrivi per il portfolio di Salvatore D'Amico un breve riassunto, in prima persona, di ciò su cui ha lavorato di recente, in ${lang === "it" ? "italiano" : "English"}.
+Massimo 3 frasi, tono semplice e caldo, niente elenchi, niente emoji. Usa SOLO i dati forniti: nomi di repository, linguaggi, numero di contributi, date. Non inventare risultati, clienti o funzionalità. I repository privati non hanno nome: non citarli per nome.`;
+
+async function digest(req: Request, env: Env, ctx: Ctx, lang: Lang) {
+	const cache = edgeCache();
+	const hit = await cache?.match(DIGEST_CACHE(lang));
+	if (hit) {
+		const text = await hit.text();
+		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text));
+	}
+	let g: { contributions?: number; languages?: { name: string; count: number }[]; recent?: { name: string; language: string; pushedAt: string }[]; privateRepos?: number; calendar?: number[][] };
+	try {
+		const r = await github(new Request("https://cache.fr7.local/internal"), env, ctx);
+		if (!r.ok) return json({ error: "github_unavailable" }, 502);
+		g = (await r.json()) as typeof g;
+	} catch {
+		return json({ error: "github_unavailable" }, 502);
+	}
+	const recent = (g.recent ?? []).slice(0, 4).map((x) => ({ name: x.name, language: x.language, pushedAt: x.pushedAt.slice(0, 10) }));
+	const facts = {
+		contributions: g.contributions ?? null,
+		languages: (g.languages ?? []).slice(0, 3).map((l) => l.name),
+		recent,
+		weeks: (g.calendar ?? []).slice(-12).map((w) => w.reduce((a, b) => a + b, 0)),
+	};
+	let text: string | null = null;
+	if (env.AI && (recent.length || facts.contributions)) {
+		try {
+			const out = (await runAi(env, {
+				messages: [
+					{ role: "system", content: digestSystem(lang) },
+					{ role: "user", content: `Dati di oggi (${today()}):\n${JSON.stringify({ ...facts, privateRepos: g.privateRepos ?? 0 })}` },
+				],
+				max_tokens: 220,
+				temperature: 0.4,
+			})) as { response?: unknown };
+			const r = typeof out?.response === "string" ? out.response.replace(/\s+/g, " ").trim() : "";
+			if (r.length >= 20 && r.length <= 700) text = r;
+		} catch {
+			text = null;
+		}
+	}
+	const payload = JSON.stringify({ text, facts, at: new Date().toISOString() });
+	const etag = etagOf(JSON.stringify({ text, facts }));
+	// senza testo si riprova prima (10 minuti); con il testo si tiene un'ora
+	if (cache) ctx.waitUntil(cache.put(DIGEST_CACHE(lang), new Response(payload, { headers: { ...JSON_HEADERS, etag, "cache-control": `public, max-age=${text ? 3600 : 600}` } })));
+	return cacheable(req, payload, etag);
+}
+
 /** Richieste: archivia (si nascondono ma restano), ripristina o elimina per sempre. Fino a 100 per volta. */
 async function adminBriefAction(req: Request, env: Env) {
 	if (!env.ADMIN_TOKEN) return json({ error: "no_admin_token" }, 404);
@@ -1010,6 +1112,15 @@ export default {
 					if (!post) return json({ error: "method" }, 405);
 					if (limited(`plan:${who}`, 5, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await plan(req, env);
+				case "/api/site":
+					return req.method === "GET" ? await publicSite(req, env, ctx) : json({ error: "method" }, 405);
+				case "/api/digest":
+					if (req.method !== "GET") return json({ error: "method" }, 405);
+					if (limited(`digest:${who}`, 20, 60_000)) return json({ error: "rate_limited" }, 429);
+					return await digest(req, env, ctx, url.searchParams.get("lang") === "en" ? "en" : "it");
+				case "/api/admin/site":
+					if (limited(`admin:${who}`, 60, 60_000)) return json({ error: "rate_limited" }, 429);
+					return await adminSite(req, env);
 				case "/api/fit":
 					if (!post) return json({ error: "method" }, 405);
 					if (limited(`fit:${who}`, 5, 60_000)) return json({ error: "rate_limited" }, 429);

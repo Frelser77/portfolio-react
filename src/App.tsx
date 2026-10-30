@@ -23,9 +23,11 @@ import { initLiquidGlass } from "./liquid";
 import { match, usePath, useRouteFocus } from "./router";
 import { usePrefs } from "./prefs";
 import { ui } from "./content/ui";
+import { useShown } from "./siteFlags";
 
 function Page({ path }: { path: string }) {
 	const r = match(path);
+	const shown = useShown();
 	switch (r.name) {
 		case "home":
 			return <Home />;
@@ -37,7 +39,7 @@ function Page({ path }: { path: string }) {
 			return (
 				<>
 					<Skills cards={false} between={<Ecosystem />} />
-					<GithubLive />
+					{shown("stack.github") && <GithubLive />}
 				</>
 			);
 		case "lab":
@@ -57,6 +59,7 @@ export default function App() {
 	const { t, lang } = usePrefs();
 	const path = usePath();
 	const r = match(path);
+	const shown = useShown();
 	usePointerFx();
 	useEffect(() => initLiquidGlass(), []);
 	useReveal(path);
@@ -90,8 +93,8 @@ export default function App() {
 				<Footer />
 			</div>
 			<Dock />
-			<AvailableBar />
-			<Guide />
+			{shown("ui.hire") && <AvailableBar />}
+			{shown("ui.dog") && <Guide />}
 			<AchievementToasts />
 		</div>
 	);

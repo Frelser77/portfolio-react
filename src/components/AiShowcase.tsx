@@ -5,6 +5,7 @@ import { usePrefs } from "../prefs";
 import { Link } from "../router";
 import Chat from "./Chat";
 import FitCheck from "./FitCheck";
+import { useShown } from "../siteFlags";
 import Planner from "./Planner";
 
 type Tab = (typeof uiAi.tabs)[number]["id"];
@@ -12,8 +13,12 @@ type Tab = (typeof uiAi.tabs)[number]["id"];
 /** Home: l'AI non è nascosta in una pagina a parte, si prova subito, qui. */
 export default function AiShowcase() {
 	const { t } = usePrefs();
-	const [tab, setTab] = useState<Tab>("fit");
-	const cur = uiAi.tabs.find((x) => x.id === tab)!;
+	const shown = useShown();
+	const tabs = uiAi.tabs.filter((x) => shown(`home.ai.${x.id}`));
+	const [tab0, setTab] = useState<Tab>("fit");
+	if (!tabs.length) return null;
+	const tab = tabs.some((x) => x.id === tab0) ? tab0 : tabs[0].id;
+	const cur = tabs.find((x) => x.id === tab)!;
 	return (
 		<section className="sec aishow" id="ai" aria-labelledby="ai-title">
 			<div className="card">
@@ -31,7 +36,7 @@ export default function AiShowcase() {
 					))}
 				</ul>
 				<div className="tabs glass aishow__tabs" role="tablist" aria-label={t(uiAi.eyebrow)} data-lg-bezel="18">
-					{uiAi.tabs.map((x) => (
+					{tabs.map((x) => (
 						<button
 							key={x.id}
 							type="button"
@@ -43,7 +48,7 @@ export default function AiShowcase() {
 							onClick={() => setTab(x.id)}
 							onKeyDown={(e) => {
 								if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-								const ids = uiAi.tabs.map((y) => y.id);
+								const ids = tabs.map((y) => y.id);
 								const n = ids[(ids.indexOf(tab) + (e.key === "ArrowRight" ? 1 : ids.length - 1)) % ids.length];
 								setTab(n);
 								document.getElementById(`ai-tab-${n}`)?.focus();
