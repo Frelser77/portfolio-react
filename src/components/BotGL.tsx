@@ -11,6 +11,7 @@ export interface Pose {
 	waving: boolean;
 	spinAt: number; // istante (ms) dell'ultima piroetta
 	hopAt: number; // istante (ms) dell'ultimo saltello
+	mood?: "neutral" | "happy" | "curious" | "angry" | "sleepy";
 }
 
 const VERT = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
@@ -30,6 +31,7 @@ uniform float uWalk;  // 0..1
 uniform float uPhase; // fase del passo
 uniform float uWave;  // 0..1 zampa alzata + coda veloce
 uniform float uBlink; // 0..1
+uniform vec4 uMood;   // felice, curioso, arrabbiato, assonnato (0..1)
 
 mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
 float sdRB(vec3 p, vec3 b, float r){ vec3 q=abs(p)-b; return length(max(q,0.0))+min(max(q.x,max(q.y,q.z)),0.0)-r; }
@@ -99,15 +101,20 @@ vec2 map(vec3 p){
   head=un(head,vec2(sdEll(h-vec3(0.0,-0.042,0.425),vec3(0.05,0.04,0.034)),2.0)); // tartufo
   // occhi scuri e lucidi, con palpebra
   float sy=mix(1.0,0.1,uBlink);
+  sy=min(sy,mix(1.0,0.38,uMood.x));
+  sy=min(sy,mix(1.0,0.62,uMood.z));
+  sy=min(sy,mix(1.0,0.07,uMood.w));
+  sy=max(sy,0.0);
   vec3 e1=h-vec3(-0.07,0.045,0.12); e1.y/=sy;
   vec3 e2=h-vec3(0.07,0.045,0.12); e2.y/=sy;
   head=un(head,vec2(length(e1)-0.03,3.0));
   head=un(head,vec2(length(e2)-0.03,3.0));
   // arcata sopracciliare
   vec3 bw=vec3(abs(h.x)-0.07,h.y-0.085,h.z-0.12);
-  head.x=smin(head.x,sdEll(bw,vec3(0.04,0.018,0.04)),0.03);
+  bw.y+=uMood.z*(-0.8*bw.x+0.03)-uMood.y*0.02;
+  head.x=smin(head.x,sdEll(bw,vec3(0.04,0.018+0.012*uMood.z,0.04)),0.03);
   // orecchie lunghe, lisce, che cadono lungo la testa
-  float flap=sin(uPhase*2.0)*0.2*uWalk+sin(uT*1.7)*0.03+uWave*0.12;
+  float flap=sin(uPhase*2.0)*0.2*uWalk+sin(uT*1.7)*0.03+uWave*0.12-uMood.y*0.4+uMood.z*0.32+uMood.w*0.1;
   vec3 e=vec3(abs(h.x),h.y,h.z)-vec3(0.135,0.07,-0.01);
   e.xy=rot(-0.12-flap)*e.xy;
   e.yz=rot(0.12)*e.yz;
@@ -115,7 +122,7 @@ vec2 map(vec3 p){
   head.x=smin(head.x,ear,0.03);
   r=un(r,head);
   // coda sottile che scodinzola
-  float wag=sin(uT*(5.0+uWalk*5.0+uWave*8.0))*(0.06+0.12*uWave+0.04*uWalk);
+  float wag=sin(uT*(5.0+uWalk*5.0+uWave*8.0+uMood.x*9.0))*(0.06+0.12*uWave+0.04*uWalk+0.14*uMood.x+0.05*uMood.y)*(1.0-0.85*uMood.z-0.7*uMood.w);
   vec3 t=b-vec3(0.0,0.03,-0.7);
   vec3 m1=vec3(wag*0.5,0.04,-0.2);
   vec3 m2=vec3(wag,0.13,-0.42);
@@ -262,11 +269,11 @@ export default function BotGL({ pose, onFail }: { pose: React.MutableRefObject<P
 		gl.enableVertexAttribArray(loc);
 		gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 		const u = (n: string) => gl.getUniformLocation(prog, n);
-		const U = { res: u("uRes"), t: u("uT"), head: u("uHead"), body: u("uBody"), bob: u("uBob"), walk: u("uWalk"), phase: u("uPhase"), wave: u("uWave"), blink: u("uBlink") };
+		const U = { res: u("uRes"), t: u("uT"), head: u("uHead"), body: u("uBody"), bob: u("uBob"), walk: u("uWalk"), phase: u("uPhase"), wave: u("uWave"), blink: u("uBlink"), mood: u("uMood") };
 
 		const calm = prefersReducedMotion();
 		const small = window.innerWidth < 720;
-		const s = { hx: 0, hy: 0, body: -0.85, walk: 0, wave: 0, phase: 0, nextBlink: 2, blinkT: -1 };
+		const s = { hx: 0, hy: 0, body: -0.85, walk: 0, wave: 0, phase: 0, nextBlink: 2, blinkT: -1, m: [0, 0, 0, 0], ty: 0 };
 
 		const resize = () => {
 			const dpr = Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2);
@@ -303,7 +310,7 @@ export default function BotGL({ pose, onFail }: { pose: React.MutableRefObject<P
 			const P = pose.current;
 			const k = 1 - Math.exp(-d * 9);
 			s.hy += (-clamp(P.lx, -1, 1) * 0.8 - s.hy) * k;
-			s.hx += (-clamp(P.ly, -1, 1) * 0.4 - s.hx) * k;
+			s.hx += (-clamp(P.ly, -1, 1) * 0.4 + s.m[1] * -0.12 + s.m[3] * 0.32 - s.m[0] * 0.1 - s.hx) * k;
 			const spin = (now - P.spinAt) / 900;
 			const spinAdd = spin >= 0 && spin < 1 ? (1 - Math.pow(1 - spin, 3)) * Math.PI * 2 : 0;
 			const bodyT = (P.walking ? -P.dir * 1.4 : -P.face * 0.85 - P.lx * 0.15) + spinAdd;
@@ -325,7 +332,7 @@ export default function BotGL({ pose, onFail }: { pose: React.MutableRefObject<P
 			}
 			const hp = (now - P.hopAt) / 520;
 			const hop = (spin >= 0 && spin < 0.6 ? Math.sin((spin / 0.6) * Math.PI) * 0.22 : 0) + (hp >= 0 && hp < 1 ? Math.sin(hp * Math.PI) * 0.12 : 0);
-			const bob = (calm ? 0 : Math.sin(tt * 2.1) * 0.012) + Math.abs(Math.sin(s.phase)) * 0.035 * s.walk + hop;
+			const bob = (calm ? 0 : Math.sin(tt * (2.1 - s.m[3] * 1.3)) * (0.012 + s.m[0] * 0.012) - s.m[3] * 0.025) + Math.abs(Math.sin(s.phase)) * 0.035 * s.walk + hop;
 
 			gl.clearColor(0, 0, 0, 0);
 			gl.clear(gl.COLOR_BUFFER_BIT);
@@ -337,6 +344,10 @@ export default function BotGL({ pose, onFail }: { pose: React.MutableRefObject<P
 			gl.uniform1f(U.walk, s.walk);
 			gl.uniform1f(U.phase, s.phase);
 			gl.uniform1f(U.wave, s.wave);
+			const want = P.mood ?? "neutral";
+			const mk = 1 - Math.exp(-d * (want === "angry" ? 10 : 5));
+			(["happy", "curious", "angry", "sleepy"] as const).forEach((n, i) => (s.m[i] += ((want === n ? 1 : 0) - s.m[i]) * mk));
+			gl.uniform4f(U.mood, s.m[0], s.m[1], s.m[2], s.m[3]);
 			gl.uniform1f(U.blink, blink);
 			gl.drawArrays(gl.TRIANGLES, 0, 3);
 		};

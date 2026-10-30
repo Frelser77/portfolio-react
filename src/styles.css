@@ -5031,3 +5031,12 @@ html.noscroll, html.noscroll body { overflow: hidden; }
 @keyframes heroin { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
 .need:nth-last-child(2) { grid-column: span 2; }
 @media (max-width: 720px) { .need.need--wide { min-height: 0; padding-block: 14px; } }
+
+/* cambio progetto con lo swipe: la scheda entra dal lato da cui è arrivato il dito */
+@media (prefers-reduced-motion: no-preference) {
+	.ppage.slide-next { animation: slidenext .42s cubic-bezier(.2,.8,.2,1) both; }
+	.ppage.slide-prev { animation: slideprev .42s cubic-bezier(.2,.8,.2,1) both; }
+}
+@keyframes slidenext { from { opacity: 0; transform: translateX(46px) } to { opacity: 1; transform: none } }
+@keyframes slideprev { from { opacity: 0; transform: translateX(-46px) } to { opacity: 1; transform: none } }
+.lbx__view { touch-action: pan-y pinch-zoom; }

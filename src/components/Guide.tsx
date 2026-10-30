@@ -106,13 +106,59 @@ export default function Guide() {
 
 	const [glOk, setGlOk] = useState(true);
 	const fail = useCallback(() => setGlOk(false), []);
-	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, face: -1, waving: false, spinAt: -1e9, hopAt: -1e9 });
+	const pose = useRef<Pose>({ lx: 0, ly: 0, walking: false, dir: 1, face: -1, waving: false, spinAt: -1e9, hopAt: -1e9, mood: "neutral" });
 	const root = useRef<HTMLDivElement>(null);
 	const bot = useRef<HTMLDivElement>(null);
 	const quiet = useRef(false);
 	const sayTimer = useRef(0);
 	const prevSide = useRef<"l" | "r">(SIDE["/"]);
+	const feelRef = useRef<(m: NonNullable<Pose["mood"]>, ms?: number) => void>(() => {});
 	const calmTimer = useRef(0);
+	/** Umore: uno stato di base (arrabbiato / assonnato) e reazioni brevi (felice, curioso). */
+	const moodTimer = useRef(0);
+	const tempMood = useRef<Pose["mood"] | null>(null);
+	const sleepy = useRef(false);
+	const applyMood = () => {
+		pose.current.mood = angryRef.current ? "angry" : (tempMood.current ?? (sleepy.current ? "sleepy" : "neutral"));
+	};
+	const feel = (m: NonNullable<Pose["mood"]>, ms = 2400) => {
+		tempMood.current = m;
+		applyMood();
+		clearTimeout(moodTimer.current);
+		moodTimer.current = window.setTimeout(() => {
+			tempMood.current = null;
+			applyMood();
+		}, ms);
+	};
+	feelRef.current = feel;
+	useEffect(() => {
+		applyMood();
+	});
+	// dopo un po' senza che nessuno tocchi niente si assopisce; qualsiasi gesto lo sveglia
+	useEffect(() => {
+		let idle = 0;
+		const arm = () => {
+			clearTimeout(idle);
+			if (sleepy.current) {
+				sleepy.current = false;
+				applyMood();
+				if (!prefersReducedMotion()) feel("curious", 1800);
+			}
+			idle = window.setTimeout(() => {
+				if (document.hidden || busyRef.current) return arm();
+				sleepy.current = true;
+				applyMood();
+			}, 55_000);
+		};
+		arm();
+		const ev = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+		ev.forEach((e) => window.addEventListener(e, arm, { passive: true }));
+		return () => {
+			clearTimeout(idle);
+			clearTimeout(moodTimer.current);
+			ev.forEach((e) => window.removeEventListener(e, arm));
+		};
+	}, []);
 	useEffect(() => () => clearTimeout(calmTimer.current), []);
 	const timers = useRef<number[]>([]);
 	const later = (fn: () => void, ms: number) => {
@@ -135,6 +181,7 @@ export default function Guide() {
 		clearTimers();
 		setTip(0);
 		setSaid(null);
+		feel("curious", 1600);
 		const changed = prevSide.current !== side;
 		const calm = prefersReducedMotion();
 		if (changed && !calm && !posRef.current) {
@@ -148,6 +195,7 @@ export default function Guide() {
 		later(() => {
 			if (!calm) {
 				setWave(true);
+				feel("happy", 2000);
 				later(() => setWave(false), 1700);
 			}
 			const phone = window.innerWidth < 720;
@@ -331,6 +379,7 @@ export default function Guide() {
 				setWave(true);
 				window.setTimeout(() => setWave(false), 1400);
 			}
+			feelRef.current("happy", 2600);
 		};
 		window.addEventListener("guide:say", onSay);
 		return () => window.removeEventListener("guide:say", onSay);
@@ -361,6 +410,7 @@ export default function Guide() {
 	};
 	const hop = () => {
 		if (!prefersReducedMotion()) pose.current.spinAt = performance.now();
+		feel("happy", 2200);
 	};
 
 	/** Ogni volta che lo "butti fuori" (lo nascondi o lo lanci): alla terza, in pochi minuti, si arrabbia. */
@@ -548,6 +598,7 @@ export default function Guide() {
 		}
 		if (mode === "open" && show) setTip((n) => n + 1);
 		else openBubble();
+		feel("happy", 2400);
 		if (!prefersReducedMotion()) {
 			setSpin(true);
 			later(() => setSpin(false), 900);

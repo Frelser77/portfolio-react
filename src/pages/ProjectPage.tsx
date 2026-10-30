@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiArrowRight, FiArrowUpRight, FiHeart, FiUsers } from "react-icons/fi";
 import { projects, statusLabel } from "../content/data";
 import { ui } from "../content/ui";
@@ -13,6 +13,10 @@ import { useProjects } from "../projectOrder";
 import Shots from "../components/Shots";
 import LivePreview from "../components/LivePreview";
 import NotFound from "./NotFound";
+import { navigate } from "../router";
+
+/** direzione dell'ultimo cambio con lo swipe: serve all'animazione di entrata */
+let slideDir = 0;
 
 export default function ProjectPage({ id }: { id: string }) {
 	const { t } = usePrefs();
@@ -32,6 +36,31 @@ export default function ProjectPage({ id }: { id: string }) {
 		setLiked(stats.liked.includes(p.id));
 	}, [stats, p]);
 
+	// swipe orizzontale su telefono: progetto precedente / successivo (non sulle cose che scorrono da sole)
+	const sw = useRef<{ x: number; y: number; ok: boolean } | null>(null);
+	const onTouchStart = (e: React.TouchEvent) => {
+		const el = e.target as HTMLElement;
+		const t0 = e.touches[0];
+		sw.current = { x: t0.clientX, y: t0.clientY, ok: e.touches.length === 1 && !el.closest(".shots, .stories, .lbx, .lp, .scrollrow, input, textarea, iframe, [data-noswipe]") };
+	};
+	const onTouchEnd = (e: React.TouchEvent) => {
+		const s0 = sw.current;
+		sw.current = null;
+		if (!s0?.ok) return;
+		const t1 = e.changedTouches[0];
+		const dx = t1.clientX - s0.x;
+		const dy = t1.clientY - s0.y;
+		if (Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2.2) return;
+		const n = ordered[index + (dx < 0 ? 1 : -1)];
+		if (!n) return;
+		slideDir = dx < 0 ? 1 : -1;
+		navigate(`/progetti/${n.id}`);
+	};
+	const enter = slideDir;
+	useEffect(() => {
+		slideDir = 0;
+	}, [id]);
+
 	if (!p) return <NotFound />;
 
 	const like = async () => {
@@ -43,9 +72,9 @@ export default function ProjectPage({ id }: { id: string }) {
 	};
 
 	return (
-		<section className="sec" aria-labelledby="project-title">
+		<section className="sec" aria-labelledby="project-title" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
 			<ProjectStories list={ordered} current={p.id} />
-			<div className="card ppage glass" data-lg-bezel="30">
+			<div key={p.id} className={`card ppage glass${enter ? (enter > 0 ? " slide-next" : " slide-prev") : ""}`} data-lg-bezel="30">
 				<div className="dlg__head">
 					<div>
 						<p className="eyebrow">

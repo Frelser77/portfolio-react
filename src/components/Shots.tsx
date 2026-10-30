@@ -19,6 +19,7 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 	const [zoom, setZoom] = useState(false);
 	const opener = useRef<HTMLElement | null>(null);
 	const closeBtn = useRef<HTMLButtonElement>(null);
+	const swipe = useRef<{ x: number; y: number } | null>(null);
 
 	const go = useCallback(
 		(n: number) => {
@@ -119,7 +120,23 @@ export default function Shots({ shots, portrait = false }: { shots: Shot[]; port
 							<FiX aria-hidden="true" />
 						</button>
 					</div>
-					<div className={`lbx__view${zoom ? " zoomed" : ""}`} onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+					<div
+						className={`lbx__view${zoom ? " zoomed" : ""}`}
+						onTouchStart={(e) => {
+							const q = e.touches[0];
+							swipe.current = e.touches.length === 1 && !zoom ? { x: q.clientX, y: q.clientY } : null;
+						}}
+						onTouchEnd={(e) => {
+							const s0 = swipe.current;
+							swipe.current = null;
+							if (!s0 || shots.length < 2) return;
+							const q = e.changedTouches[0];
+							const dx = q.clientX - s0.x;
+							const dy = q.clientY - s0.y;
+							if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6) go(i + (dx < 0 ? 1 : -1));
+							else if (dy > 110 && Math.abs(dy) > Math.abs(dx) * 1.6) setOpen(false);
+						}}
+						onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
 						<img src={cur.src} alt={t(cur.alt)} width={cur.w} height={cur.h} draggable={false} onClick={() => setZoom((z) => !z)} style={zoom ? { width: cur.w } : undefined} />
 					</div>
 					<div className="lbx__foot">
