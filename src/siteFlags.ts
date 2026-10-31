@@ -8,13 +8,26 @@ let hidden: string[] = [];
 let started = false;
 const valid = (o: unknown): o is { hidden: string[] } => !!o && Array.isArray((o as { hidden?: unknown }).hidden);
 
+/** Mostra subito l'ultimo stato visto e chiede sempre al Worker se è cambiato (304 se no). */
+let busy = false;
+const refresh = () => {
+	if (busy) return;
+	busy = true;
+	void swr<{ hidden: string[] }>("fr7-site", "/api/site", 0, (o) => {
+		hidden = o.hidden;
+		listeners.forEach((l) => l(hidden));
+	}, valid).finally(() => {
+		busy = false;
+	});
+};
 const start = () => {
 	if (started || typeof window === "undefined") return;
 	started = true;
-	void swr<{ hidden: string[] }>("fr7-site", "/api/site", 60_000, (o) => {
-		hidden = o.hidden;
-		listeners.forEach((l) => l(hidden));
-	}, valid);
+	refresh();
+	// tornando sulla scheda o sull'app si ricontrolla: una modifica fatta dall'admin altrove si vede subito
+	document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && refresh());
+	window.addEventListener("focus", refresh);
+	window.addEventListener("pageshow", (e) => (e as PageTransitionEvent).persisted && refresh());
 };
 start();
 

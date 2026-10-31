@@ -62,9 +62,12 @@ function etagOf(text: string) {
 	return `"${(h >>> 0).toString(36)}-${text.length.toString(36)}"`;
 }
 
-/** Risposta pubblica cacheable: il browser la riusa 5 minuti, poi chiede solo se è cambiata (304). */
+/**
+ * Risposta pubblica cacheable: il browser la riusa `maxAge` secondi, poi chiede solo se è cambiata (304).
+ * Con maxAge 0 (dati che decide l'admin: interruttori, ordine dei progetti) il browser chiede sempre e non usa mai una copia vecchia.
+ */
 function cacheable(req: Request, text: string, etag: string, maxAge = 300) {
-	const headers = { ...JSON_HEADERS, etag, "cache-control": `public, max-age=${maxAge}, stale-while-revalidate=86400` };
+	const headers = { ...JSON_HEADERS, etag, "cache-control": maxAge > 0 ? `public, max-age=${maxAge}, stale-while-revalidate=86400` : "no-cache" };
 	if (req.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers });
 	return new Response(text, { status: 200, headers });
 }
@@ -945,13 +948,14 @@ async function publicProjects(req: Request, env: Env, ctx: Ctx) {
 	const hit = await cache?.match(PROJECTS_KEY());
 	if (hit) {
 		const text = await hit.text();
-		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text));
+		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text), 0);
 	}
 	const rows = await loadProjectOrder(env);
 	const text = JSON.stringify({ order: rows.map((r) => r.id), hidden: rows.filter((r) => r.hidden).map((r) => r.id) });
 	const etag = etagOf(text);
-	if (cache) ctx.waitUntil(cache.put(PROJECTS_KEY(), new Response(text, { headers: { ...JSON_HEADERS, etag, "cache-control": "public, max-age=3600" } })));
-	return cacheable(req, text, etag);
+	// copia nel data center per un minuto al massimo: lo svuotamento al salvataggio vale solo per il data center dell'admin
+	if (cache) ctx.waitUntil(cache.put(PROJECTS_KEY(), new Response(text, { headers: { ...JSON_HEADERS, etag, "cache-control": "public, max-age=60" } })));
+	return cacheable(req, text, etag, 0);
 }
 
 async function adminProjects(req: Request, env: Env) {
@@ -973,7 +977,6 @@ async function adminProjects(req: Request, env: Env) {
 
 /* ------------------------------ Interruttori del sito e riassunto AI ------------------------------ */
 
-const SITE_CACHE = () => new Request("https://cache.fr7.local/site-flags-v1");
 const DIGEST_CACHE = (lang: Lang) => new Request(`https://cache.fr7.local/digest-v3-${lang}`);
 
 /** Le cose nascoste: per default è tutto visibile, quindi si salva solo ciò che si nasconde. */
@@ -986,17 +989,10 @@ async function loadHidden(env: Env): Promise<string[]> {
 	}
 }
 
-async function publicSite(req: Request, env: Env, ctx: Ctx) {
-	const cache = edgeCache();
-	const hit = await cache?.match(SITE_CACHE());
-	if (hit) {
-		const text = await hit.text();
-		return cacheable(req, text, hit.headers.get("etag") ?? etagOf(text), 30);
-	}
+async function publicSite(req: Request, env: Env) {
+	// letto ogni volta da D1 (una riga): la cache per data center non si svuoterebbe ovunque quando cambi un interruttore
 	const text = JSON.stringify({ hidden: await loadHidden(env) });
-	const etag = etagOf(text);
-	if (cache) ctx.waitUntil(cache.put(SITE_CACHE(), new Response(text, { headers: { ...JSON_HEADERS, etag, "cache-control": "public, max-age=3600" } })));
-	return cacheable(req, text, etag, 30);
+	return cacheable(req, text, etagOf(text), 0);
 }
 
 async function adminSite(req: Request, env: Env) {
@@ -1015,7 +1011,6 @@ async function adminSite(req: Request, env: Env) {
 		const known = new Set<string>(SITE_KEYS);
 		const hidden = [...new Set(b.hidden.filter((x): x is string => typeof x === "string" && known.has(x)))];
 		await kvSet(env, "site_hidden", JSON.stringify(hidden));
-		await edgeCache()?.delete(SITE_CACHE());
 	}
 	return json({ hidden: await loadHidden(env) });
 }
@@ -1166,7 +1161,7 @@ export default {
 					if (limited(`plan:${who}`, 5, 60_000)) return json({ error: "rate_limited" }, 429);
 					return await plan(req, env);
 				case "/api/site":
-					return req.method === "GET" ? await publicSite(req, env, ctx) : json({ error: "method" }, 405);
+					return req.method === "GET" ? await publicSite(req, env) : json({ error: "method" }, 405);
 				case "/api/digest":
 					if (req.method !== "GET") return json({ error: "method" }, 405);
 					if (limited(`digest:${who}`, 20, 60_000)) return json({ error: "rate_limited" }, 429);

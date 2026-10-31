@@ -17,7 +17,7 @@ const valid = (o: unknown): o is OrderInfo => !!o && Array.isArray((o as OrderIn
 const start = () => {
 	if (started || typeof window === "undefined") return;
 	started = true;
-	void swr<OrderInfo>("fr7-order", "/api/projects", 3 * 60_000, (o) => {
+	void swr<OrderInfo>("fr7-order", "/api/projects", 30_000, (o) => {
 		cache = o;
 		listeners.forEach((l) => l(o));
 	}, valid);

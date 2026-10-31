@@ -31,7 +31,8 @@ export async function swr<T>(key: string, url: string, ttl: number, onData: (d: 
 	try {
 		const ctl = new AbortController();
 		const timer = setTimeout(() => ctl.abort(), 12000);
-		const res = await fetch(url, { headers: rec?.etag ? { "if-none-match": rec.etag } : undefined, signal: ctl.signal });
+		// "no-store": l'ETag lo gestiamo noi; la cache HTTP del browser non deve rispondere con una copia vecchia
+		const res = await fetch(url, { headers: rec?.etag ? { "if-none-match": rec.etag } : undefined, signal: ctl.signal, cache: "no-store" });
 		clearTimeout(timer);
 		if (res.status === 304 && rec) {
 			save({ ...rec, t: Date.now() });

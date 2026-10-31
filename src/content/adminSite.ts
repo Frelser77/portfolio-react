@@ -32,7 +32,6 @@ export const siteSwitches: { group: L; items: { key: SiteKey; label: L; hint: L 
 		group: { it: "Interfaccia", en: "Interface" },
 		items: [
 			{ key: "ui.dog", label: { it: "Il cane (FR7 Bot)", en: "The dog (FR7 Bot)" }, hint: { it: "La guida animata che ti segue", en: "The animated guide that follows you" } },
-			{ key: "ui.hire", label: { it: "Barra «Disponibile · Scrivimi»", en: "“Available · Write me” bar" }, hint: { it: "In basso a sinistra", en: "Bottom left" } },
 		],
 	},
 ];
